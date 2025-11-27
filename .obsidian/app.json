@@ -1,1 +1,4 @@
-{}
+{
+  "useMarkdownLinks": true,
+  "newLinkFormat": "relative"
+}
