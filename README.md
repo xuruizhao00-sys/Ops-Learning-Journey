@@ -1,16 +1,25 @@
 Ops Learning Journey 🌟
 Documenting the entire process of Linux operations from beginner to proficient, covering command line, service operations, automation tool usage, etc. Each note includes practical steps and troubleshooting records.
+
 📖 仓库介绍
 这是一个记录 Linux 运维从入门到熟练 的学习笔记仓库，聚焦「理论 + 实操」，每篇笔记均包含详细操作步骤、效果验证方法及实战踩坑记录，适合：
+
 运维初学者入门参考
+
 在职运维工程师补充知识点
+
 想转型运维的技术爱好者系统学习
+
 笔记将持续更新，内容涵盖基础命令、服务部署、自动化工具、集群搭建等核心运维场景，力求简洁易懂、可直接复用。
+
 
 🚀 使用说明
 克隆仓库到本地：
+
 git clone https://github.com/xuruizhao00-sys/Ops-Learning-Journey.git
+
 cd Ops-Learning-Journey
+
 
 阅读笔记：按目录结构查找对应知识点，笔记以 Markdown 格式编写，支持直接在 GitHub 上预览或本地用 Typora、VS Code 等工具打开。
 实操验证：每篇笔记的「实操步骤」可直接复制到 Linux 终端执行，建议在测试环境（如虚拟机、Docker 容器）验证后再应用到生产环境，避免数据风险。
@@ -41,8 +50,10 @@ Linux 运维实战：菜鸟教程 - Linux 教程
 📞 联系作者
 若有学习疑问、笔记建议，或想交流运维技术，可通过以下方式联系（优先推荐公开渠道，保护隐私）：
 GitHub：xuruizhao00-sys（优先回复，仓库 Issues 可同步问题给更多学习者参考）
+
 微信：LnxGuru（添加时请备注 “Linux 运维学习”，便于快速通过）
+
 邮箱：your-email@example.com（如：linux-ops-learning@xxx.com，用于私密沟通）
-技术社区：[你的知乎 / 掘金账号链接]（可选，若有公开技术分享账号可补充）
+
 📌 隐私提示：微信为私人社交账号，建议日常技术问题优先通过 GitHub Issues 沟通，既能同步经验给其他学习者，也能避免私人账号被过度打扰～🌟 欢迎 Star 收藏本仓库，你的支持是持续更新的动力！也欢迎关注我的学习进度，一起成长为资深运维工程师～
 
