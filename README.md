@@ -53,7 +53,7 @@ GitHub：xuruizhao00-sys（优先回复，仓库 Issues 可同步问题给更多
 
 微信：LnxGuru（添加时请备注 “Linux 运维学习”，便于快速通过）
 
-邮箱：your-email@example.com（如：linux-ops-learning@xxx.com，用于私密沟通）
+邮箱：xuruizhao00@gmail.com
 
 📌 隐私提示：微信为私人社交账号，建议日常技术问题优先通过 GitHub Issues 沟通，既能同步经验给其他学习者，也能避免私人账号被过度打扰～🌟 欢迎 Star 收藏本仓库，你的支持是持续更新的动力！也欢迎关注我的学习进度，一起成长为资深运维工程师～
 
