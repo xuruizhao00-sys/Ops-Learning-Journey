@@ -1,4 +1,5 @@
 {
   "baseFontSizeAction": true,
-  "accentColor": "#cd9213"
+  "accentColor": "#cd9213",
+  "interfaceFontFamily": "Lucida Console"
 }
