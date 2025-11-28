@@ -30,21 +30,34 @@ cd Ops-Learning-Journey
 
 📌 核心亮点
 实操导向：拒绝纯理论堆砌，所有知识点均附完整操作命令、参数说明及效果验证截图（部分复杂场景）
+
 踩坑记录：专门标注实战中遇到的典型问题（如依赖冲突、配置报错）及解决方案，帮你避开常见 “陷阱”
+
 持续更新：随学习进度与技术迭代补充内容（如新增 K8s 新版本特性、工具新功能），保持时效性
+
 结构清晰：按「基础→进阶→实战」分层设计目录，从命令行入门到高可用架构，形成完整学习路径
+
 🔗 学习资源
 书籍推荐：
 《Linux 鸟哥的私房菜（基础学习篇 + 服务器架设篇）》（入门首选）
+
 《Linux 系统管理员手册》（深入理解系统原理）
+
 《Kubernetes in Action》（容器编排进阶）
+
 在线教程：
 Kubernetes 官方文档：Kubernetes Documentation
+
 Linux 运维实战：菜鸟教程 - Linux 教程
+
 工具推荐：
+
 远程连接：Xshell、FinalShell
+
 笔记编辑：Typora、VS Code（Markdown 插件）
+
 接口测试：Postman、curl（命令行）
+
 虚拟机：VMware Workstation、VirtualBox（测试环境搭建）
 
 📞 联系作者
