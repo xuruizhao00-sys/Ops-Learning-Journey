@@ -184,6 +184,7 @@ Redis 官网地址：https://redis.io/
 ### 1.1.4 单线程
 
 Redis 6.0 版本前一直是单线程方式处理用户的请求
+![](assets/redis/file-20251129112730417.png)
 
 单线程为何如此快?
 
@@ -199,10 +200,11 @@ Redis 6.0 版本前一直是单线程方式处理用户的请求
 注意事项:
 
 - 一次只运行一条命令 
-- 避免执行长(慢)命令:keys *, flushall, flushdb, slow lua script, mutil/exec, operate bigvalue(collection)
+- 避免执行长(慢)命令:keys \*, flushall, flushdb, slow lua script, mutil/exec, operate bigvalue(collection)
 - 其实不是单线程: 早期版本是单进程单线程,3.0 版本后实际还有其它的线程, 实现特定功能,如: fysnc file descriptor,close file descriptor
 
 ### 1.1.5 Redis 应用场景
+![](assets/redis/file-20251129112840047.png)
 
 - 缓存：缓存 RDBMS 中数据,比如网站的查询结果、商品信息、微博、新闻、消息
 - Session 共享：实现Web集群中的多服务器间的session共享
@@ -220,6 +222,11 @@ Redis 6.0 版本前一直是单线程方式处理用户的请求
 数据读操作流程
 
 ![image-20251013201732715](redis.assets/image-20251013201732715.png)
+
+### 1.1.7 缓存穿透,缓存击穿和缓存雪崩
+![](assets/redis/file-20251129112612468.png)
+#### 1.1.7.1 缓存穿透 Cache Penetration
+
 
 ## 1.2 Redis 安装
 
