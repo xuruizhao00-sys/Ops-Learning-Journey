@@ -828,7 +828,7 @@ root@prometheus-221:~ 15:59:13 # redis-cli -p 6380
 WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
 ```
 
-Tcp backlog 是指TCP的第三次握手服务器端收到客户端 ack 确认号之后到服务器用 Accept 函数处理请求前的队列长度，即全连接队列
+Tcp backlog 是指 TCP 的第三次握手服务器端收到客户端 ack 确认号之后到服务器用 Accept 函数处理请求前的队列长度，即全连接队列
 
 注意：Ubuntu22.04 默认值满足要求，不再有此告警
 
