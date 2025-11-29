@@ -830,6 +830,16 @@ WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net
 
 Tcp backlog 是指 TCP 的第三次握手服务器端收到客户端 ack 确认号之后到服务器用 Accept 函数处理请求前的队列长度，即全连接队列
 
+```bash
+# 半连接对列数量
+22:54:23 root@redis02:~# cat /proc/sys/net/ipv4/tcp_max_syn_backlog
+128
+# 全连接对列数量
+22:57:09 root@redis02:~# cat /proc/sys/net/core/somaxconn
+4096
+22:57:16 root@redis02:~#
+```
+
 注意：Ubuntu22.04 默认值满足要求，不再有此告警
 
 ```bash
