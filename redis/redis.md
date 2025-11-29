@@ -859,9 +859,9 @@ WARNING overcommit_memory is set to 0! Background save may fail under low memory
 ```
 
 ```shell
-root@prometheus-221:~ 16:01:44 # sysctl vm.overcommit_memory
+22:49:30 root@redis02:~# sysctl vm.overcommit_memory
 vm.overcommit_memory = 0
-root@prometheus-221:~ 16:03:11 #
+22:51:06 root@redis02:~#
 
 #修改
 #vim /etc/sysctl.conf
@@ -871,12 +871,12 @@ vm.overcommit_memory = 1  #新版只允许1，不支持2
 
 ##### 1.2.2.3.3 transparent hugepage
 
-```
+```bash
 WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
 警告：您在内核中启用了透明大页面（THP,不同于一般4k内存页,而为2M）支持。 这将在Redis中造成延迟和内存使用问题。 要解决此问题，请以root 用户身份运行命令“echo never> /sys/kernel/mm/transparent_hugepage/enabled”，并将其添加到您的/etc/rc.local中，以便在重启后保留设置。禁用THP后，必须重新启动
 ```
 
-注意：Ubuntu22.04 默认值满足要求，不再有此告警
+注意：Ubuntu22.04+ 默认值满足要求，不再有此告警
 
 范例: 
 
