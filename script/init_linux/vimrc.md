@@ -1,4 +1,4 @@
-```bash
+```vimrc
 " ==============================================================================
 " Vim Configuration for YAML + Shell Scripts
 " Core Features:
@@ -43,7 +43,7 @@ autocmd FileType yaml,yaml.ansible setlocal
 
 " 禁止 YAML 文件使用硬制表符（严格保证 Tab → Space）
 autocmd FileType yaml,yaml.ansible setlocal noexpandtab! " 覆盖全局，确保 Tab 转空格
-autocmd FileType yaml,yaml.ansible autocmd BufWritePre <buffer> :%s/\t/  /g " 保存时自动替换残留 Tab 为 2 空格
+autocmd FileType yaml,yaml.ansible autocmd BufWritePre <buffer> :%s/\t/  /ge " 保存时自动替换残留 Tab 为 2 空格
 
 " 额外优化：YAML 中按 Enter 直接从头开始（取消任何默认缩进）
 autocmd FileType yaml,yaml.ansible inoremap <CR> <CR><C-u>
