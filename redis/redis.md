@@ -523,7 +523,14 @@ Redis 源码包官方下载链接：
 http://download.redis.io/releases/
 
 #### 1.2.2.1 编译安装
+官方安装方法
+https://redis.io/docs/latest/operate/oss_and_stack/install/build-stack/ubuntu-noble/
 
+https://redis.io/docs/getting-started/installation/install-redis-from-source/
+8.x 编译说明
+https://redis.io/docs/latest/operate/oss_and_stack/install/build-stack/ubuntu-noble/
+
+范例：Ubuntu24.04 编译安装 redis-8.2.1/8.0.2
 ~~~bash
 root@node2-112:~ 15:38:29 # wget https://download.redis.io/releases/redis-7.0.0.tar.gz 
 root@node2-112:~ 15:46:06 # tar xf redis-7.0.0.tar.gz 
