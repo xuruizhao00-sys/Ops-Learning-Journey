@@ -379,7 +379,7 @@ EOF
   # SSH 优化（禁用 DNS 反向解析，加快连接速度）
   sed -i 's/^#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config 2>/dev/null || true
   sed -i 's/^UseDNS yes/UseDNS no/' /etc/ssh/sshd_config 2>/dev/null || true
-  systemctl restart sshd || true
+  systemctl restart ssh || true
   info "SSH 配置优化完成（禁用 DNS 反向解析）"
 
   # 启用 sysstat 系统监控（CentOS 需额外设置）
