@@ -588,7 +588,8 @@ root@prometheus-221:~ 15:51:53 #  cp redis.conf /apps/redis/etc/
 范例：Ubuntu24.04 编译安装 redis-8.2.1/8.0.2
 ```bash
 # 安装依赖
-apt install -y --no-install-recommends gcc make ca-certificates wget dpkg-dev g++ libc6-dev libssl-dev git cmake python3 python3-pip python3-venv python3-dev unzip rsync clang automake  autoconf libtool pkg-config libsystemd-dev
+22:11:29 root@redis02:~# apt install -y --no-install-recommends gcc make ca-certificates wget dpkg-dev g++ libc6-dev libssl-dev git cmake python3 python3-pip python3-venv python3-dev unzip rsync clang automake  autoconf libtool pkg-config libsystemd-dev
+
 # 下载源码包
 ```
 
