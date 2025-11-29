@@ -616,6 +616,14 @@ BUILD_TLS=no
 BUILD_WITH_MODULES=no
 INSTALL_RUST_TOOLCHAIN=no
 DISABLE_WERRORS=yes
+22:30:45 root@redis02:~/redis-8.2.1# export BUILD_TLS=no BUILD_WITH_MODULES=no INSTALL_RUST_TOOLCHAIN=no DISABLE_WERRORS=yes
+22:31:14 root@redis02:~/redis-8.2.1# env
+
+# 安装
+22:31:17 root@redis02:~/redis-8.2.1# make -j "$(nproc)" all
+
+
+# 验证
 
 ```
 
