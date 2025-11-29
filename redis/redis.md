@@ -529,7 +529,7 @@ https://redis.io/docs/latest/operate/oss_and_stack/install/build-stack/ubuntu-no
 https://redis.io/docs/getting-started/installation/install-redis-from-source/
 8.x 编译说明
 https://redis.io/docs/latest/operate/oss_and_stack/install/build-stack/ubuntu-noble/
-
+##### 1.2.2.1.1 源码编译安装过程
 范例：Ubuntu24.04 编译安装 redis-7.0.0
 ~~~bash
 # 下载源码
@@ -630,22 +630,76 @@ redis-cli 8.2.1
 22:39:20 root@redis02:~/redis-8.2.1#
 
 # 启动 redis
+22:44:29 root@redis02:~/redis-8.2.1# ./src/redis-server 
+14009:C 29 Nov 2025 22:49:04.194 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+14009:C 29 Nov 2025 22:49:04.195 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+14009:C 29 Nov 2025 22:49:04.195 * Redis version=8.2.1, bits=64, commit=00000000, modified=1, pid=14009, just started
+14009:C 29 Nov 2025 22:49:04.195 # Warning: no config file specified, using the default config. In order to specify a config file use ./src/redis-server /path/to/redis.conf
+14009:M 29 Nov 2025 22:49:04.197 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+14009:M 29 Nov 2025 22:49:04.197 * monotonic clock: POSIX clock_gettime
+                _._                                                  
+           _.-``__ ''-._                                             
+      _.-``    `.  `_.  ''-._           Redis Open Source            
+  .-`` .-```.  ```\/    _.,_ ''-._      8.2.1 (00000000/1) 64 bit
+ (    '      ,       .-`  | `,    )     Running in standalone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+ |    `-._   `._    /     _.-'    |     PID: 14009
+  `-._    `-._  `-./  _.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |           https://redis.io       
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |                                  
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+      `-._    `-.__.-'    _.-'                                       
+          `-._        _.-'                                           
+              `-.__.-'                                               
 
+14009:M 29 Nov 2025 22:49:04.205 * Server initialized
+14009:M 29 Nov 2025 22:49:04.205 * Ready to accept connections tcp
+
+
+22:49:23 root@redis02:~# ss -tunlp  |grep 6379
+tcp   LISTEN 0      511          0.0.0.0:6379      0.0.0.0:*    users:(("redis-server",pid=14009,fd=8))                
+tcp   LISTEN 0      511             [::]:6379         [::]:*    users:(("redis-server",pid=14009,fd=9))                
+22:49:30 root@redis02:~#
 ```
-##### 1.2.2.1.1 源码编译安装的参数含义
+##### 1.2.2.1.2 源码编译安装的参数含义
 |变量名|核心作用|详细说明与使用场景|
 |---|---|---|
 |`BUILD_TLS=yes`|启用 TLS/SSL 加密功能|- 让 Redis 支持加密连接（`redis-cli -tls`），保护数据传输安全（如跨网络访问场景）；<br><br>- 编译时会链接 OpenSSL 库（需提前安装 `libssl-dev`）；<br><br>- 生产环境必开（尤其是 Redis 暴露在公网或跨机房访问时），避免明文传输泄露数据。|
 |`BUILD_WITH_MODULES=yes`|编译并启用 Redis 模块系统（Module API）|- 允许 Redis 加载第三方扩展模块（如 RedisSearch、RedisJSON、RedisGraph 等）；<br><br>- 编译后 Redis 可通过 `loadmodule` 配置或命令动态加载模块，扩展核心功能（如全文检索、JSON 解析）；<br><br>- 开发 / 扩展场景推荐开启，纯基础缓存场景可关闭（减少编译体积）。|
 |`INSTALL_RUST_TOOLCHAIN=yes`|自动安装 Rust 工具链（用于编译 Redis 核心依赖或模块）|- Redis 从 7.0+ 开始，部分核心功能（如 `redis-stack` 相关模块、新数据结构优化）依赖 Rust 编译；<br><br>- 声明该变量后，编译脚本会自动下载、安装适配版本的 Rust 工具链（无需手动安装）；<br><br>- 依赖：需网络通畅（从 Rust 官方源下载），适合首次编译或无 Rust 环境的场景。|
 |`DISABLE_WERRORS=yes`|禁用「警告视为错误」的编译规则|- 默认情况下，Redis 编译会将所有编译器警告（`warning`）视为错误（`error`），导致编译中断；<br><br>- 声明该变量后，仅显示警告，不中断编译（适用于：系统依赖版本略高 / 略低、自定义编译参数导致的非致命警告）；<br><br>- 注意：仅用于临时规避警告问题，生产环境建议排查警告根源（避免潜在稳定性风险）。|
-##### 1.2.2.1.2 适用场景
+##### 1.2.2.1.3 相关参数适用场景
 | 变量组合                         | 适用场景                     |
 | ---------------------------- | ------------------------ |
 | 全部 `yes`                     | 生产环境（需 TLS 加密、模块扩展、兼容警告） |
 | `BUILD_TLS=yes` 仅开启          | 仅需加密连接（无模块需求）            |
 | `BUILD_WITH_MODULES=yes` 仅开启 | 需加载第三方模块（如 RedisJSON）    |
 | `DISABLE_WERRORS=yes` 仅开启    | 编译时出现非致命警告，需临时规避         |
+##### 1.2.2.1.4 `make -j "$(nproc)" all` 命令解析
+>这条命令是 **Redis 源码编译的高效执行命令**，核心作用是「多线程并行编译所有模块」，大幅缩短编译时间
+
+| 部分              | 作用与详细说明                                                                                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `make`          | 编译构建工具（读取 Redis 源码中的 `Makefile` 配置，执行编译流程）                                                                                                                                                       |
+| `-j "$(nproc)"` | 并行编译核心参数：<br><br>- `-j`（全称 `--jobs`）：指定编译时的并行线程数；<br><br>- `$(nproc)`：Linux 系统命令，动态获取当前服务器的 **CPU 核心数**（如 4 核服务器返回 `4`）；<br><br>- 组合效果：自动根据 CPU 核心数分配并行线程（4 核则同时启动 4 个编译任务），最大化利用 CPU 资源，缩短编译时间。 |
+| `all`           | Makefile 中的「目标（target）」：<br><br>- 表示编译 Redis 源码中的「所有模块」（包括 `redis-server`、`redis-cli`、`redis-benchmark` 等核心工具）；<br><br>- Redis 的 `Makefile` 默认目标就是 `all`，因此可省略不写（直接 `make -j "$(nproc)"` 效果相同）。  |
+
+```bash
+# `$(nproc)` 动态适配服务器 CPU 核心数，避免手动指定线程数（如 `-j 4`）导致的资源浪费或过载；
+22:44:17 root@redis02:~/redis-8.2.1# echo $(nproc)
+2
+22:44:29 root@redis02:~/redis-8.2.1# 
+```
+
+- 为什么需要使用 $(nproc) 而不使用固定数字？
+	- 固定数字（如 `-j 8`）：若服务器 CPU 核心数少于 8（如 4 核），会导致线程切换频繁，反而降低效率；若核心数多于 8（如 16 核），则未充分利用资源；
+	- `$(nproc)`：自动匹配硬件，无需手动修改，兼容性更强（如在虚拟机、物理机、云服务器上均可正常使用）。
+- 与之前提到的编译变量如何结合
+	- 若需启用 `BUILD_TLS=yes`、`BUILD_WITH_MODULES=yes` 等特性，需在 `make` 前声明变量
+			`make BUILD_TLS=yes BUILD_WITH_MODULES=yesINSTALL_RUST_TOOLCHAIN=yes -j "$(nproc)" all
 
 #### 1.2.2.2 前台启动 redis
 
@@ -797,7 +851,7 @@ WARNING overcommit_memory is set to 0! Background save may fail under low memory
 
 内核参数说明:
 
-```
+```ini
 内核参数 overcommit_memory 实现内存分配策略,可选值有三个：0、1、2
 0 表示内核将检查是否有足够的可用内存供应用进程使用；如果有足够的可用内存，内存申请允许；否则内存申请失败，并把错误返回给应用进程
 1 表示内核允许分配所有的物理内存，而不管当前的内存状态如何
