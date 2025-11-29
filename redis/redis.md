@@ -591,6 +591,11 @@ root@prometheus-221:~ 15:51:53 #  cp redis.conf /apps/redis/etc/
 22:11:29 root@redis02:~# apt install -y --no-install-recommends gcc make ca-certificates wget dpkg-dev g++ libc6-dev libssl-dev git cmake python3 python3-pip python3-venv python3-dev unzip rsync clang automake  autoconf libtool pkg-config libsystemd-dev
 
 # 下载源码包
+22:16:48 root@redis02:~# version=8.2.1
+22:18:32 root@redis02:~# wget -O redis-$version.tar.gz https://github.com/redis/redis/archive/refs/tags/$version.tar.gz
+
+# 解压源码包
+
 ```
 
 #### 1.2.2.2 前台启动 redis
