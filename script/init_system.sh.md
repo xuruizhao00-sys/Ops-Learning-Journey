@@ -159,6 +159,7 @@ disable_security_tools() {
     ubuntu)
       systemctl stop ufw || true
       systemctl disable ufw || true
+      systemctl disable 
       info "Ubuntu 防火墙 ufw 已关闭并禁用开机自启"
       ;;
     centos)
