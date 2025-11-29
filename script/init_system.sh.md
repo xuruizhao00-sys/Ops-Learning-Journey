@@ -20,6 +20,54 @@
     
     - 新增 `rsync`（文件同步）、`lrzsz`（文件上传下载）、`sysstat`（系统监控）等实用工具
     - 保留基础编译工具、网络工具、文本编辑工具
+### 新增功能详解（Ubuntu 自动更新关闭）：
+
+Ubuntu 22.04+ 默认启用 **自动更新 / 无人值守升级** 服务，会后台下载更新并可能自动重启，脚本通过 3 层彻底关闭：
+
+1. **停止并屏蔽核心服务**：
+    
+    - 关闭 `apt-daily`（日常更新检查）和 `apt-daily-upgrade`（系统升级）的服务 + 定时器
+    - 使用 `systemctl mask` 屏蔽服务，避免被其他进程意外激活
+2. **禁用自动更新配置文件**：
+    
+    - 备份原配置文件 `/etc/apt/apt.conf.d/20auto-upgrades`
+    - 写入禁用配置，设置自动更新、下载、清理的周期为 `0`（完全禁用）
+3. **卸载无人值守升级包**：
+    
+    - 移除 `unattended-upgrades` 包（该包是自动更新的核心依赖）
+    - 自动清理依赖包，避免残留
+
+### 验证 Ubuntu 自动更新是否关闭：
+
+执行脚本后，可通过以下命令验证效果：
+
+```bash
+# 1. 查看自动更新服务状态（应显示 inactive 且 masked）
+systemctl status apt-daily.service
+systemctl status unattended-upgrades.service
+
+# 2. 查看自动更新配置（应全部为 0）
+cat /etc/apt/apt.conf.d/20auto-upgrades
+
+# 3. 检查无人值守升级包是否已卸载
+dpkg -l | grep unattended-upgrades  # 无输出表示已卸载
+```
+
+### 手动更新方法（Ubuntu）：
+
+若后续需要手动更新系统，执行以下命令即可：
+
+```bash
+apt update -y  # 更新软件源索引
+apt upgrade -y  # 安装可用更新
+apt autoremove -y  # 清理无用依赖
+```
+
+### 注意事项：
+
+- 仅 Ubuntu 系统执行此功能，CentOS 无默认自动更新服务，脚本会自动跳过
+- 关闭自动更新后，需手动维护系统安全更新（生产环境建议定期手动执行更新）
+- 脚本保持原有兼容性，不影响 CentOS 系统的初始化逻辑
 
 ### 使用方法：
 
@@ -159,7 +207,6 @@ disable_security_tools() {
     ubuntu)
       systemctl stop ufw || true
       systemctl disable ufw || true
-      systemctl disable 
       info "Ubuntu 防火墙 ufw 已关闭并禁用开机自启"
       ;;
     centos)
@@ -344,6 +391,49 @@ EOF
   info "sysstat 系统监控已启用"
 }
 
+# 7. Ubuntu 关闭软件自动更新服务（新增功能）
+disable_ubuntu_auto_update() {
+  if [ $OS = "ubuntu" ]; then
+    info "开始关闭 Ubuntu 软件自动更新服务..."
+    
+    # 1. 停止并禁用自动更新核心服务
+    local auto_update_services=(
+      apt-daily.service        # 日常更新服务
+      apt-daily.timer          # 日常更新定时器
+      apt-daily-upgrade.service # 系统升级服务
+      apt-daily-upgrade.timer  # 系统升级定时器
+      unattended-upgrades.service # 无人值守升级服务
+    )
+    
+    for service in "${auto_update_services[@]}"; do
+      systemctl stop "$service" || true
+      systemctl disable "$service" || true
+      systemctl mask "$service" || true  # 禁止被其他服务激活
+    done
+    info "自动更新相关服务已停止、禁用并屏蔽"
+    
+    # 2. 禁用 unattended-upgrades 配置（避免自动触发更新）
+    if [ -f /etc/apt/apt.conf.d/20auto-upgrades ]; then
+      mv /etc/apt/apt.conf.d/20auto-upgrades /etc/apt/apt.conf.d/20auto-upgrades.bak || true
+      # 写入空配置彻底禁用
+      cat > /etc/apt/apt.conf.d/20auto-upgrades <<EOF
+APT::Periodic::Update-Package-Lists "0";
+APT::Periodic::Download-Upgradeable-Packages "0";
+APT::Periodic::AutocleanInterval "0";
+APT::Periodic::Unattended-Upgrade "0";
+EOF
+    fi
+    info "unattended-upgrades 自动更新配置已禁用"
+    
+    # 3. 卸载无人值守升级包（可选，保留备份方案）
+    apt remove -y unattended-upgrades || true
+    apt autoremove -y || true
+    info "Ubuntu 软件自动更新已完全关闭"
+  else
+    info "CentOS 无默认自动更新服务，跳过此步骤"
+  fi
+}
+
 # ==================== 主流程 ====================
 main() {
   info "===== 开始初始化系统（支持 Ubuntu 22.04+ / CentOS 7/8/9）====="
@@ -359,12 +449,15 @@ main() {
   replace_aliyun_repo
   install_common_packages
   system_basic_settings
+  disable_ubuntu_auto_update  # 新增：关闭 Ubuntu 自动更新
   
   info "===== 系统初始化完成 ====="
   info "需要重启才能完全生效的配置："
   info "  1. SELinux 永久关闭（CentOS）"
   info "  2. swap 永久关闭（可选重启，不重启也不影响当前会话）"
-  info "生产环境注意：防火墙和 SELinux 已关闭，建议按需配置安全规则"
+  info "生产环境注意："
+  info "  - 防火墙和 SELinux 已关闭，建议按需配置安全规则"
+  info "  - Ubuntu 自动更新已关闭，如需更新请手动执行 apt update && apt upgrade"
 }
 
 # 执行主流程
