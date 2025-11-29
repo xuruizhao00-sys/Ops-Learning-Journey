@@ -1,9 +1,9 @@
 {
   "baseFontSizeAction": true,
-  "accentColor": "#cd9213",
+  "accentColor": "#050ceb",
   "interfaceFontFamily": "Lucida Console",
   "textFontFamily": "Lucida Console",
   "cssTheme": "Blue Topaz",
   "monospaceFontFamily": "Consolas",
-  "baseFontSize": 20
+  "baseFontSize": 18
 }
