@@ -530,8 +530,9 @@ https://redis.io/docs/getting-started/installation/install-redis-from-source/
 8.x 编译说明
 https://redis.io/docs/latest/operate/oss_and_stack/install/build-stack/ubuntu-noble/
 
-范例：Ubuntu24.04 编译安装 redis-8.2.1/8.0.2
+范例：Ubuntu24.04 编译安装 redis-7.0.0
 ~~~bash
+# 下载源码
 root@node2-112:~ 15:38:29 # wget https://download.redis.io/releases/redis-7.0.0.tar.gz 
 root@node2-112:~ 15:46:06 # tar xf redis-7.0.0.tar.gz 
 root@node2-112:~ 15:46:31 # cd redis-7.0.0/
@@ -583,6 +584,13 @@ root@prometheus-221:~ 15:52:05 #
 root@prometheus-221:~ 15:51:53 # mkdir /apps/redis/{etc,log,data,run} #创建配置文件、日志、数据等目录
 root@prometheus-221:~ 15:51:53 #  cp redis.conf /apps/redis/etc/
 ~~~
+
+范例：Ubuntu24.04 编译安装 redis-8.2.1/8.0.2
+```bash
+# 安装依赖
+apt install -y --no-install-recommends gcc make ca-certificates wget dpkg-dev g++ libc6-dev libssl-dev git cmake python3 python3-pip python3-venv python3-dev unzip rsync clang automake  autoconf libtool pkg-config libsystemd-dev
+# 下载源码包
+```
 
 #### 1.2.2.2 前台启动 redis
 
