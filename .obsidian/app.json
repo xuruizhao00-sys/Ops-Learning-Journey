@@ -3,5 +3,6 @@
   "newLinkFormat": "relative",
   "promptDelete": false,
   "tabSize": 2,
-  "readableLineLength": true
+  "readableLineLength": true,
+  "showLineNumber": true
 }
