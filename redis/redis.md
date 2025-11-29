@@ -606,7 +606,7 @@ codecov.yml      deps                Makefile     README.md  redis-full.conf    
 # 源码编译安装 redis 8+ 版本，需要配置好环境变量，后面直接 make 即可
 # 在 redis 8.0+ 版本的源码包中，已经有 编译好的 Makefile 文件
 # 需要声明的变量
-# 这些变量如果声明为了 yes，那么在安装时需要再次连接 GitHub 下载源码
+# 这些变量如果声明为了 yes，那么在安装时需要再次连接 GitHub 下载源码，在下文会说明这些变量的作用
 BUILD_TLS=yes
 BUILD_WITH_MODULES=yes
 INSTALL_RUST_TOOLCHAIN=yes
@@ -622,10 +622,23 @@ DISABLE_WERRORS=yes
 # 安装
 22:31:17 root@redis02:~/redis-8.2.1# make -j "$(nproc)" all
 
-
 # 验证
 
 ```
+##### 1.2.2.1.1 源码编译安装的参数含义
+|变量名|核心作用|详细说明与使用场景|
+|---|---|---|
+|`BUILD_TLS=yes`|启用 TLS/SSL 加密功能|- 让 Redis 支持加密连接（`redis-cli -tls`），保护数据传输安全（如跨网络访问场景）；<br><br>- 编译时会链接 OpenSSL 库（需提前安装 `libssl-dev`）；<br><br>- 生产环境必开（尤其是 Redis 暴露在公网或跨机房访问时），避免明文传输泄露数据。|
+|`BUILD_WITH_MODULES=yes`|编译并启用 Redis 模块系统（Module API）|- 允许 Redis 加载第三方扩展模块（如 RedisSearch、RedisJSON、RedisGraph 等）；<br><br>- 编译后 Redis 可通过 `loadmodule` 配置或命令动态加载模块，扩展核心功能（如全文检索、JSON 解析）；<br><br>- 开发 / 扩展场景推荐开启，纯基础缓存场景可关闭（减少编译体积）。|
+|`INSTALL_RUST_TOOLCHAIN=yes`|自动安装 Rust 工具链（用于编译 Redis 核心依赖或模块）|- Redis 从 7.0+ 开始，部分核心功能（如 `redis-stack` 相关模块、新数据结构优化）依赖 Rust 编译；<br><br>- 声明该变量后，编译脚本会自动下载、安装适配版本的 Rust 工具链（无需手动安装）；<br><br>- 依赖：需网络通畅（从 Rust 官方源下载），适合首次编译或无 Rust 环境的场景。|
+|`DISABLE_WERRORS=yes`|禁用「警告视为错误」的编译规则|- 默认情况下，Redis 编译会将所有编译器警告（`warning`）视为错误（`error`），导致编译中断；<br><br>- 声明该变量后，仅显示警告，不中断编译（适用于：系统依赖版本略高 / 略低、自定义编译参数导致的非致命警告）；<br><br>- 注意：仅用于临时规避警告问题，生产环境建议排查警告根源（避免潜在稳定性风险）。|
+##### 1.2.2.1.2 适用场景
+| 变量组合                         | 适用场景                     |
+| ---------------------------- | ------------------------ |
+| 全部 `yes`                     | 生产环境（需 TLS 加密、模块扩展、兼容警告） |
+| `BUILD_TLS=yes` 仅开启          | 仅需加密连接（无模块需求）            |
+| `BUILD_WITH_MODULES=yes` 仅开启 | 需加载第三方模块（如 RedisJSON）    |
+| `DISABLE_WERRORS=yes` 仅开启    | 编译时出现非致命警告，需临时规避         |
 
 #### 1.2.2.2 前台启动 redis
 
