@@ -623,6 +623,13 @@ DISABLE_WERRORS=yes
 22:31:17 root@redis02:~/redis-8.2.1# make -j "$(nproc)" all
 
 # 验证
+22:39:02 root@redis02:~/redis-8.2.1# ./src/redis-server --version
+Redis server v=8.2.1 sha=00000000:1 malloc=jemalloc-5.3.0 bits=64 build=f636a2be442c8259
+22:39:13 root@redis02:~/redis-8.2.1# ./src/redis-cli --version
+redis-cli 8.2.1
+22:39:20 root@redis02:~/redis-8.2.1#
+
+# 启动 redis
 
 ```
 ##### 1.2.2.1.1 源码编译安装的参数含义
