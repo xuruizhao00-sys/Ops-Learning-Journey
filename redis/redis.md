@@ -300,41 +300,158 @@ https://redis.io/docs/getting-started/installation/
 
 #### 1.2.1.1 Ubuntu 安装 Redis
 
-范例：基于官方仓库包安装
+范例：Ubuntu 2404 安装 Redis
 
 https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-linux/
 
 ~~~shell
-root@node1-111:~ 15:21:10 # apt list all redis
-Listing... Done
-redis/jammy 5:6.0.16-1ubuntu1 all
 
-
-# 配置官方仓库
-root@node1-111:~ 15:20:22 # curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-
-root@node1-111:~ 15:21:10 # 
-
-root@node1-111:~ 15:31:44 # echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb jammy main
-root@node1-111:~ 15:33:05 # ls -l /etc/apt/sources.list.d/redis.list 
--rw-r--r-- 1 root root 103 Oct 15 15:33 /etc/apt/sources.list.d/redis.list
-root@node1-111:~ 15:33:19 # cat /etc/apt/sources.list.d/redis.list
-deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb jammy main
-root@node1-111:~ 15:33:20 #
-
-
- 
-root@node1-111:~ 15:34:00 # apt update ; apt list -a redis 
-# 安装最新版
-root@node1-111:~ 15:34:09 # apt install -y redis 
-root@node1-111:~ 15:35:35 # ss -ntlup | grep 6379
-tcp   LISTEN 0      511        127.0.0.1:6379       0.0.0.0:*    users:(("redis-server",pid=69869,fd=20))                                                                                            
-tcp   LISTEN 0      511            [::1]:6379          [::]:*    users:(("redis-server",pid=69869,fd=21))                                                                                            
-root@node1-111:~ 15:35:46 #
 
 ~~~
 
+范例：Ubuntu 2204 安装 Redis
+```bash
+[root@ubuntu2204 ~]#curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+
+[root@ubuntu2204 ~]#echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee
+
+/etc/apt/sources.list.d/redis.list
+
+[root@ubuntu2204 ~]#ls /etc/apt/sources.list.d
+
+redis.list
+
+[root@ubuntu2204 ~]#cat /etc/apt/sources.list.d/redis.list
+
+deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg]
+https://packages.redis.io/deb jammy main
+
+[root@ubuntu2204 ~]#apt update
+[root@ubuntu2204 ~]#apt list -a redis
+
+正在列表... 完成
+
+redis/jammy,jammy,6:7.2.4-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.2.3-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.2.2-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.2.1-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.2.0-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.15-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.14-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.13-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.12-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.11-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.10-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.9-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.8-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.7-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.6-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.5-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.4-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.3-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.2-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.1-1rl1~jammy1 all
+
+redis/jammy,jammy 6:7.0.0-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.2.14-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.2.13-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.2.12-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.2.11-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.2.10-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.2.9-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.2.8-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.2.7-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.0.20-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.0.19-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.0.18-1rl1~jammy1 all
+
+redis/jammy,jammy 6:6.0.17-1rl1~jammy1 all
+
+redis/jammy 5:6.0.16-1ubuntu1 all
+
+#安装最新版
+
+[root@ubuntu2204 ~]#apt -y install redis
+
+#指定版本安装，注意：因为依赖关系可能会失败
+
+[root@ubuntu2204 ~]#apt -y install redis=6:7.2.4-1rl1~jammy1
+```
+范例：内置仓库
+```bash
+[root@ubuntu2204 ~]#apt list redis
+
+正在列表... 完成
+
+redis/jammy 5:6.0.16-1ubuntu1 all
+
+[root@ubuntu2004 ~]#apt list redis
+
+正在列表... 完成
+
+redis/focal-security,focal-updates 5:5.0.7-2ubuntu0.1 all
+
+N: 还有 1 个版本。请使用 -a 选项来查看它(他们)。
+
+[root@ubuntu2004 ~]#apt -y install redis
+
+[root@ubuntu2004 ~]#pstree -p|grep redis
+
+          |-redis-server(1330)-+-{redis-server}(1331)
+          |                   |-{redis-server}(1332)
+
+          |                    `-{redis-server}(1333)
+
+[root@ubuntu2004 ~]#ss -ntll
+
+State           Recv-Q   Send-Q     Local Address:Port   Peer Address:Port    
+
+      Process          
+
+LISTEN           0        128            127.0.0.1:6010         0.0.0.0:*      
+
+LISTEN           0        511            127.0.0.1:6379         0.0.0.0:*      
+
+LISTEN           0        4096       127.0.0.53%lo:53           0.0.0.0:*      
+
+LISTEN           0        128              0.0.0.0:22           0.0.0.0:*      
+
+LISTEN           0        128               [::1]:6010           [::]:*      
+
+LISTEN           0        511               [::1]:6379           [::]:*      
+
+LISTEN           0        128                 [::]:22             [::]:*
+```
 #### 1.2.1.2 Centos 安装 redis
 
 ```bash
