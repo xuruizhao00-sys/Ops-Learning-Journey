@@ -3,5 +3,7 @@
   "accentColor": "#cd9213",
   "interfaceFontFamily": "Lucida Console",
   "textFontFamily": "Lucida Console",
-  "cssTheme": "Blue Topaz"
+  "cssTheme": "Blue Topaz",
+  "monospaceFontFamily": "Consolas",
+  "baseFontSize": 18
 }
