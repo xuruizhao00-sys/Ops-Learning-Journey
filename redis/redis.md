@@ -595,6 +595,27 @@ root@prometheus-221:~ 15:51:53 #  cp redis.conf /apps/redis/etc/
 22:18:32 root@redis02:~# wget -O redis-$version.tar.gz https://github.com/redis/redis/archive/refs/tags/$version.tar.gz
 
 # 解压源码包
+22:24:44 root@redis02:~# tar xf redis-8.2.1.tar.gz 
+22:24:50 root@redis02:~# cd redis-8.2.1/
+22:24:53 root@redis02:~/redis-8.2.1# ls
+00-RELEASENOTES  CODE_OF_CONDUCT.md  INSTALL      MANIFESTO  redis.conf              runtest            runtest-sentinel  src     utils
+BUGS             CONTRIBUTING.md     LICENSE.txt  modules    REDISCONTRIBUTIONS.txt  runtest-cluster    SECURITY.md       tests
+codecov.yml      deps                Makefile     README.md  redis-full.conf         runtest-moduleapi  sentinel.conf     TLS.md
+22:24:55 root@redis02:~/redis-8.2.1#
+
+# 源码编译安装 redis 8+ 版本，需要配置好环境变量，后面直接 make 即可
+# 在 redis 8.0+ 版本的源码包中，已经有 编译好的 Makefile 文件
+# 需要声明的变量
+# 这些变量如果声明为了 yes，那么在安装时需要再次连接 GitHub 下载源码
+BUILD_TLS=yes
+BUILD_WITH_MODULES=yes
+INSTALL_RUST_TOOLCHAIN=yes
+DISABLE_WERRORS=yes
+# 在非生产环境下，我们暂时不需要这些完整的功能，这里我们不全部设置为 yes
+BUILD_TLS=no
+BUILD_WITH_MODULES=no
+INSTALL_RUST_TOOLCHAIN=no
+DISABLE_WERRORS=yes
 
 ```
 
