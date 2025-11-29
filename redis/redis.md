@@ -268,6 +268,20 @@ Redis 6.0 版本前一直是单线程方式处理用户的请求
 Redis 缓存服务宕机，造成 缓存服务失效
 
 解决方法：Redis 高可用集群
+### 1.1.8 Pipeline 流水线
+Redis 客户端执行一条命令分6个过程：
+
+发送命令 ---> 网络传输 ---> 命令排队 ---> 命令执行 ---> 网络传输 ---> 返回结果
+
+这个过程称为 Round trip time(简称RTT, 往返时间)，mget,mset 指令可以一次性的批量对多个数据的执行操作,所以有效节约了 RTT
+
+但大部分命令（如 hgetall）不支持批量操作，需要消耗 N 次 RTT ，利用 Pipeline 技术可以解决这一问题
+
+未使用 pipeline 执行 N 条命令如下图
+![](assets/redis/file-20251129150919243.png)
+使用了 pipeline 执行 N 条命令如下图
+![](assets/redis/file-20251129150941536.png)
+以上对比结果说明在使用 Pipeline 执行时速度比逐条执行要快，特别是客户端与服务端的网络延迟越大，性能体能越明显。
 ## 1.2 Redis 安装
 
 官方安装说明
@@ -276,17 +290,19 @@ https://redis.io/docs/getting-started/installation/
 
 安装方法
 
-1. 包安装
-2. 源码编译
-3. 容器运行
+1. 包安装 deb、rpm....
+2. 二进制安装
+3. 源码编译
+4. 容器运行
 
 ### 1.2.1 包安装 Redis
+![](assets/redis/file-20251129151137469.png)
 
 #### 1.2.1.1 Ubuntu 安装 Redis
 
 范例：基于官方仓库包安装
 
-https://redis.io/docs/install/install-redis/install-redis-on-linux/
+https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-linux/
 
 ~~~shell
 root@node1-111:~ 15:21:10 # apt list all redis
