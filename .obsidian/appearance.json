@@ -2,5 +2,6 @@
   "baseFontSizeAction": true,
   "accentColor": "#cd9213",
   "interfaceFontFamily": "Lucida Console",
-  "textFontFamily": "Lucida Console"
+  "textFontFamily": "Lucida Console",
+  "cssTheme": "Blue Topaz"
 }
