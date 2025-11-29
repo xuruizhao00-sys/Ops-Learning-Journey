@@ -306,12 +306,42 @@ https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install
 
 ~~~bash
 # 配置官方的软件源，安装最新的版本
+# 如果你是 root 用户，可以不用加 sudo
 sudo apt-get install lsb-release curl gpg
 curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
 sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
 sudo apt-get update
-sudo apt-get install redis
+sudo apt-get install -y redis
+
+21:49:02 root@redis01:~# apt list redis 
+Listing... Done
+redis/noble,noble,now 6:8.4.0-1rl1~noble1 all [installed]
+N: There are 35 additional versions. Please use the '-a' switch to see them.
+21:50:03 root@redis01:~# 
+
+# 安装完成后会自动生成一个 redis 用户
+21:48:52 root@redis01:~# id redis
+uid=111(redis) gid=111(redis) groups=111(redis)
+
+# 并且会自动启动
+21:48:55 root@redis01:~# systemctl status redis 
+● redis-server.service - Advanced key-value store
+     Loaded: loaded (/usr/lib/systemd/system/redis-server.service; enabled; preset: enabled)
+     Active: active (running) since Sat 2025-11-29 21:48:41 CST; 20s ago
+       Docs: http://redis.io/documentation,
+             man:redis-server(1)
+   Main PID: 2359 (redis-server)
+     Status: "Ready to accept connections"
+      Tasks: 7 (limit: 2210)
+     Memory: 4.8M (peak: 5.3M)
+        CPU: 268ms
+     CGroup: /system.slice/redis-server.service
+             └─2359 "/usr/bin/redis-server 127.0.0.1:6379"
+
+Nov 29 21:48:41 redis01 systemd[1]: Starting redis-server.service - Advanced key-value store...
+Nov 29 21:48:41 redis01 systemd[1]: Started redis-server.service - Advanced key-value store.
+21:49:02 root@redis01:~# 
 ~~~
 
 范例：Ubuntu 2204 安装 Redis
