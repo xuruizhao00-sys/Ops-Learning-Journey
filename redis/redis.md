@@ -6501,4 +6501,5 @@ cluster_stats_messages_received:24449
 ## 6 MySQL 和 redis 区别
 
 1. MySQL 是关系型数据库，Redis 是非关系型数据库
+2. 
 ## 7 redis 优化
