@@ -3080,7 +3080,7 @@ systemctl restart redis.service
 127.0.0.1:6379>
 ```
 
-范例： Redis 7.0以上版本的AOF是多个文件，Redis6.0以前版本只有一个文件
+范例： Redis 7.0 以上版本的 AOF 是多个文件，Redis6.0 以前版本只有一个文件
 
 ```bash
 # Redis 7.0以上版本
