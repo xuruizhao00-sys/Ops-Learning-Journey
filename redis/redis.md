@@ -2213,13 +2213,24 @@ set immutable config
 ### 2.2.1 设置客户端连接密码
 
 ```bash
-#设置连接密码
-127.0.0.1:6379> CONFIG SET requirepass 123456
+15:08:53 root@redis02:~# redis-cli
+127.0.0.1:6379> auth 123456
 OK
-#查看连接密码
-127.0.0.1:6379> CONFIG GET requirepass  
+127.0.0.1:6379> config get requirepass
 1) "requirepass"
 2) "123456"
+127.0.0.1:6379> config set requirepass 123
+OK
+127.0.0.1:6379> exit
+15:09:29 root@redis02:~# redis-cli
+127.0.0.1:6379> auth 123456
+(error) WRONGPASS invalid username-password pair or user is disabled.
+127.0.0.1:6379> auth 123
+OK
+127.0.0.1:6379> config get requirepass 
+3) "requirepass"
+4) "123"
+127.0.0.1:6379> 
 ```
 
 ### 2.2.2 获取当前配置
