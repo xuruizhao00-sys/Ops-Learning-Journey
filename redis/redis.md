@@ -3210,6 +3210,64 @@ root@prometheus-221:~ 15:59:19 #
 - AOF 在恢复大数据集时的速度比 RDB 的恢复速度要慢
 - 如果 fsync 策略是appendfsync no, AOF保存到磁盘的速度甚至会可能会慢于RDB
 - bug 出现的可能性更多
+#### 2.4.2.6 生产环境关键配置与注意事项
+##### 2.4.2.6.1 核心配置（redis.conf）
+```bash
+# 启用 AOF 持久化（默认 no，需改为 yes）
+appendonly yes
+
+# AOF 文件名（默认 appendonly.aof，建议带版本号）
+appendfilename "appendonly-8.2.1.aof"
+
+# AOF 文件存储目录（与 RDB 一致，确保 redis 用户权限）
+dir /var/lib/redis
+
+# 同步策略（推荐 everysec，平衡性能和安全性）
+appendfsync everysec
+
+# AOF 重写配置（默认值即可，按需调整）
+auto-aof-rewrite-percentage 100  # 比上次重写大 100% 触发
+auto-aof-rewrite-min-size 64mb   # 最小文件体积 64MB 触发
+
+# 重写期间是否暂停同步（默认 no，不暂停，确保数据不丢失）
+no-appendfsync-on-rewrite no
+
+# AOF 文件损坏时是否继续启动（默认 yes，避免服务无法启动，需手动修复）
+aof-load-truncated yes
+```
+##### 2.4.2.6.2 权限与目录配置
+确保 AOF 文件和存储目录的权限归属 `redis` 用户，否则无法写入 / 读取
+```bash
+# 调整目录权限
+chown -R redis:redis /var/lib/redis
+chmod 750 /var/lib/redis
+
+# 调整 AOF 文件权限
+chown redis:redis /var/lib/redis/appendonly-8.2.1.aof
+chmod 640 /var/lib/redis/appendonly-8.2.1.aof
+```
+
+##### 2.4.2.6.3 监控 AOF 状态（生产运维）
+通过 `info persistence` 命令实时监控 AOF 状态
+```bash
+redis-cli -h 127.0.0.1 -p 6379 -a StrongPass@2025 info persistence
+
+# 重点指标
+appendonly:yes                # AOF 已启用
+aof_current_size:123456       # 当前 AOF 文件大小（字节）
+aof_base_size:65432           # 上次重写后的文件大小（字节）
+aof_pending_rewrite:0         # 0=无重写在执行，1=重写中
+aof_last_rewrite_time_sec:5   # 上次重写耗时（秒）
+aof_last_bgrewrite_status:ok  # 上次重写状态（ok/err）
+aof_last_write_status:ok      # 上次同步状态（ok/err）
+```
+
+##### 2.4.2.6.4 生产最佳实践
+- ✅ 「RDB + AOF 双持久化」：AOF 保证数据完整性，RDB 保证快速恢复，生产环境优先启用；
+- ✅ 同步策略选 `everysec`：避免 `always` 的高 IO 开销，同时控制数据丢失在 1 秒内；
+- ✅ 定期备份 AOF 文件：与 RDB 备份同步（如每天凌晨 3 点），异地存储（避免磁盘损坏）；
+- ✅ 控制 AOF 重写时机：在业务低峰期执行手动 `bgrewriteaof`，避免高峰期占用 CPU/IO；
+- ✅ 避免 AOF 文件过大：通过重写配置控制文件体积，定期清理无效数据（如过期键）。
 
 ### 2.4.3 RDB 和 AOF 的选择
 
@@ -3495,7 +3553,7 @@ rename-command shutdown ""
 
 ### 2.6.1 字符串 string
 
-字符串是一种最基本的Redis值类型。Redis字符串是二进制安全的，这意味着一个Redis字符串能包含任意类型的数据，例如： 一张JPEG格式的图片或者一个序列化的Ruby对象。一个字符串类型的值最多能存储512M字节的内容。**Redis 中所有 key 都是字符串类型的**。此数据类型最为常用
+字符串是一种最基本的 Redis 值类型。Redis 字符串是二进制安全的，这意味着一个Redis 字符串能包含任意类型的数据，例如： 一张 JPEG 格式的图片或者一个序列化的Ruby 对象。一个字符串类型的值最多能存储 512M 字节的内容。**Redis 中所有 key 都是字符串类型的**。此数据类型最为常用
 
 #### 2.6.1.1 创建一个 key
 
