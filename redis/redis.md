@@ -2855,6 +2855,7 @@ main
 ```
 
 ### 2.4.2 AOF
+Redis AOF（Append Only File）是 **基于命令日志的持久化机制**，核心是「实时记录所有写命令（如 `set`、`hset`、`lpush`）到日志文件」，Redis 重启时通过重放日志中的命令恢复数据。它与 RDB 互补，适用于对数据一致性要求高（允许少量数据丢失）、能接受一定磁盘 IO 开销的场景。
 
 #### 2.4.2.1 AOF 工作原理
 
@@ -2863,6 +2864,12 @@ graph LR;
 redis-client-->|send wrire command|redis-server-->|sync write command|AOF记录文件
 ~~~
 
+##### 2.4.2.1.1 核心概念
+- **AOF 文件**：文本格式的命令日志文件（可直接用文本编辑器打开查看），记录 Redis 所有「写操作命令」（读命令如 `get`、`keys` 不记录），按执行顺序追加存储，格式为 Redis 协议规范（如 `*3\r\n$3\r\nset\r\n$4\r\nname\r\n$8\r\nzhangsan\r\n`）。
+- **核心目标**：最小化数据丢失（默认配置下最多丢失 1 秒数据），提供比 RDB 更完整的持久化保障。
+- **与 RDB 的本质区别**：
+    - RDB 记录「数据快照」（某一时刻的全量数据）；
+    - AOF 记录「命令日志」（数据变更的过程）。
 AOF 即 AppendOnlyFile，AOF 和 RDB 都采有 COW 机制
 
 AOF 可以指定不同的保存策略,默认为每秒钟执行一次 fsync,按照操作的顺序地将变更命令追加至指定的 AOF 日志文件尾部
