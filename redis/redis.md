@@ -3171,7 +3171,7 @@ BGREWRITEAOF
 Background append only file rewriting started
 127.0.0.1:6379>
 
-# 7.X 生成一个临时的AOF文件
+# 7.X 生成一个临时的 AOF 文件
 root@prometheus-221:~ 15:59:17 # ll /apps/redis/data/
 总计 83688
 drwxr-xr-x 3 redis redis     4096  2月 19 09:41 ./
@@ -3180,7 +3180,7 @@ drwxr-xr-x 2 redis redis     4096  2月 19 09:41 appendonlydir/
 -rw-r--r-- 1 redis redis       88  2月 19 09:24 dump.rdb
 -rw-r--r-- 1 redis redis 85680128  2月 19 09:41 temp-rewriteaof-96239.aof
 
-# 执行完成后incr文件清空，合并到RDB文件中
+# 执行完成后 incr 文件清空，合并到 RDB 文件中
 root@prometheus-221:~ 15:59:17 # ls -l /apps/redis/data/appendonlydir/
 total 185416
 -rw-r--r-- 1 redis redis 189855678 Oct 19 15:59 appendonly.aof.3.base.rdb
