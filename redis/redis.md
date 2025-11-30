@@ -1882,10 +1882,10 @@ python 提供了多种开发库,都可以支持连接访问 Redis
 github redis-py 库 : https://github.com/andymccurdy/redis-py
 
 ```bash
-#Ubuntu安装
+# Ubuntu 安装
 [root@ubuntu2204 ~]#apt update && apt -y install python3-redis
 [root@ubuntu2004 ~]#apt update && apt -y install python3-redis
-#CentOS安装
+# CentOS 安装
 [root@centos8 ~]#yum info python3-redis
 
 root@prometheus-221:~ 18:25:58 # vim redis_test.py
@@ -1916,56 +1916,151 @@ dir /apps/redis/etc/redis.conf
 ```
 
 #### 1.3.3.3 Golang 程序连接 redis
+```go
+# 准备 Golang 代码，注意：文件名为 main.go
+[root@ubuntu2204 redis-go]#cat main.go
+package main
+
+import (
+    "context"
+    "fmt"
+    "github.com/redis/go-redis/v9"
+)
+
+var ctx = context.Background()
+
+func main() {
+    rdb := redis.NewClient(&redis.Options{
+        Addr:     "127.0.0.1:6379",
+        Password: "123456",
+        DB:       0,
+    })
+
+    _, err := rdb.Ping(ctx).Result()
+    if err != nil {
+        fmt.Printf("连接redis出错，错误信息：%v", err)
+        return
+    }
+
+    for i:=1;i<=10000;i++ {
+        key := fmt.Sprintf("key%d", i)
+        value := fmt.Sprintf("value%d", i)
+        err = rdb.Set(ctx, key, value,0).Err()
+        if err != nil {
+            panic(err)
+        }
+
+        keys, err := rdb.Keys(ctx, key).Result()
+        if err != nil {
+            panic(err)
+        }
+        fmt.Println(keys)
+    }
+
+}
+
+```
 
 ```bash
 [root@ubuntu2204 redis-go]#apt update && apt -y install golang
-#初始化并定义模块名，即默认生成的程序名
+
+# 初始化并定义模块名，即默认生成的程序名
+
 [root@ubuntu2204 redis-go]#go mod init redis-go
-#上面命令会生成go.mod文件
-[root@ubuntu2204 redis-go]#cat go.mod 
+
+# 上面命令会生成 go.mod 文件
+
+[root@ubuntu2204 redis-go]#cat go.mod
+
 module redis-go
+
 go 1.18
-#镜像加速
+
+# 镜像加速
+
 [root@ubuntu2204 redis-go]#go env -w GOPROXY=https://goproxy.cn,direct
-#指定项目所依赖相关包及版本
+
+# 指定项目所依赖相关包及版本
+
 [root@ubuntu2204 redis-go]#go get github.com/redis/go-redis/v9
-#上面命令会修改go.mod文件生成依赖信息
-[root@ubuntu2204 redis-go]#cat go.mod 
+
+# 上面命令会修改 go.mod 文件生成依赖信息
+
+[root@ubuntu2204 redis-go]#cat go.mod
 module redis-go
 ...
 
-[root@ubuntu2204 redis-go]#cat go.sum 
-github.com/cespare/xxhash/v2 v2.2.0 
+[root@ubuntu2204 redis-go]#cat go.sum
+
+github.com/cespare/xxhash/v2 v2.2.0
+
 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
-github.com/cespare/xxhash/v2 v2.2.0/go.mod 
+
+github.com/cespare/xxhash/v2 v2.2.0/go.mod
+
 h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f 
+
+github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f
+
 h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=
-github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod 
+
+github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod
+
 h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
-github.com/redis/go-redis/v9 v9.0.3 
+
+github.com/redis/go-redis/v9 v9.0.3
+
 h1:+7mmR26M0IvyLxGZUHxu4GiBkJkVDid0Un+j4ScYu4k=
-github.com/redis/go-redis/v9 v9.0.3/go.mod 
-h1:WqMKv5vnQbRuZstUwxQI195wHy+t4PuXDOjzMvcuQHk= #静态编译并指定生成的文件名myredis
+
+github.com/redis/go-redis/v9 v9.0.3/go.mod
+
+h1:WqMKv5vnQbRuZstUwxQI195wHy+t4PuXDOjzMvcuQHk=
+
+# 静态编译并指定生成的文件名 myredis
+
 [root@ubuntu2204 redis-go]#CGO_ENABLED=0 go build -o myredis
+
 [root@ubuntu2204 redis-go]#ls
+
 go.mod go.sum main.go myredis
+
 [root@ubuntu2204 redis-go]#ldd myredis
- 不是动态可执行文件
-#或者动态编译文件名为redis-go，如果不指定-o myredis，默认生成的名称为go mod init redis-go
-指定的名称
+
+不是动态可执行文件
+
+# 或者动态编译文件名为 redis-go，如果不指定 -o myredis，默认生成的名称为 go mod init redis-go 指定的名称
+
 [root@ubuntu2204 redis-go]#go build
+
 [root@ubuntu2204 redis-go]#ls
+
 go.mod go.sum main.go redis-go
-[root@ubuntu2204 redis-go]#ldd redis-go 
- linux-vdso.so.1 (0x00007fff5b15e000)
- libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f4fc1c18000)
- /lib64/ld-linux-x86-64.so.2 (0x00007f4fc1e48000)
- 
-#运行
+
+[root@ubuntu2204 redis-go]#ldd redis-go
+
+linux-vdso.so.1 (0x00007fff5b15e000)
+
+libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f4fc1c18000)
+
+/lib64/ld-linux-x86-64.so.2 (0x00007f4fc1e48000)
+
+# 运行
+
 [root@ubuntu2204 redis-go]#./redis-go
 ```
 
+### 1.3.4 图形工具
+有一些第三方开发的图形工具也可以连接 redis
+
+#### 1.3.4.1 RedisInsight
+https://apps.microsoft.com/store/detail/redisinsight/XP8K1GHCB0F1R2
+
+#### 1.3.4.2 Another-Redis-Desktop-Manager
+注意：当前 Redis7.2.1 无法连接，Redis7.2.2以后版本可以
+https://github.com/qishibo/AnotherRedisDesktopManager
+
+#### 1.3.4.3 RedisDesktopManager
+注意: 当前 Redis-v7.2.1 无法连接，redis-v7.2.3 以后版本可以支持连接
 
 
 # 二、redis 配置管理
