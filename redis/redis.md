@@ -970,7 +970,7 @@ logfile /apps/redis/log/6379.log
 # bind 设置
 bind 0.0.0.0 -::1
 ```
-##### 1.2.2.4.1 调整 Redis 相关目录和文件权限
+##### 1.2.2.4.2 调整 Redis 相关目录和文件权限
 ```bash
 # 1、规范管理相关目录
 11:09:47 root@redis02:~# mkdir -p /etc/redis          # 配置文件目录
@@ -990,8 +990,19 @@ chmod -R 750 /var/lib/redis
 chmod -R 750 /var/log/redis
 chmod -R 750 /var/run/redis
 
+# 4、调整配置文件权限（仅 redis 用户可读写）
+11:14:36 root@redis02:~# cp redis-8.2.1/redis.conf /etc/redis/
+11:15:10 root@redis02:~# chmod 640 /etc/redis/redis.conf
+11:15:41 root@redis02:~# ls -l /etc/redis/redis.conf
+-rw-r----- 1 redis redis 111227 Nov 30 11:15 /etc/redis/redis.conf
+11:15:43 root@redis02:~#
+```
+
+##### 1.2.2.4.3 修改 redis 配置文件
+```bash
 
 ```
+
 #### 1.2.2.5 创建 redis 的 service 文件
 
 ```bash
