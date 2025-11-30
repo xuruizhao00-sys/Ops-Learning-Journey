@@ -972,6 +972,24 @@ bind 0.0.0.0 -::1
 ```
 ##### 1.2.2.4.1 调整 Redis 相关目录和文件权限
 ```bash
+# 1、规范管理相关目录
+11:09:47 root@redis02:~# mkdir -p /etc/redis          # 配置文件目录
+mkdir -p /var/lib/redis      # 数据存储目录（RDB/AOF 文件）
+mkdir -p /var/log/redis      # 日志目录
+mkdir -p /var/run/redis      # PID 文件目录（进程标识）
+
+# 2、调整核心目录权限（递归修改所有者为 redis:redis）
+chown -R redis:redis /etc/redis          # 配置文件目录
+chown -R redis:redis /var/lib/redis      # 数据存储目录
+chown -R redis:redis /var/log/redis      # 日志目录
+chown -R redis:redis /var/run/redis      # PID 目录
+
+# 3、调整目录权限（确保 redis 用户可进入和操作）
+chmod -R 750 /etc/redis          # 仅所有者（redis）可读写执行，组只读，其他无权限
+chmod -R 750 /var/lib/redis
+chmod -R 750 /var/log/redis
+chmod -R 750 /var/run/redis
+
 
 ```
 #### 1.2.2.5 创建 redis 的 service 文件
