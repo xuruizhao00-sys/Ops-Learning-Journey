@@ -1822,14 +1822,25 @@ lrwxrwxrwx 1 redis redis       12 Oct 14 13:21 redis-check-rdb -> redis-server #
 lrwxrwxrwx 1 redis redis       12 Oct 14 13:21 redis-sentinel -> redis-server # 哨兵程序，软连
 -rwxr-xr-x 1 redis redis 11603280 Oct 14 13:21 redis-server		# 服务端主程序
 root@prometheus-221:~ 18:08:45 # 
+
+
+# Redis6.0 以下
+[root@centos8 ~]#ll /apps/redis/bin/
+total 32772
+-rwxr-xr-x 1 root root 4366792 Feb 16 21:12 redis-benchmark #性能测试程序
+-rwxr-xr-x 1 root root 8125184 Feb 16 21:12 redis-check-aof #AOF文件检查程序
+-rwxr-xr-x 1 root root 8125184 Feb 16 21:12 redis-check-rdb #RDB文件检查程序
+-rwxr-xr-x 1 root root 4807856 Feb 16 21:12 redis-cli       #客户端程序
+lrwxrwxrwx 1 root root      12 Feb 16 21:12 redis-sentinel -> redis-server #哨兵程序，软连接到服务器端主程序
+-rwxr-xr-x 1 root root 8125184 Feb 16 21:12 redis-server #服务端主程序
 ```
 
 ### 1.3.2 客户端程序 redis-cli
 
 ```bash
-#默认为本机无密码连接
+# 默认为本机无密码连接
 redis-cli
-#远程客户端连接,注意:Redis没有用户的概念
+# 远程客户端连接,注意:Redis 没有用户的概念
 redis-cli -h <Redis服务器IP> -p <PORT> -a <PASSWORD> --no-auth-warning
 ```
 
