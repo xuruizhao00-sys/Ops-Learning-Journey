@@ -949,6 +949,7 @@ root hard nofile 20000
 [root@ubuntu2404 ~]#reboot
 ```
 #### 1.2.2.4 创建 redis 用户和设置数据目录权限及修改默认配置文件
+##### 1.2.2.4.1 创建 Redis 专用用户和组
 
 ```bash
 root@prometheus-221:~ 16:08:16 # useradd -r -s /sbin/nologin redis
