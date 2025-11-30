@@ -1034,31 +1034,76 @@ supervised systemd
 ```
 
 ```shell
-root@prometheus-221:~ 16:19:01 # cat /lib/systemd/system/redis.service 
+11:30:52 root@redis02:~# cat /usr/lib/systemd/system/redis.service
 [Unit]
-Description=Redis persistent key-value database
+Description=Redis In-Memory Data Store (v8.2.1)
 After=network.target
+Documentation=https://redis.io/documentation/
+# 依赖 tmpfs 目录（可选，优化内存使用）
+RequiresMountsFor=/var/run/redis
+
 [Service]
-ExecStart=/apps/redis/bin/redis-server /apps/redis/etc/redis.conf --supervised systemd
-ExecStop=/bin/kill -s QUIT $MAINPID        
-Type=notify
+# 核心：指定运行用户和组（redis 专用用户）
 User=redis
 Group=redis
-RuntimeDirectory=redis
-RuntimeDirectoryMode=0755
-LimitNOFILE=1000000   #指定此值才支持更大的maxclients值
+
+# 工作目录（与 redis.conf 中的 dir 一致）
+WorkingDirectory=/var/lib/redis
+
+# 启动命令：指定 redis-server 路径和配置文件（必须是绝对路径）
+ExecStart=/usr/local/bin/redis-server /etc/redis/redis.conf
+
+# 停止命令：通过 redis-cli 发送 shutdown 指令（需匹配密码和端口）
+# 若未启用 TLS，用以下命令：
+ExecStop=/usr/local/bin/redis-cli -h 127.0.0.1 -p 6379 -a 123456  shutdown
+# 若启用 TLS，替换为（需指定证书）：
+# ExecStop=/usr/local/bin/redis-cli -h 127.0.0.1 -p 6380 -a StrongPass@2025 --tls --cacert /etc/redis/ca-cert.pem shutdown
+
+# 进程异常退出时自动重启（高可用）
+Restart=always
+RestartSec=3
+
+# PID 文件路径（与 redis.conf 中的 pidfile 一致）
+PIDFile=/var/run/redis/redis_6379.pid
+
+# 优化参数：提高文件描述符限制（Redis 并发连接需要）
+LimitNOFILE=65536
+
+# 禁用核心转储（避免敏感信息泄露）
+LimitCORE=0
+
+# 环境变量（可选，指定 Redis 日志编码）
+Environment=LC_ALL=C.UTF-8
+
 [Install]
 WantedBy=multi-user.target
-
-
 ```
 
-#### 1.2.2.6 通过 service 启动 redis
+==相关说明==
+1. `User=redis` 和 `Group=redis`：强制服务以专用用户运行，即使 root 启动服务，也会切换到 redis 用户。
+2. `RequiresMountsFor=/var/run/redis`：确保 PID 目录挂载后再启动 Redis，避免路径不存在报错。
+3. `LimitNOFILE=65536`：提高最大文件描述符限制（默认 1024 不足以支撑高并发）。
+4. `ExecStop` 中的密码必须与 `redis.conf` 的 `requirepass` 一致，否则无法正常停止服务。
 
-```
+#### 1.2.2.6 启动 Redis 服务并验证
+##### 1.2.2.6.1 重新加载 systemd 配置（识别新服务文件）
+```bash
 systemctl daemon-reload 
-systemctl enable --now redis
-systemctl status redis
+```
+
+##### 1.2.2.6.2 启动 Redis 服务
+```
+systemctl start redis.service
+```
+
+##### 1.2.2.6.3 设置开机自启
+```
+systemctl enable redis.service 
+```
+
+#####  1.2.2.6.4 验证服务状态（核心：确认运行用户是 redis）
+```bash
+systemctl status redis.service
 ```
 
 #### 1.2.2.7 客户端连接 redis
@@ -1066,212 +1111,24 @@ systemctl status redis
 ![image-20251015162117732](redis.assets/image-20251015162117732.png)
 
 ```shell
-/apps/redis/bin/redis-cli -h IP/HOSTNAME -p PORT -a PASSWORD
+redis-cli -h IP/HOSTNAME -p PORT -a PASSWORD
 ```
 
 ```bash
-root@prometheus-221:~ 16:19:57 # redis-cli 
+11:39:51 root@redis02:~# redis-cli -a 123456
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+127.0.0.1:6379> set test xixi
+OK
+127.0.0.1:6379> get test
+"xixi"
 127.0.0.1:6379> ping
 PONG
-127.0.0.1:6379> info
-# Server
-redis_version:7.0.0
-redis_git_sha1:00000000
-redis_git_dirty:0
-redis_build_id:9b54064f6699defd
-redis_mode:standalone
-os:Linux 5.15.0-140-generic x86_64
-arch_bits:64
-monotonic_clock:POSIX clock_gettime
-multiplexing_api:epoll
-atomicvar_api:c11-builtin
-gcc_version:11.4.0
-process_id:98504
-process_supervised:systemd
-run_id:24ecdbaf713f89f8282ded290f5dad5a49d65e22
-tcp_port:6379
-server_time_usec:1760516525698882
-uptime_in_seconds:188
-uptime_in_days:0
-hz:10
-configured_hz:10
-lru_clock:15686061
-executable:/apps/redis/bin/redis-server
-config_file:/apps/redis/etc/redis.conf
-io_threads_active:0
 
-# Clients
-connected_clients:1
-cluster_connections:0
-maxclients:10000
-client_recent_max_input_buffer:20480
-client_recent_max_output_buffer:0
-blocked_clients:0
-tracking_clients:0
-clients_in_timeout_table:0
 
-# Memory
-used_memory:934024
-used_memory_human:912.13K
-used_memory_rss:8048640
-used_memory_rss_human:7.68M
-used_memory_peak:1086384
-used_memory_peak_human:1.04M
-used_memory_peak_perc:85.98%
-used_memory_overhead:881848
-used_memory_startup:859392
-used_memory_dataset:52176
-used_memory_dataset_perc:69.91%
-allocator_allocated:1392048
-allocator_active:1728512
-allocator_resident:4587520
-total_system_memory:4064133120
-total_system_memory_human:3.79G
-used_memory_lua:31744
-used_memory_vm_eval:31744
-used_memory_lua_human:31.00K
-used_memory_scripts_eval:0
-number_of_cached_scripts:0
-number_of_functions:0
-number_of_libraries:0
-used_memory_vm_functions:32768
-used_memory_vm_total:64512
-used_memory_vm_total_human:63.00K
-used_memory_functions:184
-used_memory_scripts:184
-used_memory_scripts_human:184B
-maxmemory:0
-maxmemory_human:0B
-maxmemory_policy:noeviction
-allocator_frag_ratio:1.24
-allocator_frag_bytes:336464
-allocator_rss_ratio:2.65
-allocator_rss_bytes:2859008
-rss_overhead_ratio:1.75
-rss_overhead_bytes:3461120
-mem_fragmentation_ratio:8.64
-mem_fragmentation_bytes:7117032
-mem_not_counted_for_evict:0
-mem_replication_backlog:0
-mem_total_replication_buffers:0
-mem_clients_slaves:0
-mem_clients_normal:22272
-mem_cluster_links:0
-mem_aof_buffer:0
-mem_allocator:jemalloc-5.2.1
-active_defrag_running:0
-lazyfree_pending_objects:0
-lazyfreed_objects:0
 
-# Persistence
-loading:0
-async_loading:0
-current_cow_peak:0
-current_cow_size:0
-current_cow_size_age:0
-current_fork_perc:0.00
-current_save_keys_processed:0
-current_save_keys_total:0
-rdb_changes_since_last_save:0
-rdb_bgsave_in_progress:0
-rdb_last_save_time:1760516337
-rdb_last_bgsave_status:ok
-rdb_last_bgsave_time_sec:-1
-rdb_current_bgsave_time_sec:-1
-rdb_saves:0
-rdb_last_cow_size:0
-rdb_last_load_keys_expired:0
-rdb_last_load_keys_loaded:0
-aof_enabled:0
-aof_rewrite_in_progress:0
-aof_rewrite_scheduled:0
-aof_last_rewrite_time_sec:-1
-aof_current_rewrite_time_sec:-1
-aof_last_bgrewrite_status:ok
-aof_rewrites:0
-aof_rewrites_consecutive_failures:0
-aof_last_write_status:ok
-aof_last_cow_size:0
-module_fork_in_progress:0
-module_fork_last_cow_size:0
 
-# Stats
-total_connections_received:1
-total_commands_processed:2
-instantaneous_ops_per_sec:0
-total_net_input_bytes:55
-total_net_output_bytes:169413
-instantaneous_input_kbps:0.00
-instantaneous_output_kbps:0.00
-rejected_connections:0
-sync_full:0
-sync_partial_ok:0
-sync_partial_err:0
-expired_keys:0
-expired_stale_perc:0.00
-expired_time_cap_reached_count:0
-expire_cycle_cpu_milliseconds:5
-evicted_keys:0
-evicted_clients:0
-total_eviction_exceeded_time:0
-current_eviction_exceeded_time:0
-keyspace_hits:0
-keyspace_misses:0
-pubsub_channels:0
-pubsub_patterns:0
-latest_fork_usec:0
-total_forks:0
-migrate_cached_sockets:0
-slave_expires_tracked_keys:0
-active_defrag_hits:0
-active_defrag_misses:0
-active_defrag_key_hits:0
-active_defrag_key_misses:0
-total_active_defrag_time:0
-current_active_defrag_time:0
-tracking_total_keys:0
-tracking_total_items:0
-tracking_total_prefixes:0
-unexpected_error_replies:0
-total_error_replies:0
-dump_payload_sanitizations:0
-total_reads_processed:3
-total_writes_processed:4
-io_threaded_reads_processed:0
-io_threaded_writes_processed:0
-reply_buffer_shrinks:1
-reply_buffer_expands:0
 
-# Replication
-role:master
-connected_slaves:0
-master_failover_state:no-failover
-master_replid:e90d2bb57c954a9654fa7a429619bf695951f709
-master_replid2:0000000000000000000000000000000000000000
-master_repl_offset:0
-second_repl_offset:-1
-repl_backlog_active:0
-repl_backlog_size:1048576
-repl_backlog_first_byte_offset:0
-repl_backlog_histlen:0
 
-# CPU
-used_cpu_sys:0.329969
-used_cpu_user:0.252684
-used_cpu_sys_children:0.000000
-used_cpu_user_children:0.000000
-used_cpu_sys_main_thread:0.333097
-used_cpu_user_main_thread:0.248650
-
-# Modules
-
-# Errorstats
-
-# Cluster
-cluster_enabled:0
-
-# Keyspace
-127.0.0.1:6379>
 ```
 
 #### 1.2.2.8 脚本安装 redis
