@@ -1,14 +1,6 @@
+```bash
 #!/bin/bash
-#
-#********************************************************************
-#Author:          wangxiaochun
-#QQ:              29308620
-#Date:            2020-07-22
-#FileName：       install_redis.sh
-#URL:             http://www.magedu.com
-#Description:     The test script
-#Copyright (C):   2020 All rights reserved
-#********************************************************************
+
 
 #本脚本支持在线和离线安装
 
@@ -154,3 +146,5 @@ EOF
 prepare 
 
 install 
+
+```
