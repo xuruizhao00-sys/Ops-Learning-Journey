@@ -610,6 +610,7 @@ BUGS             CONTRIBUTING.md     LICENSE.txt  modules    REDISCONTRIBUTIONS.
 codecov.yml      deps                Makefile     README.md  redis-full.conf         runtest-moduleapi  sentinel.conf     TLS.md
 22:24:55 root@redis02:~/redis-8.2.1#
 
+# 5、编译变量配置
 # 源码编译安装 redis 8+ 版本，需要配置好环境变量，后面直接 make 即可
 # 在 redis 8.0+ 版本的源码包中，已经有 编译好的 Makefile 文件
 # 需要声明的变量
@@ -629,16 +630,24 @@ DISABLE_WERRORS=yes
 # - 若服务器内存 ≤ 2GB，建议手动指定线程数（如 -j 2），避免内存不足编译崩溃
 # - 若不需要 TLS 或模块，可将对应变量设为 no（如 BUILD_TLS=no），编译更快
 
-# 安装
+# 6、编译
 22:31:17 root@redis02:~/redis-8.2.1# make -j "$(nproc)" all
 # 编译后单元测试（可选，验证功能完整性）
 
+# 执行 Redis 内置单元测试（约 5-10 分钟，确保核心功能正常）
+make test
+# 测试通过标志：最后输出 "All tests passed without errors!"
+# 若测试失败：大概率是 TLS 依赖或 Rust 环境问题，可重新安装 libssl-dev 后重试，或忽略（核心功能通常不受影响）
+
+# 安装到默认目录 /usr/local/bin（已在系统 PATH 中，任意目录可执行 redis-server/redis-cli）
+make install
 # 验证
 22:39:02 root@redis02:~/redis-8.2.1# ./src/redis-server --version
 Redis server v=8.2.1 sha=00000000:1 malloc=jemalloc-5.3.0 bits=64 build=f636a2be442c8259
 22:39:13 root@redis02:~/redis-8.2.1# ./src/redis-cli --version
 redis-cli 8.2.1
 22:39:20 root@redis02:~/redis-8.2.1#
+
 
 # 启动 redis
 22:44:29 root@redis02:~/redis-8.2.1# ./src/redis-server 
