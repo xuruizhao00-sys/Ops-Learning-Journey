@@ -2198,14 +2198,14 @@ CONFIG GET 接受单个参数 parameter 作为搜索关键字，查找所有匹�
 范例：版本差异
 
 ```bash
-#redis-7支持动态修改端口
+# redis-7支持动态修改端口
 127.0.0.1:6379> config set port 8888
 OK
-#redis-7 不支持动态修改日志文件路径
+# redis-7 不支持动态修改日志文件路径
 127.0.0.1:6379> config set logfile /tmp/redis.log
 (error) ERR CONFIG SET failed (possibly related to argument 'logfile') - can't 
 set immutable config
-#redis-5不支持动态修改端口
+# redis-5不支持动态修改端口
 127.0.0.1:6379> config set port 8888
 (error) ERR Unsupported CONFIG parameter: port
 ```
@@ -2259,7 +2259,7 @@ OK
 2) "127.0.0.1 -::1"
 127.0.0.1:6379>
 
-#Redis5.0有些设置无法修改,Redis6.2.6版本支持修改bind
+# Redis5.0 有些设置无法修改,Redis6.2.6 版本支持修改 bind
 127.0.0.1:6379> CONFIG SET bind 127.0.0.1
 (error) ERR Unsupported CONFIG parameter: bind
 ```
