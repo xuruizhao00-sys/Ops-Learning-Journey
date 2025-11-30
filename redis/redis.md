@@ -3024,17 +3024,16 @@ tail -f /var/log/redis/redis-server.log | grep "AOF"
 范例: 错误开启 AOF 功能,会导致数据丢失
 
 ```bash
-root@prometheus-221:~ 17:40:50 # grep "^appendonly" /apps/redis/etc/redis.conf
+18:46:14 root@redis02:~# grep "^appendonly" /etc/redis/redis.conf 
 appendonly yes
-root@prometheus-221:~ 17:41:01 # systemctl restart redis.service
-root@prometheus-221:~ 17:41:13 # redis-cli  -a 123456
+18:46:15 root@redis02:~# redis-cli -a 123456 dbsize
 Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
-127.0.0.1:6379> dbsize
+(integer) 10100003
+18:46:29 root@redis02:~# systemctl restart redis 
+18:46:51 root@redis02:~# redis-cli -a 123456 dbsize
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
 (integer) 0
-127.0.0.1:6379> config get appendonly
-1) "appendonly"
-2) "yes"
-127.0.0.1:6379>
+18:46:53 root@redis02:~#
 ```
 
 范例: 正确启用 AOF 功能,访止数据丢失
