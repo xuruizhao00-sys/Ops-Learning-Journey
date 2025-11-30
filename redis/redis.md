@@ -2871,13 +2871,151 @@ redis-client-->|send wrire command|redis-server-->|sync write command|AOF记录�
     - RDB 记录「数据快照」（某一时刻的全量数据）；
     - AOF 记录「命令日志」（数据变更的过程）。
 ##### 2.4.2.1.2 AOF 核心工作机制
-AOF 即 AppendOnlyFile，AOF 和 RDB 都采有 COW 机制
+AOF 的工作机制可拆解为「命令追加 → 日志同步 → AOF 重写」三个闭环流程，全程兼顾性能和数据安全性，且不阻塞主线程（除特殊同步策略外）。
 
-AOF 可以指定不同的保存策略,默认为每秒钟执行一次 fsync,按照操作的顺序地将变更命令追加至指定的 AOF 日志文件尾部
+###### 2.4.2.1.2.1 流程一：命令追加（记录写命令）
 
+Redis 执行写命令时，不会直接将命令写入磁盘 AOF 文件，而是先写入「内存缓冲区（AOF Buffer）」，核心目的是 **减少磁盘 IO 次数**（频繁写磁盘会严重影响性能）。
+
+*具体步骤*
+1. 客户端发送写命令（如 `set name zhangsan`）；
+2. Redis 主线程验证命令合法性（如语法正确、权限通过）；
+3. 命令执行成功后，将命令按 Redis 协议格式追加到 **AOF 缓冲区**（内存中，无需磁盘 IO）；
+4. 主线程返回 `OK` 给客户端（此时命令尚未写入磁盘，仅在内存缓冲区）。
+
+- 缓冲区作用：批量收集写命令，再通过「同步策略」定期写入磁盘，降低磁盘 IO 频率；
+- 命令格式：AOF 记录的是「原始执行命令」（而非优化后的命令），例如连续执行 `incr age` 3 次，AOF 会记录 3 条 `incr age` 命令（未重写前）。
+
+###### 2.4.2.1.2.2 流程二：日志同步（缓冲区 → 磁盘文件）
+
+AOF 缓冲区的命令需要同步到磁盘 AOF 文件才算真正持久化，「同步时机」由 `appendfsync` 配置决定（核心配置，平衡性能和数据安全性）。
+
+Redis 采用「写时复制（COW）」和「内核缓冲区」机制，同步流程如下：
+
+1. 按 `appendfsync` 策略触发同步（如每秒一次）；
+2. Redis 调用 `write()` 系统调用，将 AOF 缓冲区的命令写入「内核缓冲区」（仍在内存，未真正落盘）；
+3. 内核根据自身策略（如页缓存满、超时）调用 `fsync()` ，将内核缓冲区的数据刷到磁盘 AOF 文件；
+4. 同步完成后，命令才算真正持久化。
+
+ *3 种同步策略对比（生产环境关键选型）*
+
+| 同步策略     | 配置语法                   | 核心行为                                         | 数据安全性  | 性能开销     | 生产推荐度               |
+| -------- | ---------------------- | -------------------------------------------- | ------ | -------- | ------------------- |
+| 每秒同步（默认） | `appendfsync everysec` | 每秒触发一次同步，将缓冲区命令写入磁盘；若宕机，最多丢失 1 秒数据           | 中（推荐）  | 中        | ✅ 强烈推荐              |
+| 每次命令同步   | `appendfsync always`   | 每执行一条写命令，立即同步到磁盘（无缓冲）；宕机仅丢失当前未同步的 1 条命令      | 高（最安全） | 高（IO 密集） | ❗ 仅极端一致性场景使用（如金融支付） |
+| 内核自动同步   | `appendfsync no`       | Redis 不主动同步，依赖操作系统内核定期刷盘（通常 30 秒）；宕机可能丢失大量数据 | 低（不推荐） | 低（性能最好）  | ❌ 生产环境禁止使用          |
+
+- 配置中推荐 `appendfsync everysec`，是「性能 + 安全性」的最优平衡，适合 99% 的生产场景；
+- 「同步」≠「落盘」：`write()` 只是将数据写入内核缓冲区，`fsync()` 才是真正刷到磁盘，`everysec` 策略会确保每秒调用一次 `fsync()`。
+
+###### 2.4.2.1.2.3 流程三：AOF 重写（优化日志文件）
+
+为什么需要重写？
+
+AOF 文件会随时间无限增大（例如频繁执行 `incr age` 会记录大量重复命令），导致：
+
+1. 磁盘空间占用过大（如 10GB 内存数据，AOF 文件可能达几十 GB）；
+2. 数据恢复时间过长（重放大量冗余命令）。
+
+AOF 重写的核心是 **「命令合并与压缩」**：在不丢失数据的前提下，将多条冗余命令合并为一条等效命令，生成体积更小的新 AOF 文件，替换旧文件。
+
+重写核心原理：
+
+- 不读取旧 AOF 文件（避免解析大量命令），而是直接遍历 Redis 内存中的当前数据；
+- 对每个键值对，生成一条「等效写命令」（如连续 3 次 `incr age` 合并为 `set age 3`，哈希的多条 `hset` 合并为一条 `hset`）；
+- 新命令按 Redis 协议写入临时文件，完成后原子替换旧 AOF 文件（避免文件损坏）。
+
+*重写触发方式（2 种）：*
+
+|触发方式|触发条件|核心特点|
+|---|---|---|
+|自动触发|满足 `redis.conf` 中 2 个配置（同时满足）：<br><br>1. `auto-aof-rewrite-percentage 100`（当前 AOF 文件比上次重写后大 100%）；<br><br>2. `auto-aof-rewrite-min-size 64mb`（当前 AOF 文件≥64MB）|后台异步执行（fork 子进程），不阻塞主线程；<br><br>Redis 8.2.1 默认开启。|
+|手动触发|执行 `bgrewriteaof` 命令|生产环境常用（如手动备份前优化文件体积）；<br><br>异步执行，立即返回 `Background append only file rewrite started`。|
+
+*重写完整流程（与 `bgsave` 类似）：*
+
+1. 主线程执行 `bgrewriteaof`（或自动触发），调用 `fork()` 创建子进程（短暂阻塞，毫秒级）；
+2. 子进程遍历 Redis 内存数据，生成合并后的命令，写入临时 AOF 文件（如 `appendonly.aof.rewrite`）；
+3. 重写期间，新的写命令会同时追加到「旧 AOF 缓冲区」和「重写缓冲区」（避免重写期间的命令丢失）；
+4. 子进程完成重写后，主线程将「重写缓冲区」的命令追加到临时文件；
+5. 主线程用临时文件原子替换旧 AOF 文件（`appendonly.aof`），旧文件被删除；
+6. 子进程退出，重写完成。
+
+*示例：重写前后对比*
+
+- 重写前（3 条冗余命令）：
+    
+    ```plaintext
+    incr age
+    incr age
+    incr age
+    hset user:100 name zhangsan
+    hset user:100 age 25
+    ```
+    
+- 重写后（2 条等效命令）：
+    
+    ```plaintext
+    set age 3
+    hset user:100 name zhangsan age 25
+    ```
+
+##### 2.4.2.1.3 AOF 数据恢复机制
+redis 重启时，AOF 恢复的核心是「重放日志中的命令」，流程如下（结合你的配置）：
+
+###### 2.4.2.1.3.1 恢复前提
+
+- AOF 已启用（`appendonly yes`）；
+- AOF 文件存在于 `dir` 配置目录（`/var/lib/redis`）；
+- AOF 文件完整（未损坏），`redis` 用户有读取权限。
+
+###### 2.4.2.1.3.2 恢复流程
+
+1. Redis 启动时，优先加载 AOF 文件（若 AOF 启用且文件存在），仅当 AOF 未启用或文件损坏时，才加载 RDB 文件；
+2. 读取 AOF 文件中的命令，按执行顺序逐行重放（模拟命令执行过程）；
+3. 重放完成后，Redis 内存数据恢复到宕机前的状态；
+4. 恢复成功后，Redis 开始接受客户端请求。
+
+###### 2.4.2.1.3.3 损坏文件修复（生产必备）
+
+若 AOF 文件因宕机、磁盘错误损坏，直接启动会失败，需用 Redis 自带的 `redis-check-aof` 工具修复：
+
+```bash
+# 1. 备份损坏的 AOF 文件（避免修复失败）
+cp /var/lib/redis/appendonly.aof /var/lib/redis/appendonly.aof.bak
+
+# 2. 修复 AOF 文件（--fix 参数强制修复，会删除损坏的命令）
+redis-check-aof --fix /var/lib/redis/appendonly.aof
+
+# 修复成功输出：
+# 0xXX: Expected \r\n, got: XX
+# AOF file repair success. Rewritten AOF size: XXX bytes
+
+# 3. 验证修复后的文件（可选）
+redis-check-aof /var/lib/redis/appendonly.aof
+
+# 4. 调整文件权限（确保 redis 用户可读取）
+chown redis:redis /var/lib/redis/appendonly.aof
+chmod 640 /var/lib/redis/appendonly.aof
+
+# 5. 启动 Redis 恢复数据
+sudo systemctl start redis-server
+```
+
+###### 2.4.2.1.3.4 恢复日志示例
+
+```bash
+tail -f /var/log/redis/redis-server.log | grep "AOF"
+# 输出示例：
+# 1234:M 07 Dec 2025 10:00:00.000 * Reading RDB preamble from AOF file...
+# 1234:M 07 Dec 2025 10:00:00.000 * Loading AOF override: /var/lib/redis/appendonly.aof
+# 1234:M 07 Dec 2025 10:00:02.000 * DB loaded from append only file: 2.00 seconds
+```
+
+##### 2.4.2.1.4 开启 AOF 
 在第一次启用 AOF 功能时，会做一次完全备份，后续将执行增量性备份，相当于完全数据备份+增量变化
 
-如果同时启用 RDB 和 AOF,进行恢复时,默认 AOF 文件优先级高于 RDB 文件,即会使用 AOF 文件进行恢复
+**如果同时启用 RDB 和 AOF,进行恢复时,默认 AOF 文件优先级高于 RDB 文件,即会使用 AOF 文件进行恢复**
 
 在第一次开启 AOF 功能时,会自动备份所有数据到 AOF 文件中,后续只会记录数据的更新指令
 
