@@ -2400,8 +2400,63 @@ redis-cli -h 127.0.0.1 -p 6379 -a StrongPass@2025 slowlog get > $export_dir/slow
 # 清空慢查询日志（避免重复导出，可选）
 redis-cli -h 127.0.0.1 -p 6379 -a StrongPass@2025 slowlog reset
 
-
+16:26:14 root@redis02:~# bash redis_slowlog_export.sh
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+OK
+16:26:15 root@redis02:~# ls -l /var/log/redis/slowlog/
+total 12
+-rw-r--r-- 1 root root  33 Nov 30 16:23 slowlog_2025-11-30_16-23-46.log
+-rw-r--r-- 1 root root 327 Nov 30 16:25 slowlog_2025-11-30_16-25-39.log
+-rw-r--r-- 1 root root 470 Nov 30 16:26 slowlog_2025-11-30_16-26-15.log
+16:26:57 root@redis02:~#
 ```
+
+#### 2.3.4.2 使用 Redis 模块（如 redis-log）
+通过第三方模块将慢查询日志实时写入磁盘或 ELK 等日志系统，适合大规模集群环境（需提前编译模块并通过 `loadmodule` 加载）。
+
+### 2.3.5 慢查询产生的原因
+#### 2.3.5.1 全量遍历命令（最常见）
+
+- 慢查询命令：`keys *`、`smembers 大集合键`、`hgetall 大哈希键`、`lrange 列表键 0 -1`（全量获取列表）；
+- 原因：这些命令会遍历键的所有元素，若键包含 10 万 + 元素，执行时间会远超阈值；
+- 优化方案：
+    - 替换 `keys *`：用 `scan` 命令分批遍历（非阻塞），示例：`scan 0 MATCH user_* COUNT 100`（每次返回 100 个键）；
+    - 替换 `smembers`/`hgetall`：用 `sscan`/`hscan` 分批获取元素，示例：`hscan user:100 0 COUNT 50`（分批获取哈希字段）；
+    - 避免全量获取列表：用 `lrange 列表键 0 99`（仅获取前 100 个元素），或拆分列表为多个小列表。
+
+#### 2.3.5.2 大键操作（删除 / 修改）
+
+- 慢查询命令：`del 大键`（如包含 100 万元素的集合）、`unlink 大键`（虽异步，但仍可能记录为慢查询）；
+- 原因：`del` 命令会阻塞主线程直到删除完成，`unlink` 虽异步，但命令触发时仍可能有短暂耗时；
+- 优化方案：
+    - 用 `unlink` 替代 `del`（异步删除，非阻塞），示例：`unlink large_set_key`；
+    - 提前拆分大键：将一个大集合拆分为多个小集合（如 `user_set_1`、`user_set_2`），避免单键过大。
+
+#### 2.3.5.3 复杂集合运算
+
+- 慢查询命令：`sinter 集合1 集合2`（求交集）、`sunion 集合1 集合2`（求并集），且集合元素数量大；
+- 原因：集合运算需遍历两个集合的所有元素，元素越多耗时越长；
+- 优化方案：
+    - 避免在 Redis 中做复杂集合运算：将运算逻辑迁移到应用层（如先获取两个集合的元素，在应用层求交集）；
+    - 缩小集合规模：定期清理集合中的无效元素，或拆分集合。
+
+#### 2.3.5.4 内存满导致的阻塞
+
+- 慢查询现象：多个命令突然变为慢查询，且 `info memory` 显示 `used_memory > maxmemory`；
+- 原因：Redis 内存达到 `maxmemory` 阈值后，会触发内存淘汰策略（如 `allkeys-lru`），淘汰过程会阻塞主线程；
+- 优化方案：
+    - 调整 `maxmemory`：预留更多系统内存（如 8GB 服务器设为 6GB）；
+    - 优化内存淘汰策略：若业务允许，用 `volatile-lru`（仅淘汰带过期时间的键），减少淘汰耗时；
+    - 定期清理无效键：删除过期键、冗余键，避免内存溢出。
+
+#### 2.3.5.5 持久化影响
+
+- 慢查询现象：`bgsave`/`bgrewriteaof` 执行期间，大量命令变为慢查询；
+- 原因：后台持久化会占用 CPU/IO 资源，导致主线程命令执行变慢；
+- 优化方案：
+    - 调整持久化时机：在业务低峰期（如凌晨 3 点）执行 `bgsave`，避免高峰期影响；
+    - 优化持久化配置：关闭 RDB 自动快照（注释 `save` 配置），仅保留 AOF 持久化，或调整 AOF 同步策略为 `appendfsync everysec`（平衡性能和安全性）。
 ## 2.4 redis 持久化
 
 Redis 是基于内存型的 NoSQL, 和 MySQL 是不同的,使用内存进行数据保存
