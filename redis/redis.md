@@ -2573,10 +2573,19 @@ total 668K
 
 
 #### 2.4.1.2 RDB 相关配置
+|配置项|语法格式|核心作用|默认值|生产推荐配置|注意事项|
+|---|---|---|---|---|---|
+|`save`|`save <seconds> <changes>`|自动触发 RDB 的规则：<br><br>seconds 内发生 changes 次数据修改，触发 `bgsave`|3 条默认规则：<br><br>`save 900 1`（15 分钟 1 次修改）<br><br>`save 300 10`（5 分钟 10 次修改）<br><br>`save 60 10000`（1 分钟 1 万次修改）|根据业务调整：<br><br>`save 3600 1`（1 小时 1 次修改）<br><br>`save 600 10`（10 分钟 10 次修改）<br><br>`save 60 5000`（1 分钟 5 千次修改）|1. 规则之间是「或」关系，满足任一即触发；<br><br>2. 注释所有 `save` 配置可禁用自动 RDB；<br><br>3. 写入频繁的业务可调大 `changes`（避免频繁 fork 子进程）|
+|`dbfilename`|`dbfilename <filename>`|RDB 快照文件名|`dump.rdb`|`dbfilename redis-8.2.1.rdb`|建议添加版本号，便于区分快照版本（如 `redis-8.2.1_20251205.rdb`）|
+|`dir`|`dir <path>`|RDB 文件存储目录|`.`（Redis 启动目录）|`dir /var/lib/redis`|必须与你之前创建的数据目录一致，且 `redis` 用户有读写权限|
+|`rdbcompression`|`rdbcompression yes/no`|是否压缩 RDB 文件（LZF 算法）|`yes`|`yes`|1. 开启：节省磁盘空间，消耗少量 CPU；<br><br>2. 关闭：适合 CPU 紧张、磁盘充足的场景|
+|`rdbchecksum`|`rdbchecksum yes/no`|是否对 RDB 文件做 CRC64 校验（确保文件完整性）|`yes`|`yes`|关闭可提升快照速度，但无法检测文件损坏（不推荐）|
+|`stop-writes-on-bgsave-error`|`stop-writes-on-bgsave-error yes/no`|若 `bgsave` 执行失败（如磁盘满、权限不足），是否禁止后续写入|`yes`|`yes`|生产环境推荐开启：避免数据仅在内存中，无快照备份|
+|`rdb-del-sync-files`|`rdb-del-sync-files yes/no`|主从复制时，主节点发送 RDB 文件给从节点后，是否删除本地临时 RDB 文件|`no`|`no`|保留临时文件，便于后续排查复制问题|
 
 ```bash
-#在配置文件中的 save 选项设置多个保存条件，只有任何一个条件满足，服务器都会自动执行 BGSAVE 命令
-#Redis7.0以后支持写在一行，如：save 3600 1 300 100 60 10000，此也为默认值
+# 在配置文件中的 save 选项设置多个保存条件，只有任何一个条件满足，服务器都会自动执行 BGSAVE 命令
+# Redis7.0 以后支持写在一行，如：save 3600 1 300 100 60 10000，此也为默认值
 save 900 1         #900s内修改了1个key即触发保存RDB
 save 300 10        #300s内修改了10个key即触发保存RDB
 save 60 10000      #60s内修改了10000个key即触发保存RDB
@@ -2585,7 +2594,6 @@ dir ./             #编泽编译安装时默认RDB文件存放在Redis的�
 stop-writes-on-bgsave-error yes  #当快照失败是否仍允许写入,yes为出错后禁止写入,建议为no
 rdbcompression yes
 rdbchecksum yes
-
 
 ```
 
@@ -2606,13 +2614,8 @@ OK
 # 在 60s 内修改三个 key 会触发 bgsave
 ```
 
-#### 2.4.1.4 实现 RDB 的方法
 
-1. save: 同步,不推荐使用，使用主进程完成快照，因此会阻塞其它命令执行
-2. bgsave: 异步后台执行,不影响其它命令的执行，会开启独立的子进程，因此不会阻赛其它命令执行
-3. 配置文件实现自动保存: 在配置文件中制定规则,自动执行 bgsave
-
-#### 2.4.1.5 RDB 模式优缺点
+#### 2.4.1.4 RDB 模式优缺点
 
 ##### 2.4.1.4.1 RDB 优点
 
