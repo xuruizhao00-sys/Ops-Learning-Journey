@@ -2633,75 +2633,224 @@ OK
 
 2. 在数据集比较庞大时，fork()子进程可能会非常耗时，造成服务器在一定时间内停止处理客户端请求,如果数据集非常巨大，并且CPU时间非常紧张的话，那么这种停止时间甚至可能会长达整整一秒或更久。另外子进程完成生成RDB文件的时间也会花更长时间
 
-范例: 手动执行备份RDB
+#### 2.4.1.5 redis RDB 备份脚本
 
 ```bash
-# 准备 redis 配置文件
-root@prometheus-221:~ 18:44:43 # vim /apps/redis/etc/redis.conf
-save ""
-dbfilename dump_6379.rdb
-dir "/data/redis"
-appendonly no
-
-# 自动备份脚本
 # 在 redis 进行备份时，有一个参数可以作为参考是否备份完成 
 # rdb_bgsave_in_progress 为 1 时，表示还未备份完成
 # rdb_bgsave_in_progress 为 0 时，表示备份完成
-BACKUP=/backup/redis-rdb
-DIR=/data/redis
-FILE=dump_6379.rdb
-PASS=123456
-color () {
-	RES_COL=60
-	MOVE_TO_COL="echo -en \\033[${RES_COL}G"
-	SETCOLOR_SUCCESS="echo -en \\033[1;32m"
-	SETCOLOR_FAILURE="echo -en \\033[1;31m"
-	SETCOLOR_WARNING="echo -en \\033[1;33m"
-	SETCOLOR_NORMAL="echo -en \E[0m"
-    echo -n "$1" && $MOVE_TO_COL
-    echo -n "["
-    if [ $2 = "success" -o $2 = "0" ] ;then
-        ${SETCOLOR_SUCCESS}
-        echo -n $" OK "    
-    elif [ $2 = "failure" -o $2 = "1" ] ;then 
-        ${SETCOLOR_FAILURE}
-        echo -n $"FAILED"
-    else
-        ${SETCOLOR_WARNING}
-        echo -n $"WARNING"
-    fi
-    ${SETCOLOR_NORMAL}
-    echo -n "]"
-    echo
+
+
+# ==============================================================================
+# 脚本基础信息
+# filename: redis_backup_rdb.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+
+# ========================= 基础配置（根据实际环境修改）=========================
+REDIS_HOST="127.0.0.1"          # Redis主机地址
+REDIS_PORT=6379                 # Redis端口
+REDIS_PASSWORD="your_password"  # Redis密码（无密码则设为空字符串 ""）
+REDIS_DB=0                      # 备份的数据库（0为默认，RDB默认备份所有库）
+RDB_FILENAME="dump.rdb"         # Redis配置的RDB文件名（默认dump.rdb）
+REDIS_DATA_DIR="/var/lib/redis" # Redis数据目录（需与redis.conf中dir配置一致）
+
+BACKUP_DIR="/data/redis/backup" # 备份文件存放目录
+RETENTION_DAYS=7                # 备份保留天数（超过自动删除）
+LOG_FILE="/var/log/redis_backup.log" # 日志文件路径
+##############################################################################
+
+# ========================= 脚本内部变量（无需修改）=========================
+CURRENT_TIME=$(date +"%Y%m%d_%H%M%S")  # 当前时间戳（用于备份文件名）
+BACKUP_FILENAME="redis_rdb_backup_${CURRENT_TIME}.rdb"  # 备份文件名
+BACKUP_PATH="${BACKUP_DIR}/${BACKUP_FILENAME}"           # 完整备份路径
+REDIS_CLI_CMD="redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT}"  # redis-cli基础命令
+
+# ========================= 日志函数（统一日志格式）=========================
+log() {
+    local level=$1
+    local message=$2
+    echo "[$(date +"%Y-%m-%d %H:%M:%S")] [${level}] - ${message}" >> "${LOG_FILE}"
+    echo "[$(date +"%Y-%m-%d %H:%M:%S")] [${level}] - ${message}"  # 同时输出到控制台
 }
-redis-cli -h 127.0.0.1 -a $PASS --no-auth-warning bgsave 
-result=`redis-cli -a $PASS --no-auth-warning info Persistence |grep rdb_bgsave_in_progress| sed -rn 's/.*:([0-9]+).*/\1/p'`
-#result=`redis-cli -a $PASS --no-auth-warning info Persistence |awk -F: '/rdb_bgsave_in_progress/{print $2}'`
-until [ $result -eq 0 ] ;do
-    sleep 1
-    result=`redis-cli -a $PASS --no-auth-warning info Persistence |awk -F: '/rdb_bgsave_in_progress/{print $2}'`
-done
-DATE=`date +%F_%H-%M-%S`
-[ -e $BACKUP ] || { mkdir -p $BACKUP ; chown -R redis.redis $BACKUP; }
-scp $DIR/$FILE $BACKUP/dump_6379-${DATE}.rdb backup-server:/backup/
 
-color "Backup redis RDB" 0
+# ========================= 前置检查（确保环境可用）=========================
+pre_check() {
+    log "INFO" "开始执行Redis RDB备份前置检查"
 
-# 查看 redis 中的数据
-root@prometheus-221:~ 18:44:43 # redis-cli -a 123456
-Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
-127.0.0.1:6379> dbsize
-(integer) 10100001
-127.0.0.1:6379> exit
+    # 1. 检查redis-cli是否存在
+    if ! command -v ${REDIS_CLI_CMD% *} &> /dev/null; then
+        log "ERROR" "未找到redis-cli，请确保其在PATH中或修改脚本中的REDIS_CLI_CMD"
+        exit 1
+    fi
 
+    # 2. 检查Redis连接状态
+    if [ -n "${REDIS_PASSWORD}" ]; then
+        CONNECT_TEST=$(${REDIS_CLI_CMD} -a "${REDIS_PASSWORD}" ping 2>/dev/null)
+    else
+        CONNECT_TEST=$(${REDIS_CLI_CMD} ping 2>/dev/null)
+    fi
 
-#执行
-[root@centos8 ~]#bash redis_backup_rdb.sh
-Background saving started
-Backup redis RDB                                           [ OK ]
-[root@centos8 ~]#ll /backup/redis-rdb/ -h
-total 143M
--rw-r--r-- 1 redis redis 143M Oct 21 11:08 dump_6379-2020-10-21_11-08-47.rdb
+    if [ "${CONNECT_TEST}" != "PONG" ]; then
+        log "ERROR" "Redis连接失败（主机：${REDIS_HOST}:${REDIS_PORT}，密码：${REDIS_PASSWORD:-(无)}）"
+        exit 1
+    fi
+
+    # 3. 检查Redis数据目录是否存在
+    if [ ! -d "${REDIS_DATA_DIR}" ]; then
+        log "ERROR" "Redis数据目录不存在：${REDIS_DATA_DIR}（请与redis.conf中的dir配置一致）"
+        exit 1
+    fi
+
+    # 4. 检查RDB文件是否存在
+    if [ ! -f "${REDIS_DATA_DIR}/${RDB_FILENAME}" ]; then
+        log "WARNING" "当前未找到RDB文件：${REDIS_DATA_DIR}/${RDB_FILENAME}，将执行首次备份"
+    fi
+
+    # 5. 检查备份目录是否存在，不存在则创建
+    if [ ! -d "${BACKUP_DIR}" ]; then
+        log "INFO" "备份目录不存在，创建目录：${BACKUP_DIR}"
+        mkdir -p "${BACKUP_DIR}" || {
+            log "ERROR" "创建备份目录失败：${BACKUP_DIR}"
+            exit 1
+        }
+    fi
+
+    log "INFO" "前置检查通过，开始执行备份"
+}
+
+# ========================= 执行RDB备份（异步BGSAVE）=========================
+execute_backup() {
+    log "INFO" "开始执行Redis BGSAVE命令（异步备份，不阻塞Redis）"
+
+    # 执行BGSAVE命令
+    if [ -n "${REDIS_PASSWORD}" ]; then
+        BGSAVE_RESULT=$(${REDIS_CLI_CMD} -a "${REDIS_PASSWORD}" bgsave 2>/dev/null)
+    else
+        BGSAVE_RESULT=$(${REDIS_CLI_CMD} bgsave 2>/dev/null)
+    fi
+
+    # 检查BGSAVE命令是否提交成功
+    if [ "${BGSAVE_RESULT}" != "Background saving started" ]; then
+        log "ERROR" "BGSAVE命令执行失败，返回结果：${BGSAVE_RESULT:-未知错误}"
+        exit 1
+    fi
+
+    log "INFO" "BGSAVE命令已提交，等待备份完成..."
+
+    # 等待备份完成（轮询检查备份状态）
+    BACKUP_COMPLETED=0
+    MAX_WAIT_SECONDS=3600  # 最大等待时间（1小时）
+    WAIT_SECONDS=0
+
+    while [ ${BACKUP_COMPLETED} -eq 0 ] && [ ${WAIT_SECONDS} -lt ${MAX_WAIT_SECONDS} ]; do
+        # 获取Redis备份状态
+        if [ -n "${REDIS_PASSWORD}" ]; then
+            INFO_RESULT=$(${REDIS_CLI_CMD} -a "${REDIS_PASSWORD}" info persistence 2>/dev/null)
+        else
+            INFO_RESULT=$(${REDIS_CLI_CMD} info persistence 2>/dev/null)
+        fi
+
+        # 提取rdb_bgsave_in_progress状态（1=备份中，0=备份完成）
+        BGSAVE_IN_PROGRESS=$(echo "${INFO_RESULT}" | grep "rdb_bgsave_in_progress:" | awk -F: '{print $2}' | tr -d '[:space:]')
+        
+        if [ "${BGSAVE_IN_PROGRESS}" == "0" ]; then
+            # 检查备份是否成功（rdb_last_bgsave_status=ok）
+            BGSAVE_STATUS=$(echo "${INFO_RESULT}" | grep "rdb_last_bgsave_status:" | awk -F: '{print $2}' | tr -d '[:space:]')
+            if [ "${BGSAVE_STATUS}" == "ok" ]; then
+                log "INFO" "Redis BGSAVE备份完成"
+                BACKUP_COMPLETED=1
+            else
+                log "ERROR" "BGSAVE备份失败，状态：${BGSAVE_STATUS}"
+                exit 1
+            fi
+        else
+            # 每10秒检查一次
+            sleep 10
+            WAIT_SECONDS=$((WAIT_SECONDS + 10))
+            log "INFO" "备份中，已等待${WAIT_SECONDS}秒（最大${MAX_WAIT_SECONDS}秒）"
+        fi
+    done
+
+    # 检查是否超时
+    if [ ${WAIT_SECONDS} -ge ${MAX_WAIT_SECONDS} ]; then
+        log "ERROR" "BGSAVE备份超时（超过${MAX_WAIT_SECONDS}秒）"
+        exit 1
+    fi
+}
+
+# ========================= 备份文件归档（复制+校验）=========================
+archive_backup() {
+    log "INFO" "开始归档备份文件"
+
+    # 复制RDB文件到备份目录（保留原文件，避免影响Redis）
+    cp -f "${REDIS_DATA_DIR}/${RDB_FILENAME}" "${BACKUP_PATH}" || {
+        log "ERROR" "复制RDB文件失败：${REDIS_DATA_DIR}/${RDB_FILENAME} -> ${BACKUP_PATH}"
+        exit 1
+    }
+
+    # 校验备份文件（检查文件大小是否正常）
+    SOURCE_SIZE=$(du -b "${REDIS_DATA_DIR}/${RDB_FILENAME}" | awk '{print $1}')
+    BACKUP_SIZE=$(du -b "${BACKUP_PATH}" | awk '{print $1}')
+
+    if [ "${SOURCE_SIZE}" -ne "${BACKUP_SIZE}" ]; then
+        log "WARNING" "备份文件大小与源文件不一致（源：${SOURCE_SIZE}字节，备份：${BACKUP_SIZE}字节），可能备份损坏"
+    else
+        log "INFO" "备份文件归档成功：${BACKUP_PATH}（大小：${SOURCE_SIZE}字节）"
+    fi
+}
+
+# ========================= 清理旧备份（按保留天数删除）=========================
+clean_old_backups() {
+    if [ ${RETENTION_DAYS} -le 0 ]; then
+        log "INFO" "保留天数设置为${RETENTION_DAYS}，不清理旧备份"
+        return
+    fi
+
+    log "INFO" "开始清理${RETENTION_DAYS}天前的旧备份"
+
+    # 删除备份目录中超过保留天数的.rdb备份文件
+    find "${BACKUP_DIR}" -name "redis_rdb_backup_*.rdb" -type f -mtime +${RETENTION_DAYS} -delete || {
+        log "ERROR" "清理旧备份失败"
+        # 清理失败不终止脚本，仅记录警告
+        return 1
+    }
+
+    # 统计剩余备份数量
+    REMAIN_BACKUPS=$(find "${BACKUP_DIR}" -name "redis_rdb_backup_*.rdb" -type f | wc -l)
+    log "INFO" "旧备份清理完成，当前剩余备份数量：${REMAIN_BACKUPS}"
+}
+
+# ========================= 主流程执行 =========================
+main() {
+    pre_check                # 前置检查
+    execute_backup           # 执行BGSAVE备份
+    archive_backup           # 归档备份文件
+    clean_old_backups        # 清理旧备份
+    log "INFO" "Redis RDB手动备份执行完成！"
+    exit 0
+}
+
+# 启动主流程
+main
+
+18:20:56 root@redis02:~# bash redis_backup_rdb.sh 
+[2025-11-30 18:21:12] [INFO] - 开始执行Redis RDB备份前置检查
+[2025-11-30 18:21:12] [INFO] - 前置检查通过，开始执行备份
+[2025-11-30 18:21:12] [INFO] - 开始执行Redis BGSAVE命令（异步备份，不阻塞Redis）
+[2025-11-30 18:21:12] [INFO] - BGSAVE命令已提交，等待备份完成...
+[2025-11-30 18:21:22] [INFO] - 备份中，已等待10秒（最大3600秒）
+[2025-11-30 18:21:32] [INFO] - 备份中，已等待20秒（最大3600秒）
+[2025-11-30 18:21:32] [INFO] - Redis BGSAVE备份完成
+[2025-11-30 18:21:32] [INFO] - 开始归档备份文件
+[2025-11-30 18:21:34] [INFO] - 备份文件归档成功：/var/lib/redis/redis_rdb_backup_20251130_182112.rdb（大小：189855688字节）
+[2025-11-30 18:21:34] [INFO] - 开始清理7天前的旧备份
+[2025-11-30 18:21:34] [INFO] - 旧备份清理完成，当前剩余备份数量：2
+[2025-11-30 18:21:34] [INFO] - Redis RDB手动备份执行完成！
 
 ```
 
