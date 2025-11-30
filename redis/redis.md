@@ -1362,7 +1362,14 @@ db0_distrib_strings_sizes:4=1
 127.0.0.1:6379> 
 ```
 
-#### 1.2.2.8 脚本安装 redis
+#### 1.2.2.8 故障排查
+| 报错现象                                                   | 原因                       | 解决方案                                                                                |
+| ------------------------------------------------------ | ------------------------ | ----------------------------------------------------------------------------------- |
+| 启动失败，日志显示「Permission denied」                           | 目录 / 文件权限未改为 redis:redis | 重新执行 `chown -R redis:redis /etc/redis /var/lib/redis /var/log/redis /var/run/redis` |
+| 启动失败，日志显示「PID file exists, but process is not running」 | 残留 PID 文件未删除             | `rm -f /var/run/redis/redis-server.pid`，再重启服务                                       |
+| 无法停止服务，提示「NOAUTH Authentication required」              | `ExecStop` 中的密码与配置文件不一致  | 修改服务文件的 `ExecStop` 密码，与 `requirepass` 匹配                                            |
+| 连接 Redis 提示「Permission denied」                         | redis 用户无 redis-cli 执行权限 | 检查 `redis-cli` 权限：`chmod 755 /usr/local/bin/redis-cli`（默认安装后权限正常）                   |
+#### 1.2.2.9 脚本安装 redis
 
 ```bash
 root@node2-112:~ 16:42:50 # cat install_redis.sh
