@@ -2300,10 +2300,9 @@ OK
 范例: SLOW LOG
 
 ```bash
-root@prometheus-221:~ 18:01:21 # grep slowlog /apps/redis/etc/redis.conf 
-slowlog-log-slower-than  10000	 # 单位为 us，指定超过 1us 即为慢的指令，默认值为 10000us  微秒
-slowlog-max-len 128				# 指定只保存最近的慢记录，默认值为 128
-root@prometheus-221:~ 18:01:31 #
+15:12:19 root@redis02:~# grep slowlog /etc/redis/redis.conf 
+slowlog-log-slower-than 10000 # 单位为 us，指定超过 1us 即为慢的指令，默认值为 10000us 微秒
+slowlog-max-len 128 # 指定只保存最近的慢记录，默认值为 128
 
 # 调整 slowlog-log-slower-than 和 slowlog-max-len 值
 127.0.0.1:6379> config set slowlog-log-slower-than 1
