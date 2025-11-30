@@ -1,6 +1,13 @@
 ```bash
+# ==============================================================================
+# 脚本基础信息
+# filename: install_redis.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
 #!/bin/bash
-
 
 #本脚本支持在线和离线安装
 
@@ -36,8 +43,8 @@ color () {
     echo -n "["
     if [ $2 = "success" -o $2 = "0" ] ;then
         ${SETCOLOR_SUCCESS}
-        echo -n $"  OK  "    
-    elif [ $2 = "failure" -o $2 = "1"  ] ;then 
+        echo -n $"  OK  "
+    elif [ $2 = "failure" -o $2 = "1"  ] ;then
         ${SETCOLOR_FAILURE}
         echo -n $"FAILED"
     else
@@ -46,7 +53,7 @@ color () {
     fi
     ${SETCOLOR_NORMAL}
     echo -n "]"
-    echo 
+    echo
 }
 
 
@@ -54,7 +61,7 @@ prepare(){
     if [ $ID = "centos" -o $ID = "rocky" ];then
         yum  -y install gcc make jemalloc-devel systemd-devel
     else
-        apt update 
+        apt update
         #redis-8.X以后版本安装下面相关包
         apt install -y --no-install-recommends  gcc make ca-certificates  wget dpkg-dev  g++  libc6-dev  libssl-dev  git cmake python3 python3-pip python3-venv python3-dev unzip rsync  clang  automake   autoconf libtool libjemalloc-dev pkg-config libsystemd-dev
         #redis-7.X以前版本安装下面相关包
@@ -68,7 +75,7 @@ prepare(){
     fi
 }
 
-install() {   
+install() {
     if [ ! -f ${REDIS_VERSION}.tar.gz ];then
         wget http://download.redis.io/releases/${REDIS_VERSION}.tar.gz || { color "Redis 源码下载失败" 1 ; exit; }
     fi
@@ -79,16 +86,16 @@ install() {
     make -j $CUPS USE_SYSTEMD=yes PREFIX=${INSTALL_DIR} install && color "Redis 编译安装完成" 0 || { color "Redis 编译安装失败" 1 ;exit ; }
 
     ln -s ${INSTALL_DIR}/bin/redis-*  /usr/local/bin/
-    
+
     mkdir -p ${INSTALL_DIR}/{etc,log,data,run}
-  
+
     cp redis.conf  ${INSTALL_DIR}/etc/
 
     sed -i -e 's/bind 127.0.0.1/bind 0.0.0.0/'  -e "/# requirepass/a requirepass $PASSWORD"  -e "/^dir .*/c dir ${INSTALL_DIR}/data/"  -e "/logfile .*/c logfile ${INSTALL_DIR}/log/redis-6379.log"  -e  "/^pidfile .*/c  pidfile ${INSTALL_DIR}/run/redis_6379.pid" ${INSTALL_DIR}/etc/redis.conf
 
 
-    if id redis &> /dev/null ;then 
-         color "Redis 用户已存在" 1 
+    if id redis &> /dev/null ;then
+         color "Redis 用户已存在" 1
     else
          useradd -r -s /sbin/nologin redis
          color "Redis 用户创建成功" 0
@@ -100,12 +107,12 @@ install() {
 net.core.somaxconn = 1024
 vm.overcommit_memory = 1
 EOF
-    sysctl -p 
+    sysctl -p
     if [ $ID = "centos" -o $ID = "rocky" ];then
         echo 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' >> /etc/rc.d/rc.local
         chmod +x /etc/rc.d/rc.local
-        /etc/rc.d/rc.local 
-    else 
+        /etc/rc.d/rc.local
+    else
         echo -e '#!/bin/bash\necho never > /sys/kernel/mm/transparent_hugepage/enabled' >> /etc/rc.local
         chmod +x /etc/rc.local
         /etc/rc.local
@@ -131,20 +138,20 @@ LimitNOFILE=1000000
 WantedBy=multi-user.target
 
 EOF
-     systemctl daemon-reload 
-     systemctl enable --now  redis &> /dev/null 
+     systemctl daemon-reload
+     systemctl enable --now  redis &> /dev/null
      if [ $? -eq 0 ];then
-         color "Redis 服务启动成功,Redis信息如下:"  0 
+         color "Redis 服务启动成功,Redis信息如下:"  0
      else
-        color "Redis 启动失败" 1 
+        color "Redis 启动失败" 1
         exit
      fi
      sleep 2
      redis-cli -a $PASSWORD INFO Server 2> /dev/null
 }
 
-prepare 
+prepare
 
-install 
+install
 
 ```
