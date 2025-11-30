@@ -952,10 +952,12 @@ root hard nofile 20000
 ##### 1.2.2.4.1 创建 Redis 专用用户和组
 
 ```bash
-root@prometheus-221:~ 16:08:16 # useradd -r -s /sbin/nologin redis
-root@prometheus-221:~ 16:08:18 # getent passwd redis 
-redis:x:997:997::/home/redis:/sbin/nologin
-root@prometheus-221:~ 16:08:24 # 
+10:58:17 root@redis02:~# groupadd -r redis
+11:04:13 root@redis02:~# useradd -r -s /sbin/nologin -g redis -d /var/lib/redis redis
+11:04:18 root@redis02:~# getent passwd redis 
+redis:x:999:988::/var/lib/redis:/sbin/nologin
+11:04:23 root@redis02:~# 
+
 
 root@prometheus-221:~ 16:08:24 # chown -R redis.redis /apps/redis/
 root@prometheus-221:~ 16:08:43 # vim /apps/redis/etc/redis.conf 
@@ -968,6 +970,7 @@ logfile /apps/redis/log/6379.log
 # bind 设置
 bind 0.0.0.0 -::1
 ```
+##### 1.2.2.4.1 调整 Redis 相关目录和文件权限
 
 #### 1.2.2.5 创建 redis 的 service 文件
 
