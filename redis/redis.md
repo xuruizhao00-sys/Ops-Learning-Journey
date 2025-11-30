@@ -2545,6 +2545,27 @@ OK
 由于 Redis 只保留最后一个版本的 RDB 文件,如果想实现保存多个版本的数据,需要人为实现
 
 ```bash
+# 还没有开始 bgsave 备份
+           |-redis-server(40565)-+-{redis-server}(40566)
+           |                     |-{redis-server}(40567)
+           |                     |-{redis-server}(40568)
+           |                     |-{redis-server}(40569)
+           |                     `-{redis-server}(40570)
+           |-sshd(7324)-+-sshd(14542)---bash(14710)---redis-cli(40984)
+           |            |-sshd(14779)---bash(14835)---redis-cli(40576)
+total 0
+`
+# 开始 bgsave 备份
+           |-redis-server(40565)-+-redis-server(40996)
+           |                     |-{redis-server}(40566)
+           |                     |-{redis-server}(40567)
+           |                     |-{redis-server}(40568)
+           |                     |-{redis-server}(40569)
+           |                     `-{redis-server}(40570)
+           |-sshd(7324)-+-sshd(14542)---bash(14710)---redis-cli(40984)
+           |            |-sshd(14779)---bash(14835)---redis-cli(40576)
+total 668K
+-rw-r--r-- 1 redis redis 668K Nov 30 17:51 temp-40996.rdb
 
 
 ```
