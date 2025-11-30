@@ -587,21 +587,21 @@ root@prometheus-221:~ 15:51:53 #  cp redis.conf /apps/redis/etc/
 
 ###### 1.2.2.1.1.1 Ubuntu24.04 编译安装 redis-8.2.1/8.0.2
 ```bash
-# 安装依赖
+# 1、安装依赖
 22:11:29 root@redis02:~# apt install -y --no-install-recommends gcc make ca-certificates wget dpkg-dev g++ libc6-dev libssl-dev git cmake python3 python3-pip python3-venv python3-dev unzip rsync clang automake  autoconf libtool pkg-config libsystemd-dev
 
-# 下载官方源码包（Redis 官网稳定版地址，速度快且安全）
+# 2、下载官方源码包（Redis 官网稳定版地址，速度快且安全）
 22:16:48 root@redis02:~# version=8.2.1
 22:18:32 root@redis02:~# wget -O redis-$version.tar.gz https://github.com/redis/redis/archive/refs/tags/$version.tar.gz
 
-# 验证源码包完整性（可选但推荐，避免下载损坏）
+# 3、证源码包完整性（可选但推荐，避免下载损坏）
 # 先获取官网 SHA256 校验值（官网地址：https://download.redis.io/releases/）
 # 本地计算校验值并对比（输出需与官网一致）
 10:28:07 root@redis02:~# sha256sum  redis-8.2.1.tar.gz 
 517e47ebce911ebbed2fe86047a871d9cbeadc7d2de15ffca37a1540eb4d588f  redis-8.2.1.tar.gz
 10:28:19 root@redis02:~#
 
-# 解压源码包
+# 4、解压源码包
 22:24:44 root@redis02:~# tar xf redis-8.2.1.tar.gz 
 22:24:50 root@redis02:~# cd redis-8.2.1/
 22:24:53 root@redis02:~/redis-8.2.1# ls
