@@ -2381,6 +2381,25 @@ OK  # 清空后，新日志从 ID 1 重新开始
 #### 2.3.4.1 定期导出到文件（脚本自动化）
 创建定时脚本，将慢查询日志导出到磁盘文件：
 ```bash
+# ==============================================================================
+# 脚本基础信息
+# filename: redis_slowlog_export.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+# 导出时间（格式：年-月-日_时-分-秒）
+export_time=$(date +%Y-%m-%d_%H-%M-%S)
+# 导出目录（提前创建）
+export_dir="/var/log/redis/slowlog"
+mkdir -p $export_dir
+# 导出命令（连接 Redis，获取慢查询，写入文件）
+redis-cli -h 127.0.0.1 -p 6379 -a StrongPass@2025 slowlog get > $export_dir/slowlog_$export_time.log
+# 清空慢查询日志（避免重复导出，可选）
+redis-cli -h 127.0.0.1 -p 6379 -a StrongPass@2025 slowlog reset
+
 
 ```
 ## 2.4 redis 持久化
