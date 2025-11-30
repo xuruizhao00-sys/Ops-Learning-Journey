@@ -713,15 +713,17 @@ tcp   LISTEN 0      511             [::]:6379         [::]:*    users:(("redis-s
 redis-server 是 redis 服务器端的主程序
 
 ```shell
- root@prometheus-221:~ 15:52:05 # redis-server --help
+10:30:13 root@redis02:~# redis-8.2.1/src/redis-server --help
 Usage: ./redis-server [/path/to/redis.conf] [options] [-]
        ./redis-server - (read config from stdin)
        ./redis-server -v or --version
        ./redis-server -h or --help
        ./redis-server --test-memory <megabytes>
+       ./redis-server --check-system
 
 Examples:
        ./redis-server (run the server with default conf)
+       echo 'maxmemory 128mb' | ./redis-server -
        ./redis-server /etc/redis/6379.conf
        ./redis-server --port 7777
        ./redis-server --port 7777 --replicaof 127.0.0.1 8888
@@ -730,25 +732,26 @@ Examples:
 
 Sentinel mode:
        ./redis-server /etc/sentinel.conf --sentinel
+10:30:30 root@redis02:~#
 
 ```
 
 前台启动
 
 ```bash
-root@prometheus-221:~ 15:56:31 # redis-server /apps/redis/etc/redis.conf 
-97995:C 15 Oct 2025 15:56:36.730 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
-97995:C 15 Oct 2025 15:56:36.730 # Redis version=7.0.0, bits=64, commit=00000000, modified=0, pid=97995, just started
-97995:C 15 Oct 2025 15:56:36.730 # Configuration loaded
-97995:M 15 Oct 2025 15:56:36.732 * Increased maximum number of open files to 10032 (it was originally set to 1024).
-97995:M 15 Oct 2025 15:56:36.732 * monotonic clock: POSIX clock_gettime
+10:30:30 root@redis02:~# redis-8.2.1/src/redis-server 
+14773:C 30 Nov 2025 10:30:55.641 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+14773:C 30 Nov 2025 10:30:55.641 * Redis version=8.2.1, bits=64, commit=00000000, modified=1, pid=14773, just started
+14773:C 30 Nov 2025 10:30:55.641 # Warning: no config file specified, using the default config. In order to specify a config file use redis-8.2.1/src/redis-server /path/to/redis.conf
+14773:M 30 Nov 2025 10:30:55.645 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+14773:M 30 Nov 2025 10:30:55.645 * monotonic clock: POSIX clock_gettime
                 _._                                                  
            _.-``__ ''-._                                             
-      _.-``    `.  `_.  ''-._           Redis 7.0.0 (00000000/0) 64 bit
-  .-`` .-```.  ```\/    _.,_ ''-._                                  
+      _.-``    `.  `_.  ''-._           Redis Open Source            
+  .-`` .-```.  ```\/    _.,_ ''-._      8.2.1 (00000000/1) 64 bit
  (    '      ,       .-`  | `,    )     Running in standalone mode
  |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
- |    `-._   `._    /     _.-'    |     PID: 97995
+ |    `-._   `._    /     _.-'    |     PID: 14773
   `-._    `-._  `-./  _.-'    _.-'                                   
  |`-._`-._    `-.__.-'    _.-'_.-'|                                  
  |    `-._`-._        _.-'_.-'    |           https://redis.io       
@@ -760,39 +763,35 @@ root@prometheus-221:~ 15:56:31 # redis-server /apps/redis/etc/redis.conf
           `-._        _.-'                                           
               `-.__.-'                                               
 
-97995:M 15 Oct 2025 15:56:36.737 # Server initialized
-97995:M 15 Oct 2025 15:56:36.738 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
-97995:M 15 Oct 2025 15:56:36.739 * The AOF directory appendonlydir doesn't exist
-97995:M 15 Oct 2025 15:56:36.740 * Loading RDB produced by version 7.0.0
-97995:M 15 Oct 2025 15:56:36.740 * RDB age 132 seconds
-97995:M 15 Oct 2025 15:56:36.740 * RDB memory usage when created 0.92 Mb
-97995:M 15 Oct 2025 15:56:36.740 * Done loading RDB, keys loaded: 0, keys expired: 0.
-97995:M 15 Oct 2025 15:56:36.740 * DB loaded from disk: 0.000 seconds
-97995:M 15 Oct 2025 15:56:36.740 * Ready to accept connections
-...
+14773:M 30 Nov 2025 10:30:55.663 * Server initialized
+14773:M 30 Nov 2025 10:30:55.664 * Ready to accept connections tcp
 
 
-root@prometheus-221:~ 15:57:03 # ss -tunlp | grep 6379
-tcp   LISTEN 0      511                           127.0.0.1:6379      0.0.0.0:*    users:(("redis-server",pid=97995,fd=6))    
-tcp   LISTEN 0      511                               [::1]:6379         [::]:*    users:(("redis-server",pid=97995,fd=7))    
-root@prometheus-221:~ 15:57:11 # redis-cli  
-127.0.0.1:6379> 
+10:31:21 root@redis02:~# ss -tunlp | grep 6379
+tcp   LISTEN 0      511          0.0.0.0:6379      0.0.0.0:*    users:(("redis-server",pid=14773,fd=8))                
+tcp   LISTEN 0      511             [::]:6379         [::]:*    users:(("redis-server",pid=14773,fd=9))                
 
+10:31:42 root@redis02:~# redis-8.2.1/src/redis-cli
+127.0.0.1:6379>
+```
 
-# 启动 redis 多实例
-root@prometheus-221:~ 15:58:36 # redis-server --port 6380
-98147:C 15 Oct 2025 15:58:45.710 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
-98147:C 15 Oct 2025 15:58:45.710 # Redis version=7.0.0, bits=64, commit=00000000, modified=0, pid=98147, just started
-98147:C 15 Oct 2025 15:58:45.710 # Configuration loaded
-98147:M 15 Oct 2025 15:58:45.711 * Increased maximum number of open files to 10032 (it was originally set to 1024).
-98147:M 15 Oct 2025 15:58:45.711 * monotonic clock: POSIX clock_gettime
+启动 Redis 多实例
+
+```bash
+# Redis 启动多实例
+10:33:19 root@redis02:~# redis-8.2.1/src/redis-server --port 6380
+14865:C 30 Nov 2025 10:33:37.126 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+14865:C 30 Nov 2025 10:33:37.126 * Redis version=8.2.1, bits=64, commit=00000000, modified=1, pid=14865, just started
+14865:C 30 Nov 2025 10:33:37.126 * Configuration loaded
+14865:M 30 Nov 2025 10:33:37.128 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+14865:M 30 Nov 2025 10:33:37.128 * monotonic clock: POSIX clock_gettime
                 _._                                                  
            _.-``__ ''-._                                             
-      _.-``    `.  `_.  ''-._           Redis 7.0.0 (00000000/0) 64 bit
-  .-`` .-```.  ```\/    _.,_ ''-._                                  
+      _.-``    `.  `_.  ''-._           Redis Open Source            
+  .-`` .-```.  ```\/    _.,_ ''-._      8.2.1 (00000000/1) 64 bit
  (    '      ,       .-`  | `,    )     Running in standalone mode
  |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6380
- |    `-._   `._    /     _.-'    |     PID: 98147
+ |    `-._   `._    /     _.-'    |     PID: 14865
   `-._    `-._  `-./  _.-'    _.-'                                   
  |`-._`-._    `-.__.-'    _.-'_.-'|                                  
  |    `-._`-._        _.-'_.-'    |           https://redis.io       
@@ -804,25 +803,17 @@ root@prometheus-221:~ 15:58:36 # redis-server --port 6380
           `-._        _.-'                                           
               `-.__.-'                                               
 
-98147:M 15 Oct 2025 15:58:45.713 # Server initialized
-98147:M 15 Oct 2025 15:58:45.713 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
-98147:M 15 Oct 2025 15:58:45.715 * The AOF directory appendonlydir doesn't exist
-98147:M 15 Oct 2025 15:58:45.715 * Loading RDB produced by version 7.0.0
-98147:M 15 Oct 2025 15:58:45.715 * RDB age 261 seconds
-98147:M 15 Oct 2025 15:58:45.715 * RDB memory usage when created 0.92 Mb
-98147:M 15 Oct 2025 15:58:45.715 * Done loading RDB, keys loaded: 0, keys expired: 0.
-98147:M 15 Oct 2025 15:58:45.715 * DB loaded from disk: 0.000 seconds
-98147:M 15 Oct 2025 15:58:45.715 * Ready to accept connections
+14865:M 30 Nov 2025 10:33:37.135 * Server initialized
+14865:M 30 Nov 2025 10:33:37.135 * Ready to accept connections tcp
 
+10:34:27 root@redis02:~# ss -tunlp | grep -E  "(6379)|(6380)"
+tcp   LISTEN 0      511          0.0.0.0:6380      0.0.0.0:*    users:(("redis-server",pid=14865,fd=8))                
+tcp   LISTEN 0      511          0.0.0.0:6379      0.0.0.0:*    users:(("redis-server",pid=14773,fd=8))                
+tcp   LISTEN 0      511             [::]:6380         [::]:*    users:(("redis-server",pid=14865,fd=9))                
+tcp   LISTEN 0      511             [::]:6379         [::]:*    users:(("redis-server",pid=14773,fd=9))  
 
-# 测试
-root@prometheus-221:~ 15:58:35 # ss -tunlp | grep -E "6379|6380"
-tcp   LISTEN 0      511                           127.0.0.1:6379      0.0.0.0:*    users:(("redis-server",pid=97995,fd=6))    
-tcp   LISTEN 0      511                             0.0.0.0:6380      0.0.0.0:*    users:(("redis-server",pid=98147,fd=6))    
-tcp   LISTEN 0      511                                [::]:6380         [::]:*    users:(("redis-server",pid=98147,fd=7))    
-tcp   LISTEN 0      511                               [::1]:6379         [::]:*    users:(("redis-server",pid=97995,fd=7))    
-root@prometheus-221:~ 15:59:13 # redis-cli -p 6380
-127.0.0.1:6380> 
+10:34:58 root@redis02:~# redis-8.2.1/src/redis-cli -p 6380
+127.0.0.1:6380>
 ```
 
 #### 1.2.2.3 消除 redis 启动的警告
