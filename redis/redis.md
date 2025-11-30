@@ -2870,6 +2870,7 @@ redis-client-->|send wrire command|redis-server-->|sync write command|AOF记录�
 - **与 RDB 的本质区别**：
     - RDB 记录「数据快照」（某一时刻的全量数据）；
     - AOF 记录「命令日志」（数据变更的过程）。
+##### 2.4.2.1.2 AOF 核心工作机制
 AOF 即 AppendOnlyFile，AOF 和 RDB 都采有 COW 机制
 
 AOF 可以指定不同的保存策略,默认为每秒钟执行一次 fsync,按照操作的顺序地将变更命令追加至指定的 AOF 日志文件尾部
