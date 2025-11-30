@@ -2764,8 +2764,6 @@ root@prometheus-221:~ 15:59:19 #
 
 ## 2.5 Redis 常用命令
 
-
-
 官网
 
 https://redis.io/commands
