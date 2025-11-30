@@ -2964,6 +2964,67 @@ SHUTDOWN 命令执行以下操作：
 vim /etc/redis.conf
 rename-command shutdown ""
 ```
+### 2.5.9 redis 常用命令进阶整理
+>在熟练掌握上面的命令后，在进行后面的命令练习
+#### 2.5.9.1 连接与退出命令
+| 命令              | 语法               | 作用                     | 示例（结合你的配置）                                                                                                                                                               |
+| --------------- | ---------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `redis-cli`     | `redis-cli [选项]` | 启动 Redis 客户端（连接服务）     | 1. 本地普通连接：`redis-cli -h 127.0.0.1 -p 6379 -a StrongPass@2025`<br><br>2. TLS 连接：`redis-cli -h 127.0.0.1 -p 6380 --tls --cacert /etc/redis/ca-cert.pem -a StrongPass@2025` |
+| `auth`          | `auth 密码`        | 连接后输入密码（若未在命令行指定 `-a`） | 连接后执行：`auth StrongPass@2025` → 返回 `OK` 表示认证成功                                                                                                                            |
+| `quit` / `exit` | `quit` 或 `exit`  | 优雅退出客户端连接              | `127.0.0.1:6379> quit` → 关闭连接                                                                                                                                            |
+| `ping`          | `ping [消息]`      | 测试服务连通性（心跳检测）          | `127.0.0.1:6379> ping` → 返回 `PONG`（服务正常）；`ping "hello"` → 返回 `"hello"`                                                                                                   |
+#### 2.5.9.2 键（Key）操作命令（高频）
+| 命令         | 语法                              | 作用                         | 示例                                                                                         |
+| ---------- | ------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------ |
+| `keys`     | `keys 模式`                       | 模糊匹配键（支持 `*` `?` `[]` 通配符） | 1. 匹配所有键：`keys *`<br><br>2. 匹配以 `user_` 开头的键：`keys user_*`<br><br>⚠️ 注意：生产环境慎用（遍历所有键，阻塞服务） |
+| `exists`   | `exists 键1 [键2 ...]`            | 检查键是否存在（返回存在的数量）           | `exists user_100` → 返回 `1`（存在）/ `0`（不存在）；`exists user_100 product_200` → 返回 `2`            |
+| `del`      | `del 键1 [键2 ...]`               | 删除指定键（返回删除成功的数量）           | `del user_100` → 返回 `1`（删除成功）；`del non_exist_key` → 返回 `0`                                 |
+| `unlink`   | `unlink 键1 [键2 ...]`            | 异步删除大键（非阻塞，Redis 4.0+）     | `unlink large_key` → 适合删除占用内存大的键（避免阻塞主线程）                                                  |
+| `expire`   | `expire 键 秒数`                   | 设置键的过期时间（单位：秒）             | `expire user_100 3600` → 1 小时后自动删除 `user_100`                                              |
+| `expireat` | `expireat 键 时间戳`                | 按 Unix 时间戳设置过期时间           | `expireat user_100 1735689600` → 2025-01-01 00:00 自动删除                                     |
+| `ttl`      | `ttl 键`                         | 查看键的剩余过期时间（秒）              | 返回值：`-1`（无过期）、`-2`（已过期 / 不存在）、正数（剩余秒数）                                                     |
+| `persist`  | `persist 键`                     | 取消键的过期时间（转为永久存在）           | `persist user_100` → 返回 `1`（取消成功）                                                          |
+| `rename`   | `rename 原键 新键`                  | 重命名键（若新键存在则覆盖）             | `rename user_100 user_100_new` → 重命名键                                                      |
+| `renamenx` | `renamenx 原键 新键`                | 仅当新键不存在时重命名（避免覆盖）          | `renamenx user_100 user_100_new` → 新键不存在返回 `1`，存在返回 `0`                                    |
+| `type`     | `type 键`                        | 查看键对应的值类型（字符串 / 哈希 / 列表等）  | `type user_100` → 返回 `string`（字符串类型）、`hash`（哈希类型）等                                         |
+| `scan`     | `scan 游标 [MATCH 模式] [COUNT 数量]` | 迭代遍历键（非阻塞，替代 `keys`）       | `scan 0 MATCH user_* COUNT 10` → 从游标 0 开始，匹配 `user_` 开头的键，每次返回 10 个                        |
+#### 2.5.9.3 服务器管理命令（运维高频）
+用于监控 Redis 状态、调整配置、管理服务：
+
+| 命令               | 语法                  | 作用                      | 示例与说明                                                                                                                                                                                    |
+| ---------------- | ------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `info`           | `info [section]`    | 查看服务器状态信息（支持按模块查询）      | 1. 查看所有信息：`info`<br><br>2. 查看内存信息：`info memory`<br><br>3. 查看持久化信息：`info persistence`<br><br>4. 查看客户端连接：`info clients`                                                                    |
+| `config get`     | `config get 配置项`    | 查看配置项当前值（支持 `*` 通配符）    | `config get protected-mode` → 返回 `1) "protected-mode" 2) "0"`（关闭状态）；`config get maxmemory` → 查看最大内存限制                                                                                    |
+| `config set`     | `config set 配置项 值`  | 动态修改配置项（无需重启，临时生效）      | `config set loglevel warning` → 日志级别改为警告；`config rewrite` → 持久化到配置文件（永久生效）                                                                                                               |
+| `config rewrite` | `config rewrite`    | 将动态修改的配置写入配置文件（永久生效）    | 执行 `config set` 后，必须执行此命令，否则重启后配置失效                                                                                                                                                      |
+| `client list`    | `client list`       | 查看所有客户端连接信息（IP、端口、状态等）  | `client list` → 返回每个连接的详细信息（如 `id=123 addr=192.168.1.100:54321 fd=6 name= age=300 idle=0 flags=N db=0 sub=0 psub=0 multi=-1 qbuf=0 qbuf-free=32768 obl=0 oll=0 omem=0 events=r cmd=get`） |
+| `client kill`    | `client kill IP:端口` | 强制关闭指定客户端连接             | `client kill 192.168.1.100:54321` → 关闭该 IP: 端口的连接                                                                                                                                        |
+| `slowlog`        | `slowlog get [数量]`  | 查看慢查询日志（默认阈值 10 毫秒）     | `slowlog get 10` → 查看最近 10 条慢查询；`slowlog reset` → 清空慢查询日志                                                                                                                                |
+| `stats reset`    | `stats reset`       | 重置服务器统计信息（如命令执行次数、连接数等） | `stats reset` → 重置后 `info stats` 中的统计值重新计数                                                                                                                                               |
+|                  |                     |                         |                                                                                                                                                                                          |
+
+#### 2.5.9.4 安全命令（适配你的密码配置）
+|命令|语法|作用|示例|
+|---|---|---|---|
+|`requirepass`|`config set requirepass 新密码`|动态修改访问密码（临时生效）|`config set requirepass NewStrongPass@2025` → 修改密码；`config rewrite` → 永久生效|
+|`config get requirepass`|`config get requirepass`|查看当前密码（需先认证）|`auth StrongPass@2025` → `config get requirepass` → 返回密码值|
+#### 2.5.9.5 持久化命令（控制 RDB/AOF 持久化，避免数据丢失）
+
+|命令|语法|作用|示例与注意事项|
+|---|---|---|---|
+|`save`|`save`|同步执行 RDB 持久化（阻塞服务）|`save` → 立即生成 RDB 快照（`dump.rdb`）；⚠️ 生产慎用（阻塞主线程，大内存时耗时久）|
+|`bgsave`|`bgsave`|异步执行 RDB 持久化（非阻塞）|`bgsave` → 后台生成 RDB 快照（推荐生产使用），返回 `Background saving started`|
+|`lastsave`|`lastsave`|查看最后一次 RDB 持久化的时间戳|`lastsave` → 返回 Unix 时间戳（如 `1735689600`），可转换为日期|
+|`bgrewriteaof`|`bgrewriteaof`|异步重写 AOF 文件（压缩体积，Redis 2.4+）|启用 AOF 后执行：`bgrewriteaof` → 优化 AOF 文件大小（去除冗余命令）|
+|`appendonly`|`config set appendonly yes/no`|动态启用 / 禁用 AOF 持久化（无需重启）|`config set appendonly yes` → 启用 AOF；`config rewrite` → 持久化到配置文件（避免重启失效）|
+
+#### 2.5.9.6 过期时间命令（补充键操作，强化生命周期管理）
+
+| 命令          | 语法                  | 作用                       | 示例                                                   |
+| ----------- | ------------------- | ------------------------ | ---------------------------------------------------- |
+| `pexpire`   | `pexpire 键 毫秒数`     | 设置过期时间（单位：毫秒，Redis 2.6+） | `pexpire code 60000` → 60 秒（60000 毫秒）过期              |
+| `pexpireat` | `pexpireat 键 毫秒时间戳` | 按毫秒时间戳设置过期时间             | `pexpireat code 1735689600000` → 2025-01-01 00:00 过期 |
+| `pttl`      | `pttl 键`            | 查看剩余过期时间（毫秒）             | 返回 `12345`（剩余 12.345 秒）、`-1`（无过期）、`-2`（已过期）          |
 
 ## 2.6 redis 数据类型
 
