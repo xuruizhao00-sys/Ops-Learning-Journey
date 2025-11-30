@@ -2491,7 +2491,7 @@ RDB 持久化功能所生成的 RDB 文件是一个经过压缩的二进制文�
 范例
 
 ```bash
-#生成临时文件temp-<主进程PID>.rdb文件
+#生成临时文件 temp-<主进程PID>.rdb 文件
 [root@centos7 data]#redis-cli -a 123456 save&
 [1] 28684
 [root@centos7 data]#pstree -p |grep redis ;ll /apps/redis/data
