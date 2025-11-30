@@ -2775,60 +2775,58 @@ https://redis.io/commands
 ```bash
 127.0.0.1:6379> info
 # Server
-redis_version:7.0.0
+redis_version:8.2.1
 redis_git_sha1:00000000
-redis_git_dirty:0
-redis_build_id:9b54064f6699defd
+redis_git_dirty:1
+redis_build_id:28b7a201c4fd458a
 redis_mode:standalone
-os:Linux 5.15.0-140-generic x86_64
+os:Linux 6.8.0-88-generic x86_64
 arch_bits:64
 monotonic_clock:POSIX clock_gettime
 multiplexing_api:epoll
-...
-
+....
 
 
 # 只显示指定部分的内容
-root@prometheus-221:~ 16:07:48 # redis-cli -a 123456 info server
+14:59:46 root@redis02:~# redis-cli -a 123456 info server
 Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
 # Server
-redis_version:7.0.0
+redis_version:8.2.1
 redis_git_sha1:00000000
-redis_git_dirty:0
-redis_build_id:9b54064f6699defd
+redis_git_dirty:1
+redis_build_id:28b7a201c4fd458a
 redis_mode:standalone
-os:Linux 5.15.0-140-generic x86_64
+os:Linux 6.8.0-88-generic x86_64
 arch_bits:64
 monotonic_clock:POSIX clock_gettime
 multiplexing_api:epoll
 atomicvar_api:c11-builtin
-gcc_version:11.4.0
-process_id:118589
-process_supervised:systemd
-run_id:f5af3ed6ff72af26fd97208f183b725afe59059b
+gcc_version:13.3.0
+process_id:38732
+process_supervised:no
+run_id:7beeebaf041005b57f81a57ef186a646ab3d6b17
 tcp_port:6379
-server_time_usec:1760861273453620
-uptime_in_seconds:1168
+server_time_usec:1764485990698017
+uptime_in_seconds:12550
 uptime_in_days:0
 hz:10
 configured_hz:10
-lru_clock:16030809
-executable:/apps/redis/bin/redis-server
-config_file:/apps/redis/etc/redis.conf
+lru_clock:2878310
+executable:/usr/local/bin/redis-server
+config_file:/etc/redis/redis.conf
 io_threads_active:0
-root@prometheus-221:~ 16:07:53 #
+listener0:name=tcp,bind=0.0.0.0,port=6379
 
-
-root@prometheus-221:~ 16:07:53 # redis-cli -a 123456 info cluster
+14:59:50 root@redis02:~# redis-cli -a 123456 info cluster
 Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
 # Cluster
 cluster_enabled:0
-root@prometheus-221:~ 16:08:15 #
+15:00:06 root@redis02:~#
 ```
 
 ### 2.5.2 select
 
-切换数据库，相当于在 MySQL 的 USE DBNAME 指令
+切换数据库，相当于在 MySQL 的 `USE DBNAME` 指令
 
 ```bash
 root@prometheus-221:~ 16:08:15 # redis-cli -a 123456 
