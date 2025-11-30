@@ -1877,9 +1877,9 @@ root@prometheus-221:~ 18:19:58 #
 
 python 提供了多种开发库,都可以支持连接访问 Redis
 
-下面选择使用redis-py 库连接 Redis 
+下面选择使用 redis-py 库连接 Redis 
 
-github redis-py库 : https://github.com/andymccurdy/redis-py
+github redis-py 库 : https://github.com/andymccurdy/redis-py
 
 ```bash
 #Ubuntu安装
