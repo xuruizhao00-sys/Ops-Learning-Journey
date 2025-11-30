@@ -2505,32 +2505,38 @@ RDB 持久化的触发分为「自动触发」和「手动触发」，生产环�
 4. **子进程退出**：快照完成，子进程退出，主线程收到通知并记录快照时间（可通过 `lastsave` 命令查看）。
 
 ##### 2.5.1.1.3 RDB save 和 bgsave 区别
+Redis 的 `save` 和 `bgsave` 是触发 RDB 持久化的两种核心命令，**核心差异在于「是否阻塞 Redis 主线程」**。
 
-范例
+| 对比维度                                   | `save` 命令                      | `bgsave` 命令                                                                |
+| -------------------------------------- | ------------------------------ | -------------------------------------------------------------------------- |
+| **执行方式**                               | 同步执行（主线程直接处理）                  | 异步执行（fork 子进程处理）                                                           |
+| **主线程阻塞**                              | ✅ 阻塞（期间无法处理任何客户端请求）            | ❌ 不阻塞（仅 fork 子进程时短暂阻塞，毫秒级）                                                 |
+| **资源占用**                               | 仅占用主线程 CPU/IO，无额外内存开销          | 占用子进程 CPU/IO，fork 时需「写时复制（COW）」，暂用少量额外内存                                   |
+| **执行流程**                               | 主线程 → 遍历内存数据 → 写入 RDB 文件 → 完成  | 主线程 fork 子进程 → 子进程遍历数据 → 写入临时 RDB → 替换旧文件 → 子进程退出                          |
+| **失败影响**                               | 主线程阻塞期间，业务请求超时 / 失败            | 子进程执行失败，主线程不受影响（仅 RDB 快照失败）                                                |
+| **适用场景**                               | 测试环境、单机小数据量（≤1GB）、紧急备份（无业务）    | 生产环境、大数据量（≥1GB）、自动触发 RDB（`save` 配置规则）                                      |
+| **命令返回**                               | 执行完成后返回 `OK`（或报错）              | 立即返回 `Background saving started`（异步执行中）                                    |
+| **日志输出**                               | 主线程日志：`* DB saved on disk`     | 主线程日志：`* Background saving started by pid 1234`；子进程日志：`* DB saved on disk` |
+| **与 `stop-writes-on-bgsave-error` 关联** | 该配置对 `save` 无效（配置仅针对 `bgsave`） | 若执行失败，触发配置（默认 `yes`），禁止后续写入                                                |
+范例：save 命令进行备份
 
 ```bash
-#生成临时文件 temp-<主进程PID>.rdb 文件
-[root@centos7 data]#redis-cli -a 123456 save&
-[1] 28684
-[root@centos7 data]#pstree -p |grep redis ;ll /apps/redis/data
-           |-redis-server(28650)-+-{redis-server}(28651)
-           |                     |-{redis-server}(28652)
-           |                     |-{redis-server}(28653)
-           |                     `-{redis-server}(28654)
-           |           |                         `-redis-cli(28684)
-           |           `-sshd(23494)---bash(23496)---redis-cli(28601)
-total 251016
--rw-r--r-- 1 redis redis 189855682 Nov 17 15:02 dump.rdb
--rw-r--r-- 1 redis redis  45674498 Nov 17 15:02 temp-28650.rdb
+# 手动触发 save 备份
+127.0.0.1:6379> save 
+OK
+(17.07s)
+
+# 后续的请求会处于等待序列中
+127.0.0.1:6379> set a 1
+(14.69s)
+
 ```
 
 **RDB bgsave** **实现快照的具体过程:**
 
 ![image-20251016183451154](redis.assets/image-20251016183451154.png)
 
-
-
-
+范例：bgsave 命令进行备份
 
 首先从 redis 主进程先 fork 生成一个新的子进程,此子进程负责将 Redis 内存数据保存为一个临时文件 tmp-<子进程pid>.rdb
 
@@ -2539,18 +2545,7 @@ total 251016
 由于 Redis 只保留最后一个版本的 RDB 文件,如果想实现保存多个版本的数据,需要人为实现
 
 ```bash
-drwxr-xr-x 2 redis redis    4096 Oct 16 18:46 ./
-drwxr-xr-x 7 redis redis    4096 Oct 14 13:23 ../
--rw-r--r-- 1 redis redis 1335296 Oct 16 18:46 temp-112820.rdb
-           |-redis-server(112820)-+-{redis-server}(112822)
-           |                      |-{redis-server}(112823)
-           |                      |-{redis-server}(112824)
-           |                      `-{redis-server}(112825)
-           |-sshd(91677)-+-sshd(100684)---bash(100793)---redis-cli(112912)
-total 2012
-drwxr-xr-x 2 redis redis    4096 Oct 16 18:46 ./
-drwxr-xr-x 7 redis redis    4096 Oct 14 13:23 ../
--rw-r--r-- 1 redis redis 2052096 Oct 16 18:46 temp-112820.rdb
+
 
 ```
 
