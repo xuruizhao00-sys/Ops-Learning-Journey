@@ -625,9 +625,13 @@ INSTALL_RUST_TOOLCHAIN=no
 DISABLE_WERRORS=yes
 22:30:45 root@redis02:~/redis-8.2.1# export BUILD_TLS=no BUILD_WITH_MODULES=no INSTALL_RUST_TOOLCHAIN=no DISABLE_WERRORS=yes
 22:31:14 root@redis02:~/redis-8.2.1# env
+# 避坑提示：
+# - 若服务器内存 ≤ 2GB，建议手动指定线程数（如 -j 2），避免内存不足编译崩溃
+# - 若不需要 TLS 或模块，可将对应变量设为 no（如 BUILD_TLS=no），编译更快
 
 # 安装
 22:31:17 root@redis02:~/redis-8.2.1# make -j "$(nproc)" all
+# 编译后单元测试（可选，验证功能完整性）
 
 # 验证
 22:39:02 root@redis02:~/redis-8.2.1# ./src/redis-server --version
