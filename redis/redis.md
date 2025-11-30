@@ -1883,7 +1883,7 @@ github redis-py 库 : https://github.com/andymccurdy/redis-py
 
 ```bash
 # Ubuntu 安装
-[root@ubuntu2204 ~]#apt update && apt -y install python3-redis
+14:37:22 root@redis02:~# apt update && apt -y install python3-redis
 [root@ubuntu2004 ~]#apt update && apt -y install python3-redis
 # CentOS 安装
 [root@centos8 ~]#yum info python3-redis
