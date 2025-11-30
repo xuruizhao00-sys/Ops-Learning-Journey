@@ -1000,6 +1000,14 @@ chmod -R 750 /var/run/redis
 
 ##### 1.2.2.4.3 修改 redis 配置文件
 ```bash
+11:26:15 root@redis02:~# cat /etc/redis/redis.conf | grep -E "^(dir|logfile|protected-mode|requirepass|pidfile|logfile|bind|port)"
+bind 0.0.0.0
+protected-mode no
+port 6379
+pidfile /var/run/redis/redis_6379.pid
+logfile "/var/log/redis/redis-server.log"
+dir  /var/lib/redis
+requirepass 123456
 
 ```
 
