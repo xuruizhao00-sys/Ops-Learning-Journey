@@ -971,7 +971,9 @@ logfile /apps/redis/log/6379.log
 bind 0.0.0.0 -::1
 ```
 ##### 1.2.2.4.1 调整 Redis 相关目录和文件权限
+```bash
 
+```
 #### 1.2.2.5 创建 redis 的 service 文件
 
 ```bash
