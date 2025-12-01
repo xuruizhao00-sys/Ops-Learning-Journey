@@ -3734,11 +3734,13 @@ OK
 127.0.0.1:6379> strlen name
 (integer) 4
 127.0.0.1:6379>
-127.0.0.1:6379[15]> append name  " is student"
-(integer) 19
-127.0.0.1:6379[15]> strlen name    # 返回字节数
-(integer) 19
-127.0.0.1:6379[15]> 
+127.0.0.1:6379> append name " is a student"
+(integer) 17
+127.0.0.1:6379> get name
+"lisi is a student"
+127.0.0.1:6379> strlen name
+(integer) 17
+127.0.0.1:6379> 
 
 
 127.0.0.1:6379[15]> set name "张三"
