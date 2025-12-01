@@ -3715,26 +3715,25 @@ OK
 #### 2.6.1.7 设置新值并返回旧值
 
 ```bash
-127.0.0.1:6379[15]> set name zhangsan
+127.0.0.1:6379> set name zhangsan xx
 OK
-127.0.0.1:6379[15]> get name
+127.0.0.1:6379> get name
 "zhangsan"
-127.0.0.1:6379[15]> getset name lisi
+127.0.0.1:6379> getset name lisi
 "zhangsan"
-127.0.0.1:6379[15]> get name
+127.0.0.1:6379> get name
 "lisi"
-127.0.0.1:6379[15]> 
+127.0.0.1:6379> 
 ```
 
 ####  2.6.1.8 返回字符串 key 对应值的字节数
 
 ```bash
-127.0.0.1:6379[15]> set name zhangsan
-OK
-127.0.0.1:6379[15]> get name
-"zhangsan"
-127.0.0.1:6379[15]> strlen name
-(integer) 8
+127.0.0.1:6379> get name
+"lisi"
+127.0.0.1:6379> strlen name
+(integer) 4
+127.0.0.1:6379>
 127.0.0.1:6379[15]> append name  " is student"
 (integer) 19
 127.0.0.1:6379[15]> strlen name    # 返回字节数
