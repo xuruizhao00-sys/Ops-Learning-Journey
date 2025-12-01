@@ -3703,13 +3703,13 @@ OK
 #### 2.6.1.6 追加 key 数据
 
 ```bash
-127.0.0.1:6379[15]> get key1
-"value1"
-127.0.0.1:6379[15]> append key1 "append new data"
-(integer) 21
-127.0.0.1:6379[15]> get key1
-"value1append new data"
-127.0.0.1:6379[15]>
+127.0.0.1:6379> get name
+"zhangsan"
+127.0.0.1:6379> append name " lisi"
+(integer) 13
+127.0.0.1:6379> get name
+"zhangsan lisi"
+127.0.0.1:6379> 
 ```
 
 #### 2.6.1.7 设置新值并返回旧值
