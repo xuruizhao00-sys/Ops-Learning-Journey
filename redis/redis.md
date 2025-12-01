@@ -4750,6 +4750,10 @@ Reading messages... (press Ctrl-C to quit)
 ```
 
 ## 2.8 redis 数据类型扩展
+### 2.8.1 位图（Bitmap）：基于 String 的二进制位操作（极致省内存）
+核心说明
+- 底层：String 二进制存储，1 个字节 = 8 个 bit，存储状态（0/1）；
+- 场景：用户在线状态、签到统计、权限标记（100 万用户仅需 125KB）。
 
 # 三、redis 集群和高可用
 
