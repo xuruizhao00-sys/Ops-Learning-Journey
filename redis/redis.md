@@ -3755,24 +3755,25 @@ OK
 #### 2.6.1.9 判断 key 是否存在
 
 ```bash
-127.0.0.1:6379[15]> 
-127.0.0.1:6379[15]> set name zhangsan ex 10 
+127.0.0.1:6379> set name zhangsan ex 20
 OK
-127.0.0.1:6379[15]> set age 10
-OK
-127.0.0.1:6379[15]> exists name   # 0 表示不存在，1 表示存在
+127.0.0.1:6379> get name
+"zhangsan"
+127.0.0.1:6379> exists name
 (integer) 1
-127.0.0.1:6379[15]> exists name
+127.0.0.1:6379> exists name
+(integer) 1
+# 20s 后失效
+127.0.0.1:6379> exists name
 (integer) 0
-127.0.0.1:6379[15]> exists age 
-(integer) 1
-127.0.0.1:6379[15]> exists age name  # 表示有一个存在
-(integer) 1
-127.0.0.1:6379[15]> set name zhangsan ex 10 
+127.0.0.1:6379> 
+
+# 可以同时判断多个变量shi'fou'a'c
+127.0.0.1:6379> mset age 12 name zhangsan ex 20
 OK
-127.0.0.1:6379[15]> exists age name   # 表示两个都存在 
+127.0.0.1:6379> exists age name
 (integer) 2
-127.0.0.1:6379[15]>
+127.0.0.1:6379>
 ```
 
 #### 2.6.1.10 获取 key 过期时长
