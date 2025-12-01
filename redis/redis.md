@@ -3581,64 +3581,75 @@ XX ： 只在键已经存在时， 才对键进行设置操作。
 
 ```bash
 # 不论 key 是否存在都设置
-127.0.0.1:6379[15]> set key1 value1
+127.0.0.1:6379> set key1 v1
 OK
-127.0.0.1:6379[15]> get key1
-"value1"
+127.0.0.1:6379> get key1
+"v1"
+127.0.0.1:6379> set key1 v1
+OK
+127.0.0.1:6379> get key1
+"v1"
+127.0.0.1:6379>
 127.0.0.1:6379[15]> type key1   # 查看数据类型
 string 
 127.0.0.1:6379[15]> 
 
-127.0.0.1:6379[15]> set title ceo ex 3  # 设置自动过期时间3s
+# 设置过期时间 3 s
+127.0.0.1:6379> set key2 v2 ex 3 
 OK
-127.0.0.1:6379[15]> get title
-"ceo"
-127.0.0.1:6379[15]> get title
-"ceo"
-127.0.0.1:6379[15]> get title
-"ceo"
-127.0.0.1:6379[15]> get title
+127.0.0.1:6379> get key2
+"v2"
+127.0.0.1:6379> get key2
+"v2"
+127.0.0.1:6379> get key2
 (nil)
-127.0.0.1:6379[15]>
+127.0.0.1:6379> get key2
+(nil)
+
 
 # key 大小写敏感
-127.0.0.1:6379> get name
-(nil)
-127.0.0.1:6379> set name xixi
+127.0.0.1:6379> set name zhangsan
+OK
+127.0.0.1:6379> set NAME XXX
 OK
 127.0.0.1:6379> get name
-"xixi"
+"zhangsan"
 127.0.0.1:6379> get NAME
-"haha"
+"XXX"
+127.0.0.1:6379>
 
-# key不存在,才设置,相当于add
-127.0.0.1:6379[15]> set title ceo 
+# key 不存在,才设置,相当于 add
+127.0.0.1:6379> set title cto
 OK
-127.0.0.1:6379[15]> get title
-"ceo"
-127.0.0.1:6379[15]> setnx title cto  # 此时 key 存在，不会进行设置 == set title cto nx
-(integer) 0
-127.0.0.1:6379[15]> get title
-"ceo"
-127.0.0.1:6379[15]> 
-
-
-# key存在,才设置,相当于update
-127.0.0.1:6379[15]> set title cto  xx
-OK
-127.0.0.1:6379[15]> get title
+127.0.0.1:6379> get title
 "cto"
-127.0.0.1:6379[15]> 
+
+# setnx title cto ==== set title cto nx
+127.0.0.1:6379> setnx title ceo
+(integer) 0
+127.0.0.1:6379> get title
+"cto"
+127.0.0.1:6379> 
+
+
+# key 存在,才设置,相当于 update
+127.0.0.1:6379> set title ceo xx
+OK
+127.0.0.1:6379> get title
+"ceo"
+127.0.0.1:6379>
 ```
 
 #### 2.6.1.2 查看 key 值
 
 ```bash
-127.0.0.1:6379> get key1
-"value1"
-#get只能查看一个key的值
-127.0.0.1:6379> get name age
+127.0.0.1:6379> get title
+"ceo"
+
+# get 一次只能查看一个 key 的值
+127.0.0.1:6379> get title name
 (error) ERR wrong number of arguments for 'get' command
+127.0.0.1:6379> 
 ```
 
 #### 2.6.1.3 删除 key
