@@ -3768,9 +3768,10 @@ OK
 (integer) 0
 127.0.0.1:6379> 
 
-# 可以同时判断多个变量shi'fou'a'c
+# 可以同时判断多个变量是否存在
 127.0.0.1:6379> mset age 12 name zhangsan ex 20
 OK
+# 表示两个变量都存在
 127.0.0.1:6379> exists age name
 (integer) 2
 127.0.0.1:6379>
