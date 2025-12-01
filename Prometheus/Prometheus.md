@@ -293,15 +293,15 @@ Prometheus 的主要模块包括：
 
 Prometheus 由几个主要的软件组件组成，其职责概述如下
 
-| 组件               | 解析                                                         |
-| ------------------ | ------------------------------------------------------------ |
-| Prometheus server  | 彼此独立运行，仅依靠其本地存储来实现其核心功能：抓取时序数据，规则处理和报警 |
-| Client Library     | 客户端库，为需要监控的服务生成相应的 metrics 并暴露给 Prometheus server。当 Prometheus server 来 pull 时，直接返回实时状态的 metrics。 |
+| 组件                 | 解析                                                                                                                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Prometheus server  | 彼此独立运行，仅依靠其本地存储来实现其核心功能：抓取时序数据，规则处理和报警                                                                                                    |
+| Client Library     | 客户端库，为需要监控的服务生成相应的 metrics 并暴露给 Prometheus server。当 Prometheus server 来 pull 时，直接返回实时状态的 metrics。                                         |
 | Push Gateway       | exporter 采集类型已经很丰富，但是依然需要很多自定义的监控数据,用 pushgateway 可以实现自定义的监控数据,任意灵活想做什么都可以做到 exporter 的开发需要使用真正的编程语言，不支持shell这种快速脚本,而pushgateway 开发就容易的多。 |
-| exporters          | 部署到第三方软件主机上，用于暴露已有的第三方服务的 metrics 给 Prometheus。 |
-| Alertmanager       | 从 Prometheus server 端接收到 alerts 后，会进行去除重复数据，分组，并路由到对应的接受方式，以高效向用户完成告警信息发送。常见的接收方式有：电子邮件，pagerduty，OpsGenie, webhook 等,一些其他的工具。 |
-| Data Visualization | Prometheus Web UI （Prometheus Server内建），及Grafana等     |
-| Service Discovery  | 动态发现待监控的 Target，从而完成监控配置的重要组件，在容器化环境中尤为有用；该组件目前由 Prometheus Server 内建支持； |
+| exporters          | 部署到第三方软件主机上，用于暴露已有的第三方服务的 metrics 给 Prometheus。                                                                                           |
+| Alertmanager       | 从 Prometheus server 端接收到 alerts 后，会进行去除重复数据，分组，并路由到对应的接受方式，以高效向用户完成告警信息发送。常见的接收方式有：电子邮件，pagerduty，OpsGenie, webhook 等,一些其他的工具。            |
+| Data Visualization | Prometheus Web UI （Prometheus Server内建），及Grafana等                                                                                         |
+| Service Discovery  | 动态发现待监控的 Target，从而完成监控配置的重要组件，在容器化环境中尤为有用；该组件目前由 Prometheus Server 内建支持；                                                                  |
 
 在上述的组件中，大多数都是用Go编写的，因此易于构建和部署为静态二进制文件。
 
