@@ -4931,6 +4931,51 @@ getbit user:online:1 5000 → 返回1（在线）/0（离线）
 - AOF 持久化：`setbit` 命令会记录到 AOF 日志（如 `setbit user:online 100 1`），若频繁修改，AOF 文件会变大；
     
     解决方案：启用 AOF 重写（默认开启），重写后会将多个 `setbit` 合并为更紧凑的命令，减少文件体积。
+### 2.8.2 地理空间（Geo）
+Redis Geo 是 **基于有序集合（ZSet）实现的地理位置数据类型**，核心作用是「存储经纬度坐标（如商家、用户位置），并高效支持距离计算、附近搜索等地理空间操作」。它并非独立底层结构，而是 Redis 对 ZSet 的封装（用 Geohash 编码经纬度作为 ZSet 分数，地理位置名称作为元素），兼顾存储效率和查询性能。
+#### 2.8.2.1 核心本质与底层实现
+##### 2.8.2.1.1 本质：ZSet 的地理空间封装
+
+- 存储结构：Geo 的键本质是一个 ZSet，每个元素包含两部分：
+    - 「成员（member）」：地理位置名称（如商家 ID、用户名，如 `shop_a`、`user:100`）；
+    - 「分数（score）」：经纬度通过 **Geohash 算法** 编码后的 64 位整数（Redis 内部自动完成编码 / 解码，用户无需关注）。
+- Geohash 编码作用：将二维的经纬度（经度：x 轴，纬度：y 轴）转为一维的整数分数，ZSet 按分数排序后，**地理上相近的位置会被编码为相邻的分数**，从而支持高效的 “附近搜索”。
+##### 2.8.2.1.2 核心特性
+
+- 支持的经纬度范围：
+    - 经度：-180° ~ 180°（如东经 116.4° 为正，西经 73.5° 为负）；
+    - 纬度：-85.05112878° ~ 85.05112878°（超出范围的经纬度会报错）；
+- 精度：Geohash 编码精度约为 1 米，满足绝大多数场景（如外卖、打车、附近商家）；
+- 性能：添加、删除、距离计算时间复杂度 O (1)，附近搜索 O (logN)（N 为元素数），支持百万级元素高效查询。
+
+#### 2.8.2.2 核心操作命令
+##### 2.8.2.2.1 命令整理
+
+|命令|语法格式|核心作用|生产实战示例（适配密码 / TLS）|
+|---|---|---|---|
+|`geoadd`|`geoadd 键 经度1 纬度1 成员1 [经度2 纬度2 成员2 ...]`|批量添加地理位置（经纬度 + 名称）|1. 普通环境：`redis-cli -a StrongPass@2025 geoadd shop:location 116.403963 39.915119 "shop_a" 116.418261 39.921984 "shop_b"`（添加北京 2 个商家）<br><br>2. TLS 环境：`redis-cli -p 6380 --tls --cacert /etc/redis/ca-cert.pem -a StrongPass@2025 geoadd user:location 120.1234 30.5678 "user:100"`（添加用户 100 的位置）|
+|`geodist`|`geodist 键 成员1 成员2 [m/km/mi/ft]`|计算两个位置的直线距离（默认单位：米）|`geodist shop:location "shop_a" "shop_b" km` → 返回 `"1.8763"`（约 1.88 公里）|
+|`georadius`|`georadius 键 经度 纬度 半径 [m/km/mi/ft] [ASC/DESC] [COUNT 数量] [WITHDIST] [WITHCOORD]`|按坐标搜索附近的位置（核心命令）|`georadius shop:location 116.403963 39.915119 3 km ASC COUNT 10 WITHDIST` → 搜索 3 公里内前 10 个商家，按距离升序，返回距离|
+|`georadiusbymember`|`georadiusbymember 键 参考成员 半径 [m/km/mi/ft] [ASC/DESC] [COUNT 数量]`|按已有成员搜索附近的位置（无需输入经纬度）|`georadiusbymember user:location "user:100" 5 km DESC COUNT 5` → 搜索用户 100 周围 5 公里内的前 5 个用户，按距离降序|
+|`geopos`|`geopos 键 成员1 [成员2 ...]`|获取成员的经纬度（解码 Geohash）|`geopos shop:location "shop_a"` → 返回 `1) "116.40396189689636" 2) "39.91511870542329"`（精度略有损耗，正常）|
+|`geohash`|`geohash 键 成员1 [成员2 ...]`|获取成员的 Geohash 编码（底层存储格式）|`geohash shop:location "shop_a"` → 返回 `"wx4g08b7rx0"`（字符串形式的 Geohash 编码）|
+|`zrem`|`zrem 键 成员1 [成员2 ...]`|删除地理位置（Geo 无专属删除命令，复用 ZSet 的 `zrem`）|`zrem shop:location "shop_b"` → 返回 `1`（删除成功）|
+##### 2.8.2.2.2 参数解析
+1. **`georadius`/`georadiusbymember` 核心参数**（附近搜索必用）：
+    - `ASC/DESC`：结果排序方式（`ASC` 按距离从近到远，`DESC` 从远到近，默认 `ASC`）；
+    - `COUNT 数量`：限制返回结果数（如 `COUNT 10` 只返回前 10 个，避免返回过多元素阻塞主线程）；
+    - `WITHDIST`：返回每个位置与中心点的距离（如 `1.8763 km`）；
+    - `WITHCOORD`：返回每个位置的经纬度；
+    - `WITHHASH`：返回每个位置的 Geohash 编码（调试用）。
+2. **距离单位**：
+    - `m`：米（默认）、`km`：公里、`mi`：英里、`ft`：英尺（生产常用 `km`/`m`）；
+3. **编码精度损耗**：`geopos` 返回的经纬度与 `geoadd` 输入的略有差异（如输入 116.403963，返回 116.40396189689636），是 Geohash 编码的正常精度损耗（误差 < 1 米），不影响使用。
+#### 2.8.2.3 典型使用场景
+#### 2.8.2.3.1 附近的商家 / POI 搜索（核心场景）
+用户打开外卖 App，搜索当前位置 3 公里内的餐厅，按距离从近到远排序，显示距离和商家名称；
+```bash
+
+```
 
 # 三、redis 集群和高可用
 
