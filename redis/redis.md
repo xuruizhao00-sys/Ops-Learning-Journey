@@ -4951,15 +4951,15 @@ Redis Geo 是 **基于有序集合（ZSet）实现的地理位置数据类型**
 #### 2.8.2.2 核心操作命令
 ##### 2.8.2.2.1 命令整理
 
-|命令|语法格式|核心作用|生产实战示例（适配密码 / TLS）|
-|---|---|---|---|
-|`geoadd`|`geoadd 键 经度1 纬度1 成员1 [经度2 纬度2 成员2 ...]`|批量添加地理位置（经纬度 + 名称）|1. 普通环境：`redis-cli -a StrongPass@2025 geoadd shop:location 116.403963 39.915119 "shop_a" 116.418261 39.921984 "shop_b"`（添加北京 2 个商家）<br><br>2. TLS 环境：`redis-cli -p 6380 --tls --cacert /etc/redis/ca-cert.pem -a StrongPass@2025 geoadd user:location 120.1234 30.5678 "user:100"`（添加用户 100 的位置）|
-|`geodist`|`geodist 键 成员1 成员2 [m/km/mi/ft]`|计算两个位置的直线距离（默认单位：米）|`geodist shop:location "shop_a" "shop_b" km` → 返回 `"1.8763"`（约 1.88 公里）|
-|`georadius`|`georadius 键 经度 纬度 半径 [m/km/mi/ft] [ASC/DESC] [COUNT 数量] [WITHDIST] [WITHCOORD]`|按坐标搜索附近的位置（核心命令）|`georadius shop:location 116.403963 39.915119 3 km ASC COUNT 10 WITHDIST` → 搜索 3 公里内前 10 个商家，按距离升序，返回距离|
-|`georadiusbymember`|`georadiusbymember 键 参考成员 半径 [m/km/mi/ft] [ASC/DESC] [COUNT 数量]`|按已有成员搜索附近的位置（无需输入经纬度）|`georadiusbymember user:location "user:100" 5 km DESC COUNT 5` → 搜索用户 100 周围 5 公里内的前 5 个用户，按距离降序|
-|`geopos`|`geopos 键 成员1 [成员2 ...]`|获取成员的经纬度（解码 Geohash）|`geopos shop:location "shop_a"` → 返回 `1) "116.40396189689636" 2) "39.91511870542329"`（精度略有损耗，正常）|
-|`geohash`|`geohash 键 成员1 [成员2 ...]`|获取成员的 Geohash 编码（底层存储格式）|`geohash shop:location "shop_a"` → 返回 `"wx4g08b7rx0"`（字符串形式的 Geohash 编码）|
-|`zrem`|`zrem 键 成员1 [成员2 ...]`|删除地理位置（Geo 无专属删除命令，复用 ZSet 的 `zrem`）|`zrem shop:location "shop_b"` → 返回 `1`（删除成功）|
+| 命令                  | 语法格式                                                                             | 核心作用                                 | 生产实战示例（适配密码 / TLS）                                                                                                                                                                                                                                                                               |
+| ------------------- | -------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `geoadd`            | `geoadd 键 经度1 纬度1 成员1 [经度2 纬度2 成员2 ...]`                                         | 批量添加地理位置（经纬度 + 名称）                   | 1. 普通环境：`redis-cli -a StrongPass@2025 geoadd shop:location 116.403963 39.915119 "shop_a" 116.418261 39.921984 "shop_b"`（添加北京 2 个商家）<br><br>2. TLS 环境：`redis-cli -p 6380 --tls --cacert /etc/redis/ca-cert.pem -a StrongPass@2025 geoadd user:location 120.1234 30.5678 "user:100"`（添加用户 100 的位置） |
+| `geodist`           | `geodist 键 成员1 成员2 [m/km/mi/ft]`                                                 | 计算两个位置的直线距离（默认单位：米）                  | `geodist shop:location "shop_a" "shop_b" km` → 返回 `"1.8763"`（约 1.88 公里）                                                                                                                                                                                                                          |
+| `georadius`         | `georadius 键 经度 纬度 半径 [m/km/mi/ft] [ASC/DESC] [COUNT 数量] [WITHDIST] [WITHCOORD]` | 按坐标搜索附近的位置（核心命令）                     | `georadius shop:location 116.403963 39.915119 3 km ASC COUNT 10 WITHDIST` → 搜索 3 公里内前 10 个商家，按距离升序，返回距离                                                                                                                                                                                          |
+| `georadiusbymember` | `georadiusbymember 键 参考成员 半径 [m/km/mi/ft] [ASC/DESC] [COUNT 数量]`                 | 按已有成员搜索附近的位置（无需输入经纬度）                | `georadiusbymember user:location "user:100" 5 km DESC COUNT 5` → 搜索用户 100 周围 5 公里内的前 5 个用户，按距离降序                                                                                                                                                                                                 |
+| `geopos`            | `geopos 键 成员1 [成员2 ...]`                                                         | 获取成员的经纬度（解码 Geohash）                 | `geopos shop:location "shop_a"` → 返回 `1) "116.40396189689636" 2) "39.91511870542329"`（精度略有损耗，正常）                                                                                                                                                                                                 |
+| `geohash`           | `geohash 键 成员1 [成员2 ...]`                                                        | 获取成员的 Geohash 编码（底层存储格式）             | `geohash shop:location "shop_a"` → 返回 `"wx4g08b7rx0"`（字符串形式的 Geohash 编码）                                                                                                                                                                                                                         |
+| `zrem`              | `zrem 键 成员1 [成员2 ...]`                                                           | 删除地理位置（Geo 无专属删除命令，复用 ZSet 的 `zrem`） | `zrem shop:location "shop_b"` → 返回 `1`（删除成功）                                                                                                                                                                                                                                                     |
 ##### 2.8.2.2.2 参数解析
 1. **`georadius`/`georadiusbymember` 核心参数**（附近搜索必用）：
     - `ASC/DESC`：结果排序方式（`ASC` 按距离从近到远，`DESC` 从远到近，默认 `ASC`）；
@@ -4971,12 +4971,72 @@ Redis Geo 是 **基于有序集合（ZSet）实现的地理位置数据类型**
     - `m`：米（默认）、`km`：公里、`mi`：英里、`ft`：英尺（生产常用 `km`/`m`）；
 3. **编码精度损耗**：`geopos` 返回的经纬度与 `geoadd` 输入的略有差异（如输入 116.403963，返回 116.40396189689636），是 Geohash 编码的正常精度损耗（误差 < 1 米），不影响使用。
 #### 2.8.2.3 典型使用场景
-#### 2.8.2.3.1 附近的商家 / POI 搜索（核心场景）
+##### 2.8.2.3.1 附近的商家 / POI 搜索（核心场景）
 用户打开外卖 App，搜索当前位置 3 公里内的餐厅，按距离从近到远排序，显示距离和商家名称；
 ```bash
+# 1. 提前添加商家地理位置（键：shop:location，成员：商家ID/名称，值：经纬度）
+geoadd shop:location 116.403963 39.915119 "shop_1001" 116.418261 39.921984 "shop_1002" 116.397470 39.908823 "shop_1003"
 
+# 2. 用户当前经纬度：116.403963（经度）、39.915119（纬度），搜索3公里内前10个商家
+georadius shop:location 116.403963 39.915119 3 km ASC COUNT 10 WITHDIST
+
+# 3. 返回结果示例（距离+商家ID）
+1) 1) "shop_1001" 2) "0.0000 km"  # 中心点就是shop_1001
+2) 1) "shop_1003" 2) "1.5234 km"
+3) 1) "shop_1002" 2) "1.8763 km"
 ```
 
+##### 2.8.2.3.2 外卖骑手 / 网约车司机定位追踪
+```bash
+# 1. 实时更新骑手位置（覆盖旧位置，Geo 会自动更新 ZSet 分数）
+geoadd rider:location 116.405000 39.916000 "rider_2001"  # 骑手2001的新位置
+
+# 2. 用户位置：116.403963、39.915119，搜索5公里内最近的3个骑手
+georadius rider:location 116.403963 39.915119 5 km ASC COUNT 3 WITHDIST
+
+# 3. 平台调度：获取骑手2001周围3公里内的订单（按成员搜索）
+georadiusbymember order:location "order_3001" 3 km ASC COUNT 1  # 订单3001周围3公里内最近的骑手
+```
+
+##### 2.8.2.3.3 好友距离排序（社交场景）
+```bash
+# 1. 添加好友位置（键：friend:location:user:100，成员：好友ID）
+geoadd friend:location:user:100 116.404000 39.915200 "friend_101" 116.406000 39.917000 "friend_102"
+
+# 2. 按当前用户（user:100）的位置搜索附近好友（复用成员搜索）
+georadiusbymember friend:location:user:100 "user:100" 10 km ASC COUNT 20 WITHDIST
+```
+#### 2.8.2.4 生产配置指南
+##### 2.8.2.4.1 键设计优化（避免大键）
+
+- 单键元素数限制：单个 Geo 键的成员数建议不超过 10 万，超过则按「区域 / 类型」拆分：
+    - 按城市拆分：`shop:location:beijing`（北京商家）、`shop:location:shanghai`（上海商家）；
+    - 按类型拆分：`shop:location:restaurant`（餐厅）、`shop:location:hotel`（酒店）；
+    - 按用户拆分：`friend:location:user:100`（用户 100 的好友）、`friend:location:user:101`（用户 101 的好友）。
+- 键名规范：`业务前缀:location:细分维度`（如 `rider:location:beijing`），便于维护。
+
+#####  2.8.2.4.2 性能优化
+
+- 限制返回结果数：`georadius` 必须加 `COUNT` 参数（如 `COUNT 20`），避免返回成千上万个元素阻塞主线程；
+- 实时更新频率控制：骑手 / 用户定位无需每秒更新，按场景调整（如外卖骑手 3~5 秒更新一次，社交 App 用户 1 分钟更新一次），减少 `geoadd` 调用频率；
+- 缓存热门查询：高频搜索的区域（如市中心商圈），可缓存 `georadius` 结果（设置 1~5 分钟过期），减少重复计算；
+- 避免复杂筛选：Geo 不支持按 “商家评分”“销量” 筛选，复杂筛选需在应用层实现（先通过 Geo 获取附近商家 ID，再从数据库查询评分排序）。
+
+#####  2.8.2.4.3 持久化与高可用
+
+- RDB 持久化：Geo 数据（ZSet）会被正常快照存储，恢复速度快（推荐）；
+- AOF 持久化：`geoadd` 命令会记录到 AOF 日志，重写后体积可控，无需特殊配置；
+- 集群环境适配：Geo 支持 Redis 集群（哈希槽分片），拆分后的键会分布到不同节点，查询时需指定键（无跨节点 Geo 查询支持，需通过应用层路由）。
+
+
+#####  2.8.2.4.4 数据清理
+
+- 过期数据删除：骑手离职、商家下架后，需及时用 `zrem` 删除对应的 Geo 成员，避免无效数据占用内存；
+- 批量删除：需批量删除某类成员时（如删除上海所有酒店），可结合 `zscan` 遍历该键的成员，批量执行 `zrem`（非阻塞）： 
+```bash
+# 遍历 shop:location:shanghai:hotel 键，批量删除成员
+redis-cli -a StrongPass@2025 zscan shop:location:shanghai:hotel 0 MATCH * COUNT 100 | awk '{print $2}' | xargs redis-cli -a StrongPass@2025 zrem shop:location:shanghai:hotel
+```
 # 三、redis 集群和高可用
 
 Redis 单机服务存在数据和服务的单点问题,而且单机性能也存在着上限,可以利用Redis的集群相关技术来解决这些问题
