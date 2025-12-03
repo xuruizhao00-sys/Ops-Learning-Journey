@@ -5330,11 +5330,28 @@ repl_backlog_size:1048576
 repl_backlog_first_byte_offset:0
 repl_backlog_histlen:0
 ```
-##### 3.1.2.1.2 删除主从同步
+
+##### 3.1.2.1.3 动态配置（可选，无需重启从库）
+```bash
+# 连接从库
+redis-cli -a StrongPass@2025
+
+# 动态指定主库（非TLS）
+127.0.0.1:6379> replicaof 192.168.1.100 6379
+127.0.0.1:6379> config set masterauth StrongPass@2025
+
+# 若主库启用TLS，动态配置TLS连接
+127.0.0.1:6379> config set replica-tls yes
+127.0.0.1:6379> config set replica-tls-port 6380
+
+# 持久化到配置文件（避免重启失效）
+127.0.0.1:6379> config rewrite
+```
+##### 3.1.2.1.4 删除主从同步
 
 在从节点执行 REPLICAOF NO ONE 或 SLAVEOF NO ONE 指令可以取消主从复制
 
-取消复制 会断开和master的连接而不再有主从复制关联, 但不会清除slave上已有的数据
+取消复制 会断开和master的连接而不再有主从复制关联, 但不会清除 slave 上已有的数据
 
 ```bash
 # 新版
@@ -5373,6 +5390,42 @@ root@prometheus-221:~ 18:53:28 # tail /apps/redis/log/redis_6379.log
 117446:S 20 Oct 2025 17:09:12.493 * Done loading RDB, keys loaded: 10100001, keys expired: 0.
 117446:S 20 Oct 2025 17:09:12.494 * MASTER <-> REPLICA sync: Finished with success
 
+```
+
+##### 3.1.2.2.3 主库验证（确认从库连接）
+```bash
+22:32:51 root@redis01:~# redis-cli -a 123456 info Replication
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+# Replication
+role:master     # 角色是 master
+connected_slaves:2  # 2 个从库已连接
+# 从库 1 状态，（lag=0表示延迟极低）
+slave0:ip=192.168.121.132,port=6379,state=online,offset=392,lag=1
+# 从库 2 状态
+slave1:ip=192.168.121.133,port=6379,state=wait_bgsave,offset=0,lag=0
+master_failover_state:no-failover
+master_replid:e6a59735eeec7516a52d7647bbcdf54da0823582
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:392
+second_repl_offset:-1
+repl_backlog_active:1    # 复制积压缓冲区已激活
+repl_backlog_size:1048576  # 缓冲区大小 100MB
+repl_backlog_first_byte_offset:1
+repl_backlog_histlen:392
+```
+
+##### 3.1.2.2.4 从库验证（确认同步状态）
+```bash
+22:37:48 root@redis03:~# redis-cli -a 123456 info Replication
+
+# 核心字段
+role:slave  # 角色为slave
+master_host:192.168.121.131  # 主库IP
+master_port:6379  # 主库端口
+master_link_status:up  # 主从连接正常（up=正常，down=异常）
+master_last_io_seconds_ago:1  # 最后一次与主库通信时间（1秒前，延迟低）
+slave_repl_offset:1234  # 从库偏移量（与主库一致，说明数据同步完成）
+replica_read_only:1  # 已启用只读模式
 ```
 
 #### 3.1.2.3 修改 slave 节点配置文件
