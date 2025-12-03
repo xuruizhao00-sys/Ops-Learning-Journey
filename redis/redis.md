@@ -5496,6 +5496,29 @@ repl_backlog_histlen:1048576
 127.0.0.1:6379> 
 ```
 
+#### 3.1.2.6 数据一致性测试（生产必做）
+```bash
+# 主库 写入数据
+127.0.0.1:6379> set phone apple
+OK
+127.0.0.1:6379> set phone huawei
+OK
+127.0.0.1:6379> get phone
+"huawei"
+127.0.0.1:6379>
+
+# 从库读取数据
+127.0.0.1:6379> get phone
+"apple"
+127.0.0.1:6379> get phone
+"huawei"
+
+# 验证从库只读
+127.0.0.1:6379> set phone oppo
+(error) READONLY You can't write against a read only replica.
+127.0.0.1:6379> 
+```
+
 ### 3.1.3 主从复制故障恢复
 
 #### 3.1.3.1 主从复制故障恢复过程介绍
@@ -5676,15 +5699,15 @@ Redis 的主从同步是非阻塞的，即同步过程不会影响主服务器�
 
 ##### 3.1.5.1.1 全量复制过程 full resync
 
-4.0之前版本的复制：run_id和复制偏移量来判断进行全量复制还是部分复制
+4.0之前版本的复制：run_id 和复制偏移量来判断进行全量复制还是部分复制
 
-4.0之后版本的复制：根据master_replid和复制偏移量来判断进行全量复制还是部分复制
+4.0之后版本的复制：根据 master_replid 和复制偏移量来判断进行全量复制还是部分复制
 
 主从关系建立后 master_replid 保存的是当前主节点的 master_replid，master_replid2 保存的是上一个主节点的master_replid
 
 ![image-20251021205351396](redis.assets/image-20251021205351396.png)
 
-- 主从节点建立连接,验证身份后,从节点向主节点发送 PSYNC(2.8版本之前是SYNC) 命令
+- 主从节点建立连接,验证身份后,从节点向主节点发送 PSYNC(2.8版本之前是 SYNC) 命令
 - 主节点向从节点发送 FULLRESYNC 命令,包括 master_replid(runID) 和 offset
 - 从节点保存主节点信息
 - 主节点执行 BGSAVE 保存 RDB 文件,同时记录新的记录到 buffer 中
@@ -5696,14 +5719,14 @@ Redis 的主从同步是非阻塞的，即同步过程不会影响主服务器�
 
 全量复制发生在下面情况
 
-- 从节点首次连接主节点(无master_replid/run_id)
+- 从节点首次连接主节点(无 master_replid/run_id)
 - 从节点的复制偏移量不在复制积压缓冲区内
 - 从节点无法连接主节点超过一定的时间
 
 范例: 查看 master_replid
 
 ```bash
-# 注意：单机时重启服务master_replid会变化
+# 注意：单机时重启服务 master_replid 会变化
 [root@ubuntu2204 ~]#redis-cli -a 123456 info replication
 Warning: Using a password with '-a' or '-u' option on the command line interface 
 may not be safe.
@@ -5724,7 +5747,7 @@ repl_backlog_histlen:0
 范例：查看 RUNID
 
 ```bash
-# Redis 重启服务后，RUNID会发生变化
+# Redis 重启服务后，RUNID 会发生变化
 127.0.0.1:6379> info server
 # Server
 redis_version:7.0.5
@@ -5759,7 +5782,7 @@ io_threads_active:0
 
 ![image-20251021210510399](redis.assets/image-20251021210510399.png)
 
-在主从复制首次完成全量同步之后再次需要同步时,从服务器只要发送当前的offset位置(类似于MySQL的binlog的位置)给主服务器，然后主服务器根据相应的位置将之后的数据(包括写在缓冲区的积压数据)发送给从服务器,再次将其保存到从节点内存即可。
+在主从复制首次完成全量同步之后再次需要同步时,从服务器只要发送当前的 offset 位置(类似于 MySQL 的 binlog 的位置)给主服务器，然后主服务器根据相应的位置将之后的数据(包括写在缓冲区的积压数据)发送给从服务器,再次将其保存到从节点内存即可。
 
 即首次全量复制,之后的复制基本增量复制实现
 
@@ -5767,22 +5790,22 @@ io_threads_active:0
 
 主从同步完整过程如下：
 
-1. slave发起连接master，验证通过后,发送PSYNC命令
-2. master接收到PSYNC命令后，执行BGSAVE命令将全部数据保存至RDB文件中,并将后续发生的写操作记录至buffer中
-3. master向所有slave发送RDB文件
-4. master向所有slave发送后续记录在buffer中写操作
-5. slave收到快照文件后丢弃所有旧数据
-6. slave加载收到的RDB到内存
-7. slave 执行来自master接收到的buffer写操作
-8. 当slave完成全量复制后,后续master只会先发送slave_repl_offset信息
-9. 以后slave比较自身和master的差异,只会进行增量复制的数据即可
+1. slave 发起连接 master，验证通过后,发送 PSYNC 命令
+2. master 接收到 PSYNC 命令后，执行 BGSAVE 命令将全部数据保存至 RDB 文件中,并将后续发生的写操作记录至 buffer 中
+3. master 向所有 slave 发送 RDB 文件
+4. master 向所有 slave 发送后续记录在 buffer 中写操作
+5. slave 收到快照文件后丢弃所有旧数据
+6. slave 加载收到的 RDB 到内存
+7. slave 执行来自 master 接收到的 buffer 写操作
+8. 当 slave 完成全量复制后,后续 master只会先发送 slave_repl_offset 信息
+9. 以后 slave 比较自身和 master 的差异,只会进行增量复制的数据即可
 
 ![image-20251021210613308](redis.assets/image-20251021210613308.png)
 
 复制缓冲区(环形队列)配置参数
 
 ```bash
-#master的写入数据缓冲区，用于记录自上一次同步后到下一次同步过程中间的写入命令，计算公式：replbacklog-size = 允许从节点最大中断时长 * 主实例offset每秒写入量，比如:master每秒最大写入64mb，最大允许60秒，那么就要设置为64mb*60秒=3840MB(3.8G),建议此值是设置的足够大，默认值为1M
+#master的写入数据缓冲区，用于记录自上一次同步后到下一次同步过程中间的写入命令，计算公式：repl-backlog-size = 允许从节点最大中断时长 * 主实例offset每秒写入量，比如:master每秒最大写入64mb，最大允许60秒，那么就要设置为64mb*60秒=3840MB(3.8G),建议此值是设置的足够大，默认值为1M
 repl-backlog-size 1mb 
 #如果一段时间后没有slave连接到master，则backlog size的内存将会被释放。如果值为0则表示永远不释放这部份内存。
 repl-backlog-ttl   3600
@@ -5816,9 +5839,9 @@ repl-backlog-ttl   3600
 
 #### 3.1.5.2 主从复制优化
 
-Redis在2.8版本之前没有提供增量部分复制的功能，当网络闪断或者slave Redis重启之后会导致主从之间的全量同步，即从2.8版本开始增加了部分复制的功能。
+Redis 在2.8版本之前没有提供增量部分复制的功能，当网络闪断或者 slave Redis 重启之后会导致主从之间的全量同步，即从2.8版本开始增加了部分复制的功能。
 
-**性能相关配置**
+##### 3.1.5.2.1 性能相关配置
 
 ```bash
 repl-diskless-sync no # 是否使用无盘方式进行同步RDB文件，默认为no(编译安装默认为yes)，no表示不使用无盘，需要将RDB文件保存到磁盘后再发送给slave，yes表示使用无盘，即RDB文件不需要保存至本地磁盘，而且直接通过网络发送给slave
@@ -5835,13 +5858,67 @@ min-replicas-to-write 1 #指定master的可用slave不能少于个数，如果�
 min-slaves-max-lag 20 #指定至少有min-replicas-to-write数量的slave延迟时间都大于此秒数时，master将不能执行写操作,默认为10s
 ```
 
+##### 3.1.5.2.2 高可用优化
+- 从库优先级配置（`replica-priority`）：给核心从库设置更低优先级（如 50），故障切换时优先升级；
+- 主从延迟监控：通过 `master_last_io_seconds_ago` 监控从库延迟，超过 10 秒需告警（可能是网络拥堵或主库写压力过大）；
+- 密码与 TLS 强制配置：主从密码必须一致（`requirepass = masterauth`），TLS 配置需主从统一（避免数据传输泄露）
+##### 3.1.5.2.3 安全优化
+- 从库只读强制开启（`replica-read-only yes`）：禁止从库写操作，避免人为误写导致数据不一致；
+- 专用用户权限控制：`redis` 用户仅授予必要权限（`+@all` 适用于主从，若为只读从库可限制为 `+@read`）；
+- 防火墙限制：仅允许从库 IP 访问主库的 6379/6380 端口（如 iptables 配置：`iptables -A INPUT -s 192.168.1.101,192.168.1.102 -p tcp --dport 6379 -j ACCEPT`）。
+
 ### 3.1.6 主从复制常见故障
 
-#### 3.1.6.1 主从软件和硬件配置不一致
+#### 3.1.6.1 从库 `master_link_status:down`（主从连接失败）
 
-主从节点的maxmemory不一致,主节点内存大于从节点内存,主从复制可能丢失数据
+- 原因 1：主库密码与从库 `masterauth` 不一致；
+    
+    解决方案：确认主库 `requirepass` 和从库 `masterauth` 均为 `StrongPass@2025`；
+- 原因 2：主库 `bind 127.0.0.1` 导致从库无法连接；
+    
+    解决方案：主库 `bind 0.0.0.0`，关闭 `protected-mode`；
+- 原因 3：防火墙拦截 6379/6380 端口；
+    
+    解决方案：`sudo iptables -F` 临时关闭防火墙（生产需配置白名单）；
+- 原因 4：TLS 配置不一致（主库启用 TLS，从库未配置 `replica-tls yes`）；
+    
+    解决方案：从库添加 `replica-tls yes` 和 `replica-tls-port 6380`。
 
-rename-command 命令不一致,如在主节点启用flushdb,从节点禁用此命令,结果在master节点执行flushdb后,导致slave节点不同步
+#### 3.1.6.2 从库数据同步延迟过高（`master_last_io_seconds_ago > 10`）
+
+- 原因 1：主库写压力过大（频繁执行大键写入、批量操作）；
+    
+    解决方案：拆分大键、批量操作分时段执行，或增加从库分担读压力；
+- 原因 2：网络带宽不足（主库发送 RDB 或命令时网络拥堵）；
+    
+    解决方案：优化网络（如主从同机房部署），增大 `repl-backlog-size`；
+- 原因 3：从库性能不足（CPU / 内存瓶颈，无法及时执行主库命令）；
+    
+    解决方案：升级从库硬件，禁用从库持久化。
+
+#### 3.1.6.3 主库重启后，从库触发全量复制（耗时过长）
+
+- 原因：主库重启后 runid 变更，从库认为是新主库，触发全量复制；
+    
+    解决方案：主库启用 AOF 持久化（`appendonly yes`），重启后快速恢复数据，减少全量复制耗时；或使用 Redis 哨兵（Sentinel）自动管理主从关系。
+
+#### 3.1.6.4 从库执行 `info replication` 显示 `slave_repl_offset` 远小于主库
+
+- 原因：从库正在执行全量复制（加载 RDB 或执行积压命令）；
+    
+    解决方案：等待同步完成（观察 `master_last_io_seconds_ago` 变为 0），若长时间未完成，检查 RDB 文件大小（避免主库大键导致同步超时）。
+
+#### 3.1.6.5 TLS 环境下，从库连接主库报错 “TLS handshake failed”
+
+- 原因：主从证书不一致（CA 证书不同）或证书权限不足；
+    
+    解决方案：主从使用同一 CA 签发的证书，确保证书文件权限为 `redis:redis`（`chmod 600 /etc/redis/*.pem`）。
+
+#### 3.1.6.6 主从软件和硬件配置不一致
+
+主从节点的 maxmemory 不一致,主节点内存大于从节点内存,主从复制可能丢失数据
+
+rename-command 命令不一致,如在主节点启用 flushdb,从节点禁用此命令,结果在master 节点执行 flushdb 后,导致 slave 节点不同步
 
 ```bash
 #在从节点定义rename-command flushall "",但是在主节点没有此配置,则当在主节点执行flushall时,会在从节点提示下面同步错误
@@ -5854,29 +5931,10 @@ error to its master: 'unknown command `wang`, with args beginning with: ' after
 processing the command '<unknown>'
 ```
 
-#### 3.1.6.2 master 节点密码错误
 
-如果slave节点配置的master密码错误，导致验证不通过,自然将无法建立主从同步关系。
+#### 3.1.6.7 保护（安全）模式下无法远程连接
 
-```bash
-[root@centos8 ~]#tail -f /var/log/redis/redis.log 
-24930:S 20 Feb 2020 13:53:57.029 * Connecting to MASTER 10.0.0.8:6379
-24930:S 20 Feb 2020 13:53:57.030 * MASTER <-> REPLICA sync started
-24930:S 20 Feb 2020 13:53:57.030 * Non blocking connect for SYNC fired the 
-event.
-24930:S 20 Feb 2020 13:53:57.030 * Master replied to PING, replication can 
-continue...
-24930:S 20 Feb 2020 13:53:57.031 # Unable to AUTH to MASTER: -ERR invalid 
-password
-```
-
-#### 3.1.6.3 redis 版本不一致
-
-不同的redis 版本之间尤其是大版本间可能会存在兼容性问题，如：Redis 3,4,5,6之间因此主从复制的所有节点应该使用相同的版本
-
-#### 3.1.6.4 保护（安全）模式下无法远程连接
-
-如果开启了安全模式，并且没有设置bind地址和密码,会导致无法远程连接
+如果开启了安全模式，并且没有设置 bind 地址和密码,会导致无法远程连接
 
 ```bash
 [root@centos8 ~]#vim /etc/redis.conf 
