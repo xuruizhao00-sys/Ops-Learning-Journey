@@ -5180,10 +5180,80 @@ repl-backlog-ttl 3600    # 缓冲区空闲超时时间（1小时无从库连接�
 maxclients 10000         # 允许最大连接数（支持更多从库连接）
 
 # 配置完成后，重启主库（以 `redis` 用户启动）：
+22:28:27 root@redis01:~# grep -E "^(masterauth|requirepass|port|bind|protected-mode)" /apps/redis/etc/redis.conf
+bind 0.0.0.0 -::1
+protected-mode no
+port 6379
+masterauth 123456
+requirepass 123456
+22:28:37 root@redis01:~# systemctl restart redis 
+22:29:37 root@redis01:~# systemctl status  redis 
+● redis.service - Redis persistent key-value database
+     Loaded: loaded (/usr/lib/systemd/system/redis.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2025-12-03 22:29:37 CST; 5s ago
+   Main PID: 14929 (redis-server)
+     Status: "Ready to accept connections"
+      Tasks: 6 (limit: 4548)
+     Memory: 2.4M (peak: 2.7M)
+        CPU: 111ms
+     CGroup: /system.slice/redis.service
+             └─14929 "/apps/redis/bin/redis-server 0.0.0.0:6379"
 
+Dec 03 22:29:37 redis01 systemd[1]: Starting redis.service - Redis persistent key-value database...
+Dec 03 22:29:37 redis01 systemd[1]: Started redis.service - Redis persistent key-value database.     
+22:29:42 root@redis01:~# redis-cli -a 123456 info Replication
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+# Replication
+role:master
+connected_slaves:0
+master_failover_state:no-failover
+master_replid:010d5edfa1fe51befbdaa6860326e75cbf6721f8
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:0
+second_repl_offset:-1
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
+# role:master，connected_slaves:0（暂无从库连接）
 ```
 
+##### ##### 3.1.2.1.2 从库（Slave）配置（2 个从库配置一致）
+从库核心是「指定主库地址 + 密码 + 同步参数」，修改从库配置文件 `/etc/redis/redis.conf`
+```bash
+# 1. 基础网络配置（与主库一致）
+bind 0.0.0.0
+protected-mode no
+port 6379  # 从库端口（可与主库一致，只要IP不同）
 
+# 2. 安全配置（与主库一致）
+requirepass StrongPass@2025  # 从库自身密码（客户端连接从库需用）
+user redis on >StrongPass@2025 ~* +@all  # 专用用户
+masterauth StrongPass@2025  # 关键！主库密码（必须与主库 requirepass 一致）
+
+# 3. TLS配置（若主库启用TLS，从库必须同步配置）
+tls-port 6380
+tls-cert-file /etc/redis/server-cert.pem
+tls-key-file /etc/redis/server-key.pem
+tls-ca-cert-file /etc/redis/ca-cert.pem
+tls-auth-clients yes
+
+# 4. 主从复制核心配置（指定主库）
+replicaof 192.168.1.100 6379  # 主库IP + 主库端口（非TLS端口）
+# 若主库启用TLS，需添加以下参数（Redis 6.0+ 支持）
+replica-tls yes  # 从库通过TLS连接主库
+replica-tls-port 6380  # 主库的TLS端口
+
+# 5. 从库优化配置（生产推荐）
+replica-read-only yes  # 从库只读（禁止写操作，避免数据不一致）
+repl-diskless-sync yes  # 无盘同步（主库直接通过网络发送RDB给从库，无需落地磁盘，速度更快）
+repl-diskless-sync-delay 5  # 无盘同步延迟（等待5秒再发送，避免频繁同步）
+replica-priority 100  # 从库优先级（故障切换时，数值越小越优先成为新主库，默认100）
+replica-lazy-flush yes  # 加载RDB时延迟清空数据（减少从库 downtime）
+
+
+
+```
 ##### 3.1.2.1.2 删除主从同步
 
 在从节点执行 REPLICAOF NO ONE 或 SLAVEOF NO ONE 指令可以取消主从复制
