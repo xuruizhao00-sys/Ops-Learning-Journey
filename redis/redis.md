@@ -5252,7 +5252,13 @@ replica-priority 100  # 从库优先级（故障切换时，数值越小越优�
 replica-lazy-flush yes  # 加载RDB时延迟清空数据（减少从库 downtime）
 
 
-
+22:34:14 root@redis02:~# grep -E "^(bind|port|masterauth|requirepass|protected-mode|replicaof)" /etc/redis/redis.conf
+bind 0.0.0.0
+protected-mode no
+port 6379
+replicaof 192.168.121.131 6379
+masterauth 123456
+requirepass 123456
 ```
 ##### 3.1.2.1.2 删除主从同步
 
