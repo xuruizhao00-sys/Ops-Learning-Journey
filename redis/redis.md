@@ -5525,7 +5525,7 @@ OK
 
 ##### 3.1.3.1.1 slave 节点故障和恢复
 
-当 slave 节点故障时，将Redis Client指向另一个 slave 节点即可,并及时修复故障从节点
+当 slave 节点故障时，将 Redis Client 指向另一个 slave 节点即可,并及时修复故障从节点
 
 ![image-20251021201739746](redis.assets/image-20251021201739746-17610490608521.png)
 
@@ -5646,7 +5646,7 @@ OK
 127.0.0.1:6379> CONFIG SET masterauth 123456
 
 # 在 master 设置 key,观察是否同步
-#在 master 新建 key
+# 在 master 新建 key
 127.0.0.1:6379> set key2 v2
 OK
 127.0.0.1:6379> get key2
@@ -5656,7 +5656,7 @@ OK
 "v2"
 #在 slave1 和 slave2 都无法新建 key
 127.0.0.1:6379> set key3 v3
-(error) READONLY You can't write against a read only replica.
+(error) READONLY You can't write against a read only replica.'
 
 
 # 在中间那个slave1查看状态
