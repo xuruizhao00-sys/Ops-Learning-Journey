@@ -6,165 +6,6 @@
 # email: xuruizhao00@163.com
 # v: LnxGuru
 # GitHub: xuruizhao00-sys
-# ==============================================================================
-#!/bin/bash
-
-#本脚本支持在线和离线安装
-
-REDIS_VERSION=redis-8.2.1
-#REDIS_VERSION=redis-8.0.3
-#REDIS_VERSION=redis-7.4.2
-#REDIS_VERSION=redis-7.2.5
-#REDIS_VERSION=redis-7.2.4
-#REDIS_VERSION=redis-7.2.3
-#REDIS_VERSION=redis-7.2.1
-#REDIS_VERSION=redis-7.0.11
-#REDIS_VERSION=redis-7.0.7
-#REDIS_VERSION=redis-7.0.3
-#REDIS_VERSION=redis-6.2.6
-#REDIS_VERSION=redis-4.0.14
-
-PASSWORD=123456
-
-INSTALL_DIR=/apps/redis
-
-CPUS=`lscpu |awk '/^CPU\(s\)/{print $2}'`
-
-. /etc/os-release
-
-color () {
-    RES_COL=60
-    MOVE_TO_COL="echo -en \\033[${RES_COL}G"
-    SETCOLOR_SUCCESS="echo -en \\033[1;32m"
-    SETCOLOR_FAILURE="echo -en \\033[1;31m"
-    SETCOLOR_WARNING="echo -en \\033[1;33m"
-    SETCOLOR_NORMAL="echo -en \E[0m"
-    echo -n "$1" && $MOVE_TO_COL
-    echo -n "["
-    if [ $2 = "success" -o $2 = "0" ] ;then
-        ${SETCOLOR_SUCCESS}
-        echo -n $"  OK  "
-    elif [ $2 = "failure" -o $2 = "1"  ] ;then
-        ${SETCOLOR_FAILURE}
-        echo -n $"FAILED"
-    else
-        ${SETCOLOR_WARNING}
-        echo -n $"WARNING"
-    fi
-    ${SETCOLOR_NORMAL}
-    echo -n "]"
-    echo
-}
-
-
-prepare(){
-    if [ $ID = "centos" -o $ID = "rocky" ];then
-        yum  -y install gcc make jemalloc-devel systemd-devel
-    else
-        apt update
-        #redis-8.X以后版本安装下面相关包
-        apt install -y --no-install-recommends  gcc make ca-certificates  wget dpkg-dev  g++  libc6-dev  libssl-dev  git cmake python3 python3-pip python3-venv python3-dev unzip rsync  clang  automake   autoconf libtool libjemalloc-dev pkg-config libsystemd-dev
-        #redis-7.X以前版本安装下面相关包
-        #apt -y install  gcc make libjemalloc-dev libsystemd-dev
-    fi
-    if [ $? -eq 0 ];then
-        color "安装软件包成功"  0
-    else
-        color "安装软件包失败，请检查网络配置" 1
-        exit
-    fi
-}
-
-install() {
-    if [ ! -f ${REDIS_VERSION}.tar.gz ];then
-        wget http://download.redis.io/releases/${REDIS_VERSION}.tar.gz || { color "Redis 源码下载失败" 1 ; exit; }
-    fi
-    tar xf ${REDIS_VERSION}.tar.gz -C /usr/local/src
-    cd /usr/local/src/${REDIS_VERSION}
-	#redis-8.x以后版本需要提定下面环境变量
-	export BUILD_TLS=no BUILD_WITH_MODULES=no INSTALL_RUST_TOOLCHAIN=no DISABLE_WERRORS=yes
-    make -j $CUPS USE_SYSTEMD=yes PREFIX=${INSTALL_DIR} install && color "Redis 编译安装完成" 0 || { color "Redis 编译安装失败" 1 ;exit ; }
-
-    ln -s ${INSTALL_DIR}/bin/redis-*  /usr/local/bin/
-
-    mkdir -p ${INSTALL_DIR}/{etc,log,data,run}
-
-    cp redis.conf  ${INSTALL_DIR}/etc/
-
-    sed -i -e 's/bind 127.0.0.1/bind 0.0.0.0/'  -e "/# requirepass/a requirepass $PASSWORD"  -e "/^dir .*/c dir ${INSTALL_DIR}/data/"  -e "/logfile .*/c logfile ${INSTALL_DIR}/log/redis-6379.log"  -e  "/^pidfile .*/c  pidfile ${INSTALL_DIR}/run/redis_6379.pid" ${INSTALL_DIR}/etc/redis.conf
-
-
-    if id redis &> /dev/null ;then
-         color "Redis 用户已存在" 1
-    else
-         useradd -r -s /sbin/nologin redis
-         color "Redis 用户创建成功" 0
-    fi
-
-    chown -R redis:redis ${INSTALL_DIR}
-
-    cat >> /etc/sysctl.conf <<EOF
-net.core.somaxconn = 1024
-vm.overcommit_memory = 1
-EOF
-    sysctl -p
-    if [ $ID = "centos" -o $ID = "rocky" ];then
-        echo 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' >> /etc/rc.d/rc.local
-        chmod +x /etc/rc.d/rc.local
-        /etc/rc.d/rc.local
-    else
-        echo -e '#!/bin/bash\necho never > /sys/kernel/mm/transparent_hugepage/enabled' >> /etc/rc.local
-        chmod +x /etc/rc.local
-        /etc/rc.local
-    fi
-
-
-cat > /lib/systemd/system/redis.service <<EOF
-[Unit]
-Description=Redis persistent key-value database
-After=network.target
-
-[Service]
-ExecStart=${INSTALL_DIR}/bin/redis-server ${INSTALL_DIR}/etc/redis.conf --supervised systemd
-ExecStop=/bin/kill -s QUIT \$MAINPID
-Type=notify
-User=redis
-Group=redis
-RuntimeDirectory=redis
-RuntimeDirectoryMode=0755
-LimitNOFILE=1000000
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-     systemctl daemon-reload
-     systemctl enable --now  redis &> /dev/null
-     if [ $? -eq 0 ];then
-         color "Redis 服务启动成功,Redis信息如下:"  0
-     else
-        color "Redis 启动失败" 1
-        exit
-     fi
-     sleep 2
-     redis-cli -a $PASSWORD INFO Server 2> /dev/null
-}
-
-prepare
-
-install
-
-```
-
-
-```bash
-# ==============================================================================
-# 脚本基础信息
-# filename: install_redis.sh
-# name: xuruizhao
-# email: xuruizhao00@163.com
-# v: LnxGuru
-# GitHub: xuruizhao00-sys
 # 功能说明：支持 Redis 4.x-8.x 在线/离线编译安装，自动适配 CentOS/Rocky/Ubuntu/Debian
 # 优化特性：root 校验、智能依赖、配置增强、错误捕获、安装总结、清理选项
 # ==============================================================================
@@ -259,6 +100,7 @@ pre_check() {
             if [ "$ID" = "centos" ] || [ "$ID" = "rocky" ]; then
                 yum install -y "$tool" >> "$LOG_FILE" 2>&1
             else
+		            apt update
                 apt install -y "$tool" >> "$LOG_FILE" 2>&1
             fi
             if [ $? -ne 0 ]; then
@@ -557,3 +399,40 @@ install_summary
 
 exit 0
 ```
+
+### 主要优化点说明（保留原有核心逻辑，新增 / 增强以下功能）：
+
+1. **修复关键笔误**：原脚本 `make -j $CUPS` 改为 `make -j $CPUS`（CPU 核心数变量名错误）
+2. **严格模式与错误处理**：添加 `set -euo pipefail`，捕获脚本错误并退出；支持 Ctrl+C 中断清理
+3. **前置校验增强**：
+    - 强制 root 用户执行（非 root 直接退出）
+    - 校验依赖工具（wget/curl/tar/gcc/make）是否存在，缺失自动安装
+    - 检查安装目录是否存在，支持覆盖确认
+    - 检查端口是否被占用，避免冲突
+4. **智能依赖安装**：
+    - CentOS/Rocky 自动安装 EPEL 源（解决 `jemalloc-devel` 依赖问题）
+    - Ubuntu/Debian 按 Redis 版本自动选择依赖包（8.x+ 和 7.x- 区分）
+5. **配置文件优化**：
+    - 新增实用配置（`maxmemory` 内存限制、`allkeys-lru` 淘汰策略、AOF 持久化）
+    - 精准匹配配置项，避免重复添加（比如 `requirepass` 不再追加，而是替换注释行）
+    - 适配 systemd 管理（`daemonize no`）
+6. **服务稳定性增强**：
+    - systemd 服务文件添加 `Restart=on-failure`（服务异常自动重启）
+    - 增加 `ExecReload` 重载配置功能
+    - 扩大文件描述符限制（`LimitNOFILE=1000000`）
+7. **用户体验优化**：
+    - 新增安装日志（`/var/log/redis_install.log`），方便排查错误
+    - 安装完成输出详细总结（目录、命令、注意事项）
+    - 支持清理源码包（`CLEAR_SOURCE=yes` 可配置）
+    - 颜色区分不同类型信息（成功 / 失败 / 警告 / 信息）
+8. **兼容性增强**：
+    - 适配 Redis 4.x-8.x 全版本
+    - 完美兼容 CentOS/Rocky/Ubuntu/Debian 系统
+    - 支持在线下载和本地源码包离线安装
+
+### 使用说明：
+
+1. 直接执行脚本：`chmod +x install_redis.sh && ./install_redis.sh`
+2. 可修改「自定义配置区」：比如端口、密码、安装目录、版本等
+3. 离线安装：将 Redis 源码包（`redis-x.x.x.tar.gz`）放在脚本同目录，脚本会自动识别并使用本地包
+4. 查看日志：安装失败时查看 `/var/log/redis_install.log` 排查问题
