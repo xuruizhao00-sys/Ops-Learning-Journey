@@ -5259,6 +5259,76 @@ port 6379
 replicaof 192.168.121.131 6379
 masterauth 123456
 requirepass 123456
+22:36:21 root@redis03:~# grep -E "^(bind|port|masterauth|requirepass|protected-mode|replicaof)" /apps/redis/etc/redis.conf 
+bind 0.0.0.0
+protected-mode no
+port 6379
+replicaof 192.168.121.131 6379
+masterauth 123456
+requirepass 123456
+22:36:28 root@redis03:~# 
+
+# 查看从库配置
+22:37:08 root@redis02:~# redis-cli -a 123456 info Replication
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+# Replication
+role:slave
+master_host:192.168.121.131
+master_port:6379
+master_link_status:up
+master_last_io_seconds_ago:5
+master_sync_in_progress:0
+slave_read_repl_offset:42
+slave_repl_offset:42
+replica_full_sync_buffer_size:0
+replica_full_sync_buffer_peak:0
+master_current_sync_attempts:1
+master_total_sync_attempts:1
+master_link_up_since_seconds:20
+total_disconnect_time_sec:0
+slave_priority:100
+slave_read_only:1
+replica_announced:1
+connected_slaves:0
+master_failover_state:no-failover
+master_replid:e6a59735eeec7516a52d7647bbcdf54da0823582
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:42
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:15
+repl_backlog_histlen:28
+22:37:01 root@redis03:~# redis-cli -a 123456 info Replication
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+# Replication
+role:slave
+master_host:192.168.121.131
+master_port:6379
+master_link_status:down
+master_last_io_seconds_ago:-1
+master_sync_in_progress:0
+slave_read_repl_offset:1
+slave_repl_offset:1
+replica_full_sync_buffer_size:0
+replica_full_sync_buffer_peak:0
+master_current_sync_attempts:8
+master_total_sync_attempts:8
+master_link_down_since_seconds:-1
+total_disconnect_time_sec:0
+slave_priority:100
+slave_read_only:1
+replica_announced:1
+connected_slaves:0
+master_failover_state:no-failover
+master_replid:c86485d1ff8c2cc2626e14ef6910699a74ab4170
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:0
+second_repl_offset:-1
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
 ```
 ##### 3.1.2.1.2 删除主从同步
 
