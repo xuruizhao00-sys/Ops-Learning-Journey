@@ -4489,7 +4489,7 @@ HSET hash field value
 (integer) 2
 127.0.0.1:6379[15]> type 9527  # 查看类型
 hash
-127.0.0.1:6379[15]> hgetall 9527  # 获取类型
+127.0.0.1:6379[15]> hgetall 9527  # 获取 hash 中所有键值对的信息
 1) "name"
 2) "xixi"
 3) "age"
