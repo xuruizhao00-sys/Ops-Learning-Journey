@@ -526,5 +526,170 @@ chmod +x 脚本名.sh
 ```
 
 ##### 1.2.4.2.2 案例
+```bash
+15:57:37 root@redis01:~# cat test01.sh
+# ==============================================================================
+# 脚本基础信息
+# filename: test01.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+# 演示直接执行的特点
+export TEST_VAR="直接执行-子Shell变量"
+echo "脚本内的TEST_VAR：$TEST_VAR"
+echo "当前Shell进程ID（PID）：$$" # $$表示当前进程ID
+
+15:57:39 root@redis01:~# chmod +x test01.sh
+15:57:54 root@redis01:~# ls -l test01.sh
+-rwxr-xr-x 1 root root 486 Dec  4 15:57 test01.sh
+
+# 直接执行（相对路径）
+# 输出示例：
+# 脚本内的TEST_VAR：直接执行-子Shell变量
+# 当前Shell进程ID（PID）：12345（随机数，与终端PID不同）
+15:57:59 root@redis01:~# ./test01.sh 
+脚本内的TEST_VAR：直接执行-子Shell变量
+当前Shell进程ID（PID）：17051
+
+# 验证是否修改当前 Shell 环境
+# 输出：终端的TEST_VAR：（空，子 Shell 变量不回传）
+15:58:06 root@redis01:~# echo "终端的TEST_VAR：$TEST_VAR"
+终端的TEST_VAR：
+15:58:42 root@redis01:~# 
+
+```
+
+##### 1.2.4.2.3 适用场景
+- 生产环境中独立运行的脚本（如自动化部署、日志清理、定时任务核心脚本）；
+- 脚本需要作为可执行程序独立分发 / 运行；
+- 希望脚本在子 Shell 中运行，避免污染当前终端环境（如修改环境变量、定义函数）。
+##### 1.2.4.2.4 注意事项
+- 必须指定路径（`./`或绝对路径），否则系统会在`$PATH`中查找，若当前目录不在`$PATH`则报错（如直接输`exec_direct.sh`会提示 “命令未找到”）；
+- 脚本首行`#!/bin/bash`（Shebang）必须正确，否则可能执行失败（如指定不存在的解释器`#!/bin/xxx`）；
+- 执行权限仅需赋予一次，后续可重复执行。
+#### 1.2.4.3 方式二：通过解释器直接执行（bash/sh 脚本.sh）
+##### 1.2.4.3.1 核心语法
+```bash
+bash 脚本名.sh [参数]  # 使用Bash解释器（推荐）
+sh 脚本名.sh [参数]    # 使用sh解释器（兼容模式）
+zsh 脚本名.sh [参数]   # 其他Shell解释器（如zsh/ksh）
+```
+
+##### 1.2.4.3.2 配套案例
+```bash
+16:06:05 root@redis01:~# cat test02.sh 
+# ==============================================================================
+# 脚本基础信息
+# filename: test02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+# 演示解释器执行的特点
+echo "使用的解释器：$SHELL"
+echo "脚本参数1：$1"  # 接收命令行参数
+export INTERP_VAR="解释器执行-子Shell变量"
+echo "脚本内的INTERP_VAR：$INTERP_VAR"
+
+
+# 1. 无需赋予执行权限，直接用bash执行（传参）
+bash exec_interpreter.sh 测试参数
+# 输出示例：
+# 使用的解释器：/bin/bash
+# 脚本参数1：测试参数
+# 脚本内的INTERP_VAR：解释器执行-子Shell变量
+
+# 2. 验证当前Shell环境（变量未同步）
+echo "终端的INTERP_VAR：$INTERP_VAR"
+# 输出：终端的INTERP_VAR：（空）
+
+# 3. 用sh执行（兼容模式，注意Bash扩展语法可能报错）
+sh exec_interpreter.sh
+# 若脚本含[[ ]]、C风格for循环等Bash扩展语法，sh执行会报错
+```
+
+##### 1.2.4.3.3 适用场景
+- 脚本未赋予执行权限（如临时测试、只读文件、共享目录下的脚本）；
+- 需要指定特定解释器运行（如用`sh`兼容模式验证脚本跨 Shell 兼容性）；
+- 开发 / 调试阶段快速测试脚本，无需频繁修改权限。
+##### 1.2.4.3.4 注意事项
+- 无需执行权限，但脚本文件需有**读权限**（`r`）（如`chmod 400 脚本.sh`仍可执行）；
+- 若脚本首行 Shebang 与执行时指定的解释器冲突，以执行时指定的为准（如 Shebang 是`#!/bin/sh`，但用`bash`执行则用 Bash）；
+- `sh`是 Bash 的兼容模式，部分 Bash 扩展语法（如`[[ ]]`、`for ((i=1; i<=10; i++))`）在`sh`下会报错。
+#### 1.2.4.3 方式三：source / 点命令执行（source 脚本.sh/. 脚本.sh）
+##### 1.2.4.3.1 核心语法
+```bash
+source 脚本名.sh [参数]  # 方式1（直观）
+. 脚本名.sh [参数]       # 方式2（点+空格+脚本名，空格不可省略）
+```
+##### 1.2.4.3.2 配套案例
+```bash
+16:09:50 root@redis01:~# cat test03.sh
+# ==============================================================================
+# 脚本基础信息
+# filename: test03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+# 演示source执行的特点
+export SOURCE_VAR="source执行-当前Shell变量"
+echo "脚本内的SOURCE_VAR：$SOURCE_VAR"
+echo "当前Shell进程ID（PID）：$$" # 与终端PID一致
+
+# 定义一个函数（仅当前Shell有效）
+hello() {
+    echo "Hello from source script! 参数：$1"
+}
+
+
+# 1. 无需执行权限，source执行（传参）
+source test03.sh 测试参数
+# 输出示例：
+# 脚本内的SOURCE_VAR：source执行-当前Shell变量
+# 当前Shell进程ID（PID）：6789（与终端PID相同）
+
+# 2. 验证当前Shell环境（变量已生效）
+echo "终端的SOURCE_VAR：$SOURCE_VAR"
+# 输出：终端的SOURCE_VAR：source执行-当前Shell变量
+
+# 3. 调用脚本内定义的函数（已生效）
+hello 世界
+# 输出：Hello from source script! 参数：世界
+
+# 4. 用点命令执行（等价source）
+. exec_source.sh
+```
+
+##### 1.2.4.3.3 适用场景
+
+- 需要修改当前 Shell 环境的场景（如定义环境变量、别名、函数）；
+- 加载系统 / 项目配置文件（如`source ~/.bashrc`、`source /etc/profile`）；
+- 脚本中的变量 / 函数需要在终端后续操作中使用（如项目启动前的环境配置）；
+- 批量设置环境变量（如`export PATH=/usr/local/bin:$PATH`）。
+##### 1.2.4.3.4 注意事项
+
+- 不创建子 Shell，脚本的所有修改（变量、函数、别名）都会直接影响当前终端；
+- 无需执行权限，但需读权限；
+- 脚本中的`exit`命令会直接退出当前终端（而非仅退出脚本），需慎用；
+- 路径规则：若脚本不在当前目录，需指定相对 / 绝对路径（如`source ../config.sh`）
+#### 1.2.4.4 方式四：重定向执行（sh < 脚本.sh）
+##### 1.2.4.4.1 核心语法
+```bash
+bash < 脚本名.sh [参数]  # Bash解释器
+sh < 脚本名.sh [参数]    # sh解释器
+
+# 扩展：远程脚本管道执行（最常用场景）
+curl -s http://example.com/remote.sh | bash
+```
+
+##### 1.2.4.4.2 配套案例
 
 ### 1.2.5 脚本调试方式
