@@ -1211,6 +1211,7 @@ echo "总和：$sum"
 yum install -y shellcheck
 
 # Ubuntu/Debian
+apt update
 apt install -y shellcheck
 
 # macOS
