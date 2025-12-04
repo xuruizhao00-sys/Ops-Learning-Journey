@@ -1220,6 +1220,44 @@ brew install shellcheck
 ###### 1.2.5.5.1.3 案例（检测脚本问题）
 
 准备有问题的脚本
-```
+```bash
+#!/bin/bash
+# 存在的问题：未定义变量、无用的cd命令、双引号缺失
+cd /tmp
+echo $undefined_var
+ls $HOME/*.log  # 无双引号，若文件名含空格会出错
 
+shellcheck bad_script.sh
+# 输出示例（给出问题和修复建议）：
+# In bad_script.sh line 5:
+# echo $undefined_var
+#      ^-----------^ SC2154: undefined_var is referenced but not assigned.
+#
+# In bad_script.sh line 4:
+# cd /tmp
+# ^-- SC2164: Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+#
+# In bad_script.sh line 6:
+# ls $HOME/*.log
+#    ^----------^ SC2086: Double quote to prevent globbing and word splitting.
 ```
+#### 1.2.5.6 总结
+| 调试场景                 | 推荐方式                        | 核心优势             |
+| -------------------- | --------------------------- | ---------------- |
+| 快速检查语法错误             | `bash -n` + `shellcheck`    | 不执行脚本，快速定位语法问题   |
+| 定位逻辑错误（变量 / 循环 / 判断） | `bash -x` + 脚本内 `set -x/+x` | 跟踪执行过程，还原变量变化    |
+| 避免错误扩散               | `bash -e` + `trap ERR`      | 出错立即退出，自动打印错误信息  |
+| 变量相关问题               | `bash -u` + 手动 `echo` 变量    | 定位未定义 / 空变量导致的问题 |
+| 复杂脚本（多函数 / 分支）       | `bashdb` 断点调试               | 精细化控制执行流程，查看调用栈  |
+| 规范 / 潜在问题            | `shellcheck`                | 给出修复建议，提升脚本健壮性   |
+
+#### 1.2.5.7 调试最佳实践
+1. **先静态后动态**：先用 `bash -n` + `shellcheck` 检查语法 / 规范，再用 `-x` 跟踪执行；
+2. **局部调试**：长脚本用 `set -x/+x` 只调试关键段，避免日志冗余；
+3. **关键节点打印**：在判断、循环、函数前后打印变量 / 状态，快速定位问题；
+4. **重定向调试日志**：复杂脚本将 `-x` 输出重定向到文件，便于复盘；
+5. **避免调试残留**：调试完成后，删除 / 注释掉脚本内的 `set -x`、`echo` 等调试代码；
+6. **结合返回值**：通过 `echo $?` 打印命令返回值，定位命令执行失败的原因（如 `ls /xxx; echo $?`）。
+### 1.2.6 脚本开发规范
+
+#### 1.2.6.1 开发规范
