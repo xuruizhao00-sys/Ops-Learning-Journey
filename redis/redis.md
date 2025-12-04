@@ -4691,7 +4691,7 @@ OK
 
 #### 2.7.2.1 模式说明
 
-在发布者订阅者 Publisher/Subscriber 模式下，发布者 Publisher 将消息发布到指定的频道 channel，事先监听此 channel 的一个或多个订阅者 Subscriber都会收到相同的消息。即一个消息可以由多个订阅者获取到. 对于社交应用中的群聊、群发、群公告等场景适用于此模式。
+在发布者订阅者 Publisher/Subscriber 模式下，发布者 Publisher 将消息发布到指定的频道 channel，事先监听此 channel 的一个或多个订阅者 Subscriber 都会收到相同的消息。即一个消息可以由多个订阅者获取到. 对于社交应用中的群聊、群发、群公告等场景适用于此模式。
 
 #### 2.7.2.2 订阅者订阅频道
 
