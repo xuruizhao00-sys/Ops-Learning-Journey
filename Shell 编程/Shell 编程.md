@@ -292,6 +292,35 @@ shell脚本的命名简单来说就是要有意义，方便我们通过脚本名
 各种可以执行的命令
 ```
 
+#### 1.2.2.3 脚本实践
+```bash
+15:14:38 root@redis01:~# cat net_info.sh
+# ==============================================================================
+# 脚本基础信息
+# filename: net_info.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+# 获取ip地址信息
+ifconfig ens33 | grep -w inet | awk '{print $2}' | xargs echo "IP: "
+# 获取掩码地址信息
+ifconfig ens33 | grep -w inet | awk '{print $4}' | xargs echo "NetMask: "
+# 获取广播地址信息
+ifconfig ens33 | grep -w inet | awk '{print $6}' | xargs echo "Broadcast: "
+# 获取 MAC 地址信息
+ifconfig ens33 | grep ether | awk '{print $2}' |xargs echo "MAC Address: "
+
+# 执行脚本
+15:14:40 root@redis01:~# bash net_info.sh
+IP:  192.168.121.131
+NetMask:  255.255.255.0
+Broadcast:  192.168.121.255
+MAC Address:  00:0c:29:b4:8d:6a
+15:14:43 root@redis01:~#
+```
 ### 1.2.3 脚本注释
 注释是 Shell 脚本中对代码逻辑、功能的说明，解释器会忽略注释内容，核心作用是提升脚本可读性、便于维护。Shell 本身仅原生支持**单行注释**，多行注释需通过特殊语法模拟
 #### 1.2.3.1 单行注释（核心语法）
@@ -476,3 +505,8 @@ echo "日志清理完成！保留最近${KEEP_DAYS}天的日志"
 2. 过度注释：简单逻辑（如 `i=1`）无需注释，避免冗余；
 3. 注释内容模糊：如仅写 “处理数据”，应明确 “处理 /var/log 下的日志数据，过滤空行”；
 4. 行内注释滥用：行尾仅注释关键逻辑，避免每行都加行内注释。
+
+### 1.2.4 脚本执行方式
+
+
+### 1.2.5 脚本调试方式
