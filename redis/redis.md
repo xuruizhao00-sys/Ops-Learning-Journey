@@ -6559,6 +6559,44 @@ master0:name=mymaster,status=ok,address=10.0.0.18:6379,slaves=2,sentinels=3
 ```
 
 ### 3.2.4 sentinel 运维
+#### 3.2.4.1 监控 sentinel 状态
+```bash
+# 1. 查看哨兵监控的Master状态（最简命令）
+redis-cli -h 192.168.1.200 -p 26379 -a StrongPass@2025 sentinel get-master-addr-by-name mymaster
+# 正常输出：1) "192.168.1.100" 2) "6379"（Master IP/端口）
+
+# 2. 查看哨兵完整状态
+redis-cli -h 192.168.1.200 -p 26379 -a StrongPass@2025 info sentinel
+# 核心字段：sentinel_masters:1、sentinel_tilt:0（tilt=0表示正常）
+
+# 3. 实时查看哨兵日志（故障排查核心）
+sudo tail -f /var/log/redis/sentinel.log
+```
+
+#### 3.2.4.2 添加 / 移除哨兵
+##### 3.2.4.2.1 添加新的哨兵节点
+1. 新哨兵节点（如 192.168.1.203）配置与现有哨兵一致；
+2. 启动新哨兵：`sudo -u redis redis-sentinel /etc/redis/sentinel.conf`；
+3. 验证：现有哨兵执行 `sentinel sentinels mymaster`，能看到新节点。
+
+##### 3.2.4.2.2 移除哨兵节点
+1. 停止待下线哨兵：`sudo kill <哨兵PID>`；
+2. 其他哨兵会自动检测到该节点下线，无需手动配置（2 秒内同步状态）；
+3. 若需永久移除，删除该节点的配置文件，避免重启后重新加入。
+##### 3.2.4.2.3 修改哨兵配置
+```bash
+# 示例1：修改 Master 下线超时时间为20秒（20000毫秒）
+redis-cli -h 192.168.1.200 -p 26379 -a StrongPass@2025 sentinel set mymaster down-after-milliseconds 20000
+
+# 示例2：修改 quorum 值为3（5哨兵集群）
+redis-cli -h 192.168.1.200 -p 26379 -a StrongPass@2025 sentinel set mymaster quorum 3
+
+# 示例3：更新 Master 密码（主库密码变更后）
+redis-cli -h 192.168.1.200 -p 26379 -a StrongPass@2025 sentinel set mymaster auth-pass NewStrongPass@2025
+
+# 验证修改结果
+redis-cli -h 192.168.1.200 -p 26379 -a StrongPass@2025 sentinel master mymaster | grep down-after-milliseconds
+```
 
 在 Sentinel 主机手动触发故障切换
 
@@ -6649,6 +6687,25 @@ r_ret = slave.get('name')
 print(r_ret)
 #输出：wang
 ```
+
+### 3.2.6 生产配置与优化
+#### 3.2.6.1 脑裂防护
+脑裂：Master 网络隔离但未宕机，哨兵选举新 Master，导致双主写入（数据冲突）。
+
+解决方案：
+```bash
+# Master 配置文件添加（限制仅 N 个从库连接时才允许写）
+min-replicas-to-write 1  # 至少1个从库连接才允许写
+min-replicas-max-lag 10  # 从库延迟≤10秒才允许写
+```
+#### 3.2.6.2 quorum 值设置
+- 3 哨兵集群：quorum=2（≥2 个哨兵确认下线）；
+- 5 哨兵集群：quorum=3；
+- 禁止设置 quorum=1（单哨兵误判会触发切换）。
+#### 3.2.6.3 超时参数优化
+- `down-after-milliseconds`：网络不稳定场景设为 60000（60 秒），避免误判；
+- `failover-timeout`：设为 300000（5 分钟），给足切换时间（大内存从库同步需更久）。
+
 
 ## 3.3 redis cluster
 
