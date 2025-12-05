@@ -6220,26 +6220,46 @@ root@prometheus-221:~ 15:55:09 # ll /apps/redis/etc/sentinel.conf
 root@prometheus-221:~ 15:55:13 # 
 
 # 包安装修改配置文件
-[root@centos8 ~]#vim /etc/redis-sentinel.conf 
-bind 0.0.0.0
-port 26379
-daemonize yes
-pidfile "redis-sentinel.pid"
-logfile "sentinel_26379.log"
-dir "/tmp"  #工作目录
-sentinel monitor mymaster 10.0.0.8 6379 2
-# mymaster是集群的名称，此行指定当前mymaster集群中master服务器的地址和端口
-# 2为法定人数限制(quorum)，即有几个sentinel认为master down了就进行故障转移，一般此值是所有sentinel节点(一般总数是>=3的 奇数,如:3,5,7等)的一半以上的整数值，比如，总数是3，即3/2=1.5，取整为2,是master的ODOWN客观下线的依据
-sentinel auth-pass mymaster 123456
-# mymaster集群中 master 的密码，注意此行要在上面行的下面,注意：要求这组 redis 主从复制所有节点的密
-码是一样的
+# ====================== 基础配置 ======================
+port 26379  # 哨兵端口（默认26379）
+bind 0.0.0.0  # 允许外部连接
+protected-mode no  # 关闭保护模式（跨IP连接）
+daemonize yes  # 后台运行
+pidfile /var/run/redis-sentinel.pid  # PID文件路径
+logfile /var/log/redis/sentinel.log  # 日志文件（生产必配，便于排查）
+dir /var/lib/redis  # 工作目录（存储临时文件）
+
+# ====================== 核心监控配置 ======================
+# 格式：sentinel monitor <监控名称> <MasterIP> <MasterPort> <quorum值>
+# 监控名称：自定义（如 mymaster）；quorum=2：至少2个哨兵确认Master下线才触发切换
+sentinel monitor mymaster 192.168.1.100 6379 2
+
+# Master密码（与主库requirepass一致，哨兵连接Master/Slave需认证）
+sentinel auth-pass mymaster StrongPass@2025
+
+# Master下线超时时间（毫秒），超过该时间未响应标记为SDOWN
 sentinel down-after-milliseconds mymaster 30000
-# 判断mymaster集群中所有节点的主观下线(SDOWN)的时间，单位：毫秒，建议3000
-sentinel parallel-syncs mymaster 1 #发生故障转移后，可以同时向新master同步数据的slave的数量，数字越小总同步时间越长，但可以减轻新 master 的负载压力
+
+# 故障切换超时时间（毫秒），超过该时间切换失败
 sentinel failover-timeout mymaster 180000
-# 所有 slaves 指向新的 master 所需的超时时间，单位：毫秒
-sentinel deny-scripts-reconfig yes #禁止修改脚本
-logfile /var/log/redis/sentinel.log
+
+# 并行同步的从库数量（默认1，避免大量从库同时同步导致新Master压力大）
+sentinel parallel-syncs mymaster 1
+
+# ====================== TLS配置（生产启用时添加） ======================
+# 哨兵通过TLS连接主从节点（与主从TLS配置一致）
+sentinel tls-enabled mymaster yes
+sentinel tls-cert-file mymaster /etc/redis/server-cert.pem
+sentinel tls-key-file mymaster /etc/redis/server-key.pem
+sentinel tls-ca-cert-file mymaster /etc/redis/ca-cert.pem
+sentinel tls-port mymaster 6380  # 主从的TLS端口
+
+# ====================== 通知配置（可选，运维告警） ======================
+# Master故障时执行的脚本（如发送邮件/钉钉告警）
+# sentinel notification-script mymaster /etc/redis/sentinel-notify.sh
+
+# 故障切换完成后执行的脚本（通知客户端切换Master）
+# sentinel client-reconfig-script mymaster /etc/redis/sentinel-reconfig.sh
 ```
 
 **三个哨兵服务器的配置都如下**
@@ -6265,6 +6285,14 @@ SENTINEL master-reboot-down-after-period mymaster 0
 
 ```
 
+*配置参数说明（生产必懂）*
+
+| 参数                        | 取值示例         | 核心作用                                      |
+| ------------------------- | ------------ | ----------------------------------------- |
+| `down-after-milliseconds` | 30000（30 秒）  | 避免网络抖动误判（建议≥10 秒，生产常用 30 秒）；              |
+| `failover-timeout`        | 180000（3 分钟） | 故障切换超时时间，超时后放弃切换（避免无限重试）；                 |
+| `parallel-syncs`          | 1            | 从库同步新 Master 时，仅 1 个从库并行同步，降低新 Master 压力； |
+| `quorum`                  | 2（3 哨兵集群）    | 需≥(哨兵数量 / 2)+1（3 哨兵设 2，5 哨兵设 3），确保共识；     |
 #### 3.2.3.3 编写 service 文件
 
 ```bash
