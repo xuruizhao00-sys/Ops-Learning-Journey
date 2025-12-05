@@ -6294,19 +6294,54 @@ SENTINEL master-reboot-down-after-period mymaster 0
 | `parallel-syncs`          | 1            | 从库同步新 Master 时，仅 1 个从库并行同步，降低新 Master 压力； |
 | `quorum`                  | 2（3 哨兵集群）    | 需≥(哨兵数量 / 2)+1（3 哨兵设 2，5 哨兵设 3），确保共识；     |
 #### 3.2.3.3 编写 service 文件
-
+##### 3.2.3.3.1 基础信息确认
+| 项              | 路径 / 值                                                       | 说明                                    |
+| -------------- | ------------------------------------------------------------ | ------------------------------------- |
+| Sentinel 配置文件  | `/apps/redis/etc/sentinel.conf`                              | 哨兵核心配置文件                              |
+| 工作目录           | `/var/lib/redis`                                             | 存储临时文件 / PID 文件                       |
+| 日志目录           | `/var/log/redis`                                             | 哨兵日志文件目录                              |
+| 运行用户 / 组       | `redis:redis`                                                | 专用低权限用户                               |
+| Sentinel 可执行文件 | `/usr/local/bin/redis-sentinel`（或 `/usr/bin/redis-sentinel`） | 需确认实际路径（执行 `which redis-sentinel` 查看） |
+##### 3.2.3.3.2 创建 service 文件
 ```bash
 [Unit]
-Description=Redis Sentinel
-After=network.target
+# 服务描述
+Description=Redis Sentinel (Redis 8.2.1)
+# 依赖：网络就绪后启动
+After=network.target network-online.target
+# 弱依赖：redis主从服务（可选，若哨兵与主从同服务器）
+# Wants=redis-server.service
+
 [Service]
-ExecStart=/apps/redis/bin/redis-sentinel /apps/redis/etc/sentinel.conf --supervised systemd
-ExecStop=/bin/kill -s QUIT $MAINPID
+# 运行用户/组（必须与哨兵配置文件、日志目录的所有者一致）
 User=redis
 Group=redis
-RuntimeDirectory=redis
-Mode=0755
+# 服务类型（simple 适配后台运行的哨兵）
+Type=simple
+# 启动命令（指定配置文件，绝对路径！）
+ExecStart=/usr/local/bin/redis-sentinel /etc/redis/sentinel.conf
+# 优雅停止（发送 SIGTERM 信号，避免强制杀进程）
+ExecStop=/usr/local/bin/redis-cli -p 26379 -a StrongPass@2025 shutdown
+# 停止后清理 PID 文件
+ExecStopPost=/bin/rm -f /var/run/redis-sentinel.pid
+# 重启策略：失败时始终重启（生产推荐）
+Restart=always
+# 重启间隔（避免频繁重启）
+RestartSec=3s
+# 文件描述符限制（解决大并发下文件句柄不足）
+LimitNOFILE=65535
+# 最大进程数限制
+LimitNPROC=65535
+# 内存锁定（可选，避免哨兵内存被交换到磁盘）
+# MemoryLock=yes
+# 工作目录（与哨兵配置的 dir 参数一致）
+WorkingDirectory=/var/lib/redis
+# 日志重定向（可选，将 stdout/stderr 写入指定日志文件）
+StandardOutput=append:/var/log/redis/sentinel.service.log
+StandardError=append:/var/log/redis/sentinel.service.log
+
 [Install]
+# 开机自启目标（多用户模式）
 WantedBy=multi-user.target
 
 
@@ -6315,6 +6350,16 @@ WantedBy=multi-user.target
 [root@redis-master ~]#systemctl daemon-reload
 [root@redis-master ~]#systemctl enable --now redis-sentinel.service
 ```
+
+
+|段|参数|作用|
+|---|---|---|
+|`[Unit]`|`After=network.target`|确保网络启动后再启动哨兵（避免哨兵启动时无法连接主从节点）；|
+|`[Service]`|`User=redis`|强制以 `redis` 用户运行，避免 root 权限风险；|
+|`[Service]`|`ExecStop`|优雅停止哨兵（通过 `redis-cli` 发送 `shutdown` 命令，而非 `kill -9`）；|
+|`[Service]`|`Restart=always`|哨兵崩溃、被杀死、配置错误修复后，`systemd` 自动重启（生产必配）；|
+|`[Service]`|`LimitNOFILE=65535`|提升文件描述符限制（Redis 哨兵 / 主从默认需要大量句柄）；|
+|`[Install]`|`WantedBy=multi-user.target`|配置为多用户模式下的开机自启服务；|
 
 #### 3.2.3.4 验证 sentinel 服务
 
