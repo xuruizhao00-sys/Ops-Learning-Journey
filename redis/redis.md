@@ -6431,7 +6431,7 @@ master0:name=mymaster,status=ok,address=192.168.121.131:6379,slaves=2,sentinels=
 
 ##### 3.2.3.5.1 停止 master 节点
 
-```
+```bash
 [root@redis-master ~]#killall redis-server
 
 # 查看个节点上哨兵的信息
@@ -6450,14 +6450,14 @@ master0:name=mymaster,status=ok,address=10.0.0.18:6379,slaves=2,sentinels=3
 
 ##### 3.2.3.5.2 验证故障转移
 
-故障转移后redis.conf中的replicaof行的master IP会被修改
+故障转移后 redis.conf 中的 replicaof 行的 master IP 会被修改
 
 ```bash
 [root@redis-slave2 ~]#grep ^replicaof /etc/redis.conf 
 replicaof 10.0.0.18 6379
 ```
 
-哨兵配置文件的sentinel monitor IP 同样也会被修改
+哨兵配置文件的 sentinel monitor IP 同样也会被修改
 
 ```bash
 [root@redis-slave1 ~]#grep "^[a-Z]" /etc/redis-sentinel.conf
