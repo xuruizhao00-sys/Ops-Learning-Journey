@@ -6321,7 +6321,7 @@ Type=simple
 # 启动命令（指定配置文件，绝对路径！）
 ExecStart=/usr/local/bin/redis-sentinel /etc/redis/sentinel.conf
 # 优雅停止（发送 SIGTERM 信号，避免强制杀进程）
-ExecStop=/usr/local/bin/redis-cli -p 26379 -a StrongPass@2025 shutdown
+ExecStop=/usr/local/bin/redis-cli -p 26379 -a 123456 shutdown
 # 停止后清理 PID 文件
 ExecStopPost=/bin/rm -f /var/run/redis-sentinel.pid
 # 重启策略：失败时始终重启（生产推荐）
