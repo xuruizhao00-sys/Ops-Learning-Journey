@@ -6360,6 +6360,7 @@ WantedBy=multi-user.target
 |`[Service]`|`Restart=always`|哨兵崩溃、被杀死、配置错误修复后，`systemd` 自动重启（生产必配）；|
 |`[Service]`|`LimitNOFILE=65535`|提升文件描述符限制（Redis 哨兵 / 主从默认需要大量句柄）；|
 |`[Install]`|`WantedBy=multi-user.target`|配置为多用户模式下的开机自启服务；|
+##### 3.2.3.3.3 启动 sentinel 服务
 
 #### 3.2.3.4 验证 sentinel 服务
 
@@ -6410,19 +6411,20 @@ LISTEN  0       128             [::]:6379         [::]:*
 
 ##### 3.2.3.4.3 当前 sentinel 状态
 
-在sentinel状态中尤其是最后一行，涉及到masterIP是多少，有几个slave，有几个sentinels，必须是符合全部服务器数量
+在 sentinel 状态中尤其是最后一行，涉及到 masterIP 是多少，有几个 slave，有几个sentinels，必须是符合全部服务器数量
 
 ```bash
-[root@redis-master ~]#redis-cli -p 26379
-127.0.0.1:26379> INFO sentinel
+17:51:03 root@redis01:~# redis-cli -p 26379
+127.0.0.1:26379> info sentinel
 # Sentinel
 sentinel_masters:1
 sentinel_tilt:0
+sentinel_tilt_since_seconds:-1
+sentinel_total_tilt:0
 sentinel_running_scripts:0
 sentinel_scripts_queue_length:0
 sentinel_simulate_failure_flags:0
-master0:name=mymaster,status=ok,address=10.0.0.8:6379,slaves=2,sentinels=3 
-#两个slave,三个sentinel服务器,如果sentinels值不符合,检查myid可能冲突
+master0:name=mymaster,status=ok,address=192.168.121.131:6379,slaves=2,sentinels=2
 ```
 
 #### 3.2.3.5 停止 master 节点实现故障转移
