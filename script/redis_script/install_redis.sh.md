@@ -45,7 +45,7 @@ color() {
     SETCOLOR_WARNING="echo -en \\033[1;33m"
     SETCOLOR_INFO="echo -en \\033[1;34m"
     SETCOLOR_NORMAL="echo -en \E[0m"
-    
+
     echo -n "$1" && $MOVE_TO_COL
     echo -n "["
     case "$2" in
@@ -100,7 +100,7 @@ pre_check() {
             if [ "$ID" = "centos" ] || [ "$ID" = "rocky" ]; then
                 yum install -y "$tool" >> "$LOG_FILE" 2>&1
             else
-		            apt update
+                apt update >> "$LOG_FILE" 2>&1
                 apt install -y "$tool" >> "$LOG_FILE" 2>&1
             fi
             if [ $? -ne 0 ]; then
@@ -219,26 +219,46 @@ compile_install() {
 
     # 创建目录结构
     mkdir -p "$INSTALL_DIR/etc" "$DATA_DIR" "$LOG_DIR" "$RUN_DIR" >> "$LOG_FILE" 2>&1
+    # 校验目录创建是否成功
+    if [ ! -d "$INSTALL_DIR/etc" ]; then
+        color "错误：配置目录 $INSTALL_DIR/etc 创建失败" 1
+        exit 1
+    fi
 
     # 复制并优化配置文件
     cp -f redis.conf "$CONF_FILE" >> "$LOG_FILE" 2>&1
+    # 校验配置文件复制是否成功
+    if [ ! -f "$CONF_FILE" ]; then
+        color "错误：配置文件 $CONF_FILE 复制失败" 1
+        exit 1
+    fi
     color "开始优化 Redis 配置文件..." 3
 
-    # 配置文件修改（精准匹配，避免重复）
+    # ========== 核心修正：重构 sed 命令 ==========
+    # 1. 移除行尾注释，避免干扰
+    # 2. 替换分隔符为 |，避免路径中的 / 冲突
+    # 3. 确保反斜杠后仅换行，无多余字符
+    # 必要性确定：先取消dir行的注释（如果有）
+		sed -i 's|^# dir |dir |' "$CONF_FILE"
     sed -i \
-        -e 's/^bind 127.0.0.1/bind 0.0.0.0/' \  # 允许全网访问（生产环境建议限制IP）
-        -e 's/^# requirepass foobared/requirepass '"$PASSWORD"'/' \  # 设置密码
-        -e 's/^dir \.\//dir '"$DATA_DIR"'/' \  # 数据目录
-        -e 's/^logfile ""/logfile '"${LOG_DIR}/redis-${REDIS_PORT}.log"'/' \  # 日志文件
-        -e 's/^pidfile \/var\/run\/redis_6379.pid/pidfile '"${RUN_DIR}/redis_${REDIS_PORT}.pid"'/' \  # PID文件
-        -e 's/^daemonize yes/daemonize no/' \  # systemd 管理时禁用后台运行
-        -e 's/^maxmemory <bytes>/maxmemory 1gb/' \  # 限制最大内存（可修改）
-        -e 's/^maxmemory-policy noeviction/maxmemory-policy allkeys-lru/' \  # 内存满时淘汰策略
-        -e 's/^appendonly no/appendonly yes/' \  # 启用AOF持久化
-        -e 's/^appendfsync everysec/appendfsync everysec/' \  # AOF同步策略
-        -e 's/^protected-mode yes/protected-mode yes/' \  # 启用保护模式
+        -e 's|^bind 127.0.0.1|bind 0.0.0.0|' \
+        -e 's|^# requirepass foobared|requirepass '"$PASSWORD"'|' \
+        -e 's|^dir .*|dir '"$DATA_DIR"'|' \
+        -e 's|^logfile ""|logfile '"${LOG_DIR}/redis-${REDIS_PORT}.log"'|' \
+        -e 's|^pidfile \/var\/run\/redis_6379.pid|pidfile '"${RUN_DIR}/redis_${REDIS_PORT}.pid"'|' \
+        -e 's|^daemonize yes|daemonize no|' \
+        -e 's|^maxmemory <bytes>|maxmemory 1gb|' \
+        -e 's|^maxmemory-policy noeviction|maxmemory-policy allkeys-lru|' \
+        -e 's|^appendonly no|appendonly yes|' \
+        -e 's|^appendfsync everysec|appendfsync everysec|' \
+        -e 's|^protected-mode yes|protected-mode yes|' \
         "$CONF_FILE" >> "$LOG_FILE" 2>&1
 
+    # 校验 sed 执行是否成功
+    if [ $? -ne 0 ]; then
+        color "错误：配置文件优化失败，查看日志 $LOG_FILE" 1
+        exit 1
+    fi
     color "配置文件优化完成" 0
 }
 
