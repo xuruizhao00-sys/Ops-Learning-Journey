@@ -6113,30 +6113,36 @@ requirepass "123456"
 
 **master 服务器状态**
 
-```
-[root@redis-master ~]#redis-cli -a 123456
-Warning: Using a password with '-a' or '-u' option on the command line interface 
-may not 
-127.0.0.1:6379> INFO replication
+```bash
+127.0.0.1:6379> role 
+1) "master"
+2) (integer) 77945
+3) 1) 1) "192.168.121.133"
+      2) "6379"
+      3) "77945"
+   4) 1) "192.168.121.132"
+      2) "6379"
+      3) "77945"
+127.0.0.1:6379> info replication
 # Replication
 role:master
 connected_slaves:2
-slave0:ip=10.0.0.28,port=6379,state=online,offset=112,lag=1
-slave1:ip=10.0.0.18,port=6379,state=online,offset=112,lag=0
-master_replid:8fdca730a2ae48fb9c8b7e739dcd2efcc76794f3
+slave0:ip=192.168.121.133,port=6379,state=online,offset=77959,lag=1
+slave1:ip=192.168.121.132,port=6379,state=online,offset=77959,lag=1
+master_failover_state:no-failover
+master_replid:d5cd6257cac628b944c7f4674b8aae84e7405589
 master_replid2:0000000000000000000000000000000000000000
-master_repl_offset:112
+master_repl_offset:77959
 second_repl_offset:-1
 repl_backlog_active:1
 repl_backlog_size:1048576
 repl_backlog_first_byte_offset:1
-repl_backlog_histlen:112
-127.0.0.1:6379>
+repl_backlog_histlen:77959
 ```
 
 **配置 slave1**
 
-```
+```bash
 [root@redis-slave1 ~]#redis-cli -a 123456
 Warning: Using a password with '-a' or '-u' option on the command line interface 
 may not be safe.
@@ -6168,7 +6174,7 @@ repl_backlog_histlen:42
 
 **配置 slave2**
 
-```
+```bash
 [root@redis-slave2 ~]#redis-cli -a 123456
 Warning: Using a password with '-a' or '-u' option on the command line interface 
 may not be safe.
@@ -6200,7 +6206,7 @@ repl_backlog_histle
 
 #### 3.2.3.2 编辑 sentinel 哨兵配置
 
-Sentinel实际上是一个特殊的redis服务器,有些redis指令支持,但很多指令并不支持.默认监听在 26379/tcp 端口.
+Sentinel 实际上是一个特殊的 redis 服务器,有些 redis 指令支持,但很多指令并不支持.默认监听在 26379/tcp 端口.
 
 哨兵服务可以和 Redis 服务器分开部署在不同主机，但为了节约成本一般会部署在一起
 
