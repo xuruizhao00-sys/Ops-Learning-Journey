@@ -2311,5 +2311,264 @@ declare [选项] 变量名[=值]
 3. 关联数组（`-A`）仅支持 Bash 4.0+，需确认 Bash 版本（`bash --version`）。
 
 #### 2.1.4.4 declare 实践
+```bash
+16:08:35 root@redis01:~# vim define_variable_2.sh 
+16:11:30 root@redis01:~# cat define_variable_2.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: define_variable_2.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+# 1. -i：声明整数变量（自动算术运算）
+echo "1. 声明整数变量（-i）："
+declare -i num1=10
+declare -i num2=5
+num1=num1 + num2  # 整数类型可直接算术赋值（无需 $(( ))）
+echo "num1 = $num1"  # 输出：15
+num3=abc           # 赋值非数字，值为 0
+declare -i num3
+echo "num3 = $num3"  # 输出：0
+echo "-------------------------"
 
+# 2. -r：声明只读变量
+echo -e "\n2. 声明只读变量（-r）："
+declare -r readonly_var="只读变量"
+echo "readonly_var = $readonly_var"
+# readonly_var=修改  # 运行会报错：readonly variable
+# unset readonly_var  # 运行会报错：cannot unset: readonly variable
+echo "-------------------------"
+
+# 3. -a：声明索引数组
+echo -e "\n3. 声明索引数组（-a）："
+declare -a arr=(apple banana cherry)
+echo "数组第1个元素：${arr[0]}"  # 索引从0开始
+echo "数组所有元素：${arr[@]}"    # 输出：apple banana cherry
+echo "数组长度：${#arr[@]}"      # 输出：3
+# 追加元素
+arr[3]="date"
+echo "追加后数组：${arr[@]}"     # 输出：apple banana cherry date
+echo "-------------------------"
+
+# 4. -A：声明关联数组（键值对）
+echo -e "\n4. 声明关联数组（-A）："
+declare -A user_info=([name]="王五" [age]=28 [city]="上海")
+echo "姓名：${user_info[name]}"   # 输出：王五
+echo "年龄：${user_info[age]}"    # 输出：28
+echo "所有键：${!user_info[@]}"   # 输出：name age city
+echo "所有值：${user_info[@]}"    # 输出：王五 28 上海
+echo "-------------------------"
+
+# 5. -x：声明环境变量（等同于 export）
+echo -e "\n5. 声明环境变量（-x）："
+declare -x env_test="环境变量测试"
+echo "env_test = $env_test"
+# 验证是否为环境变量
+export | grep "^env_test="  # 输出：env_test=环境变量测试
+echo "-------------------------"
+
+# 6. -u/-l：大小写转换
+echo -e "\n6. 大小写转换（-u/-l）："
+declare -u upper_str="hello world"
+echo "大写转换：$upper_str"  # 输出：HELLO WORLD
+declare -l lower_str="HELLO SHELL"
+echo "小写转换：$lower_str"  # 输出：hello shell
+echo "-------------------------"
+
+# 7. -p：查看变量属性
+echo -e "\n7. 查看变量属性（-p）："
+declare -p num1 readonly_var arr user_info
+
+16:11:32 root@redis01:~# bash define_variable_2.sh
+1. 声明整数变量（-i）：
+define_variable_2.sh: line 15: +: command not found
+num1 = 10
+num3 = abc
+-------------------------
+
+2. 声明只读变量（-r）：
+readonly_var = 只读变量
+-------------------------
+
+3. 声明索引数组（-a）：
+数组第1个元素：apple
+数组所有元素：apple banana cherry
+数组长度：3
+追加后数组：apple banana cherry date
+-------------------------
+
+4. 声明关联数组（-A）：
+姓名：王五
+年龄：28
+所有键：city age name
+所有值：上海 28 王五
+-------------------------
+
+5. 声明环境变量（-x）：
+env_test = 环境变量测试
+-------------------------
+
+6. 大小写转换（-u/-l）：
+大写转换：HELLO WORLD
+小写转换：hello shell
+-------------------------
+
+7. 查看变量属性（-p）：
+declare -i num1="10"
+declare -r readonly_var="只读变量"
+declare -a arr=([0]="apple" [1]="banana" [2]="cherry" [3]="date")
+declare -A user_info=([city]="上海" [age]="28" [name]="王五" )
+```
 #### 2.1.4.5 变量移除
+当变量不再使用时，可通过 `unset` 命令移除变量（释放内存），核心是删除变量的定义和值。
+```bash
+unset [选项] 变量名/数组名
+```
+1. `unset` 可移除普通变量、数组、环境变量，但**无法移除只读变量**（`declare -r` 声明的）；
+2. 移除数组时：`unset 数组名` 移除整个数组，`unset 数组名[索引]` 移除指定元素；
+3. 移除环境变量后，该变量仅在当前 Shell 失效，子 Shell 不受影响。
+```bash
+16:13:22 root@redis01:~# cat unset_variable.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: unset_variable.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+# 1. 移除普通变量
+echo "1. 移除普通变量："
+test_var="要移除的变量"
+echo "移除前：test_var = $test_var"
+unset test_var
+echo "移除后：test_var = $test_var"  # 输出为空
+echo "-------------------------"
+
+# 2. 移除数组（整体/单个元素）
+echo -e "\n2. 移除数组："
+declare -a fruit=(apple banana cherry)
+echo "移除前数组：${fruit[@]}"
+# 移除单个元素（索引1）
+unset fruit[1]
+echo "移除索引1后：${fruit[@]}"  # 输出：apple cherry
+# 移除整个数组
+unset fruit
+echo "移除整个数组后：${fruit[@]}"  # 输出为空
+echo "-------------------------"
+
+# 3. 移除环境变量
+echo -e "\n3. 移除环境变量："
+declare -x env_var="测试环境变量"
+echo "移除前：env_var = $env_var"
+unset env_var
+echo "移除后：env_var = $env_var"  # 输出为空
+# 验证环境变量是否存在
+export | grep "^env_var="  # 无输出
+echo "-------------------------"
+
+# 4. 尝试移除只读变量（报错）
+echo -e "\n4. 尝试移除只读变量："
+declare -r readonly_var="只读变量"
+echo "readonly_var = $readonly_var"
+unset readonly_var  # 运行会报错：cannot unset: readonly variable
+
+16:13:23 root@redis01:~# bash unset_variable.sh
+1. 移除普通变量：
+移除前：test_var = 要移除的变量
+移除后：test_var = 
+-------------------------
+
+2. 移除数组：
+移除前数组：apple banana cherry
+移除索引1后：apple cherry
+移除整个数组后：
+-------------------------
+
+3. 移除环境变量：
+移除前：env_var = 测试环境变量
+移除后：env_var = 
+-------------------------
+
+4. 尝试移除只读变量：
+readonly_var = 只读变量
+unset_variable.sh: line 45: unset: readonly_var: cannot unset: readonly variable
+```
+## 2.2 全局变量
+### 2.2.1 基本操作
+#### 2.2.1.1 基础知识
+```powershell
+全局变量是什么
+全局变量就是：在当前系统的所有环境下都能生效的变量。
+
+查看全局环境变量
+ env 只显示全局变量,一般结合 grep 和管道符来使用
+ printenv 效果与 env 等同
+ export 查看所有的环境变量，包括声明的过程等信息，一般不用
+ declare -x 效果与 export 类似
+ 
+ 
+定义全局变量方法一：
+ 变量=值
+ export 变量
+定义全局变量方法二：（最常用）
+ export 变量=值
+ declare -x 
+```
+#### 2.2.1.2 查看全局变量
+```bash
+# 查看所有的全局变量
+[root@rocky9 ~]# env
+XDG_SESSION_ID=4
+HOSTNAME=localhost
+SHELL=/bin/bash
+TERM=xterm
+HISTSIZE=1000
+...
+# 查看制定的全局变量
+[root@rocky9 ~]# env | grep SHELL
+SHELL=/bin/bash
+
+# 定制本地变量
+[root@rocky9 ~]# envtype=local
+[root@rocky9 ~]# echo $envtype
+local
+# 从全局变量中查看
+[root@rocky9 ~]# env | grep envtype
+[root@rocky9 ~]#
+结果显示：
+ 无法从全局变量中查看本地变量的名称
+```
+#### 2.2.1.3 定制全局变量
+```bash
+方法1定制全局变量
+[root@rocky9 ~]# echo $envtype
+local
+[root@rocky9 ~]# env | grep envtype
+[root@rocky9 ~]# export envtype
+[root@rocky9 ~]# env | grep envtype
+envtype=local
+方法2定制全局变量
+[root@rocky9 ~]# export myuser=root
+[root@rocky9 ~]# env | grep myuser
+myuser=root
+鸡肋方法定制全局变量
+[root@rocky9 ~]# declare -x mydir=/root
+[root@rocky9 ~]# env | grep mydir
+mydir=/root
+清理全局变量
+[root@rocky9 ~]# unset envtype myuser mydir
+```
+### 2.3.2 文件体系
+#### 2.3.2.1 变量文件
+
+
+#### 2.3.2.2 bashrc 和 bash_profile
+
+#### 2.3.2.3 profile
