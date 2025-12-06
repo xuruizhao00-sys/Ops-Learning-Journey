@@ -6713,7 +6713,7 @@ min-replicas-max-lag 10  # 从库延迟≤10秒才允许写
 
 ### 3.3.1 redis cluster 介绍
 
-使用哨兵 Sentinel 只能解决Redis高可用问题，实现Redis的自动故障转移,但仍然无法解决 Redis Master 单节点的性能瓶颈问题
+使用哨兵 Sentinel 只能解决 Redis 高可用问题，实现 Redis 的自动故障转移,但仍然无法解决 Redis Master 单节点的性能瓶颈问题
 
 为了解决单机性能的瓶颈，提高 Redis 服务整体性能，可以使用分布式集群的解决方案
 
@@ -6722,15 +6722,15 @@ min-replicas-max-lag 10  # 从库延迟≤10秒才允许写
 - 客户端分区：由客户端程序自己实现写入分配、高可用管理和故障转移等,对客户端的开发实现较为复杂
 - 代理服务：客户端不直接连接Redis,而先连接到代理服务，由代理服务实现相应读写分配，当前代理服务都是第三方实现.此方案中客户端实现无需特殊开发,实现容易,但是代理服务节点仍存有单点故障和性能瓶颈问题。比如：Twitter开源Twemproxy,豌豆荚开发的 codis
 
-Redis 3.0 版本之后推出无中心架构的 Redis Cluster ，支持多个master节点并行写入和故障的自动转移功能
+Redis 3.0 版本之后推出无中心架构的 Redis Cluster ，支持多个 master 节点并行写入和故障的自动转移功能
 
 ### 3.3.2 redis cluster 架构
 
 #### 3.3.2.1 redis cluster 架构
 
-Redis cluster 需要至少 3个master节点才能实现,slave节点数量不限,当然一般每个master都至少对应的有一个slave节点
+Redis cluster 需要至少 3 个 master 节点才能实现,slave 节点数量不限,当然一般每个 master 都至少对应的有一个slave节点
 
-如果有三个主节点采用哈希槽 hash slot 的方式来分配16384个槽位 slot 
+如果有三个主节点采用哈希槽 hash slot 的方式来分配 16384 个槽位 slot 
 
 此三个节点分别承担的slot 区间可以是如以下方式分配
 
