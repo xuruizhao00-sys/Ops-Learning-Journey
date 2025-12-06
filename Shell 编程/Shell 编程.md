@@ -2118,12 +2118,197 @@ echo ${arr[@]}    # 输出：apple banana orange（所有元素）
 echo ${#arr[@]}   # 输出：3（数组长度）
 ```
 ### 2.1.4 变量基本操作
-
 #### 2.1.4.1 变量查看
+在 Shell 中，查看变量的目的是确认变量的**值**、**属性**（如类型、只读、环境变量等）或**所有已定义变量**，常用方法如下：
 
+|方法|用途|适用场景|
+|---|---|---|
+|`echo $变量名`|查看单个变量的值|快速验证单个变量赋值结果|
+|`printf "%s\n" $变量名`|格式化查看变量值（避免特殊字符问题）|变量值含空格 / 特殊符号时|
+|`set`|查看所有变量（包括本地 / 环境 / 函数）|排查所有已定义变量|
+|`env`/`export`|查看环境变量（全局可访问）|确认环境变量是否生效|
+|`declare -p 变量名`|查看变量的**值 + 属性**（类型 / 只读等）|调试变量属性问题|
+```bash
+16:06:12 root@redis01:~# cat show_variable.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: show_variable.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 先定义测试变量
+name="张三"
+age=25
+export PATH=$PATH:/tmp  # 环境变量示例
+
+# 1. 基础查看：echo
+echo "echo 查看单个变量："
+echo "name = $name"
+echo "age = $age"
+echo "-------------------------"
+
+# 2. 格式化查看：printf（处理含空格/特殊字符的变量）
+address="北京市 朝阳区"
+echo -e "\nprintf 格式化查看："
+printf "address = %s\n" "$address"
+echo "-------------------------"
+
+# 3. set 查看所有变量（本地+环境+函数）
+# 注：输出内容较多，可结合 grep 过滤指定变量
+echo -e "\nset 过滤查看 name 变量："
+set | grep "^name="
+echo "-------------------------"
+
+# 4. env/export 查看环境变量
+echo -e "\nexport 查看 PATH 环境变量（截取末尾）："
+export | grep "^PATH=" | awk -F'/tmp' '{print $1 "/tmp..."}'
+echo "-------------------------"
+
+# 5. declare -p 查看变量值+属性（最推荐的调试方式）
+echo -e "\ndeclare -p 查看变量属性："
+declare -p name age address
+
+16:06:17 root@redis01:~# bash show_variable.sh 
+echo 查看单个变量：
+name = 张三
+age = 25
+-------------------------
+
+printf 格式化查看：
+address = 北京市 朝阳区
+-------------------------
+
+set 过滤查看 name 变量：
+name=张三
+-------------------------
+
+export 查看 PATH 环境变量（截取末尾）：
+-------------------------
+
+declare -p 查看变量属性：
+declare -- name="张三"
+declare -- age="25"
+declare -- address="北京市 朝阳区"
+```
 #### 2.1.4.2 变量定义
+Shell 变量默认是**字符串类型**，定义的核心规则是「变量名 = 值」，无类型限制（除非用 `declare` 声明）。
+1. 变量名：只能包含**字母、数字、下划线**，且**不能以数字开头**（区分大小写）；
+2. 赋值符号 `=` 两边**不能有空格**（空格会被 Shell 解析为命令分隔符）；
+3. 变量值含**空格 / 特殊字符**时，需用单引号 `''` 或双引号 `""` 包裹；
+4. 引用变量：用 `$变量名` 或 `${变量名}`（推荐后者，避免变量名拼接歧义）。
 
+*赋值方式（4 种常用）*
+
+|赋值方式|语法示例|说明|
+|---|---|---|
+|直接赋值|`var=value`|最简单的赋值，值为固定字符串|
+|命令替换赋值|`var=$(命令)` 或 `var=`命令 ``|变量值为命令的执行结果|
+|算术赋值|`var=$((算术表达式))`|整数运算（仅支持整数，浮点数需用 bc）|
+|交互赋值|`read [-p 提示语] var`|从用户输入获取变量值|
+```bash
+16:08:26 root@redis01:~# cat define_variable.sh 
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: define_variable.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+# 1. 直接赋值（核心规则演示）
+var1=hello          # 正确：无空格
+# var2 = world      # 错误：=两边有空格（运行会报错）
+var3="hello world"  # 含空格，双引号包裹
+var4='hello $var1'  # 单引号：原样输出（不解析变量）
+var5="hello $var1"  # 双引号：解析变量
+
+echo "1. 直接赋值："
+echo "var1 = $var1"
+echo "var3 = $var3"
+echo "var4 = $var4"  # 输出：hello $var1
+echo "var5 = $var5"  # 输出：hello hello
+echo "-------------------------"
+
+# 2. 命令替换赋值（$() 推荐，` ` 兼容旧版本）
+current_dir=$(pwd)       # 获取当前目录
+file_count=$(ls | wc -l) # 统计当前目录文件数
+echo -e "\n2. 命令替换赋值："
+echo "当前目录：$current_dir"
+echo "当前目录文件数：$file_count"
+echo "-------------------------"
+
+# 3. 算术赋值（$(( )) 仅支持整数）
+a=10
+b=3
+sum=$((a + b))
+sub=$((a - b))
+mul=$((a * b))
+div=$((a / b))  # 整数除法，结果取整
+mod=$((a % b))
+echo -e "\n3. 算术赋值："
+echo "$a + $b = $sum"
+echo "$a - $b = $sub"
+echo "$a * $b = $mul"
+echo "$a / $b = $div"  # 输出：3
+echo "$a % $b = $mod"  # 输出：1
+echo "-------------------------"
+
+# 4. 交互赋值（read）
+echo -e "\n4. 交互赋值："
+read -p "请输入你的姓名：" username
+read -p "请输入你的年龄：" userage
+echo "你输入的姓名：$username，年龄：$userage"
+
+16:08:29 root@redis01:~# bash define_variable.sh 
+1. 直接赋值：
+var1 = hello
+var3 = hello world
+var4 = hello $var1
+var5 = hello hello
+-------------------------
+
+2. 命令替换赋值：
+当前目录：/root
+当前目录文件数：8
+-------------------------
+
+3. 算术赋值：
+10 + 3 = 13
+10 - 3 = 7
+10 * 3 = 30
+10 / 3 = 3
+10 % 3 = 1
+-------------------------
+
+4. 交互赋值：
+请输入你的姓名：xu
+请输入你的年龄：22
+你输入的姓名：xu，年龄：22
+```
 #### 2.1.4.3 declare 语法
+`declare` 是 Shell 内置命令，用于**声明变量类型 / 修改变量属性**，解决默认字符串类型的限制（如整数、数组、只读、环境变量等）。
+```bash
+declare [选项] 变量名[=值]
+```
+
+|选项|作用|示例|
+|---|---|---|
+|`-i`|声明变量为**整数类型**（自动算术运算）|`declare -i num=10`|
+|`-r`|声明变量为**只读变量**（不可修改 / 删除）|`declare -r readonly_var=test`|
+|`-a`|声明变量为**索引数组**（默认数组类型）|`declare -a arr=(1 2 3)`|
+|`-A`|声明变量为**关联数组**（键值对）|`declare -A dict=([name]=张三 [age]=25)`|
+|`-x`|声明变量为**环境变量**（等同于 export）|`declare -x env_var=hello`|
+|`-p`|查看变量的**值 + 属性**（无参数时查看所有）|`declare -p num`|
+|`-u`|变量值转为**大写**（赋值时自动转换）|`declare -u str=hello`|
+|`-l`|变量值转为**小写**（赋值时自动转换）|`declare -l str=HELLO`|
+1. 只读变量（`-r`）一旦声明，无法修改值、无法用 `unset` 删除，仅能通过重启 Shell 清除；
+2. 整数变量（`-i`）赋值非数字时，值会被设为 0；
+3. 关联数组（`-A`）仅支持 Bash 4.0+，需确认 Bash 版本（`bash --version`）。
 
 #### 2.1.4.4 declare 实践
 
