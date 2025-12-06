@@ -2585,5 +2585,13 @@ Shell 变量的 “持久化” 和 “全局生效” 依赖于系统的配置�
 
 
 #### 2.3.2.2 bashrc 和 bash_profile
+`bashrc` 和 `bash_profile` 是 Bash Shell 的核心初始化文件，用于配置 Shell 环境（变量、别名、函数等），核心区别在于**加载时机**：
+
+|特性|`.bashrc`|`.bash_profile`（`.bash_login`/`.profile` 是备选）|
+|---|---|---|
+|加载场景|非登录 Shell（如终端直接打开、SSH 连接后新建终端）|登录 Shell（如 SSH 首次登录、控制台登录）|
+|加载次数|每次新建 Shell 会话都加载|仅登录时加载一次|
+|核心作用|定义本地变量、别名、函数（高频使用）|定义环境变量、登录时的一次性操作（如加载 bashrc）|
+|生效范围|当前用户（`~/.bashrc`）/ 系统全局（`/etc/bashrc`）|当前用户（`~/.bash_profile`）/ 系统全局（`/etc/profile`）|
 
 #### 2.3.2.3 profile
