@@ -1882,6 +1882,42 @@ Shell 变量的分类可以从**作用域 / 生命周期**、**定义主体**、
 - **定义**：仅在**当前 shell 进程**或**函数内部**有效，子进程 / 子 shell 无法访问，退出当前 shell / 函数后立即销毁。
 - **声明方式**：普通 shell 中直接赋值（默认当前 shell 局部）；函数内需用 `local` 关键字显式声明（否则会升级为当前 shell 的全局变量）。
 ```bash
+15:33:45 root@redis01:~# cat local_variable.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: local_variable.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 普通 shell 的局部变量，只对当前 shell 有效
+var="local variable"
+echo ${var}
+
+
+# 函数内部的局部变量（仅在函数内部有效）
+test_func(){
+  local func_inner_var="func_inner"
+  echo ${func_inner_var}
+}
+
+test_func
+
+# 无输出，函数外不可见
+echo ${func_inner_var}
+
+15:33:46 root@redis01:~# bash local_variable.sh
+local variable
+func_inner
+```
+
+- **查看方式**：`set` 命令（列出所有局部变量 + 环境变量）。
+##### 2.1.3.1.2 环境变量（Environment Variable）
+- **定义**：全局有效，当前 shell 及所有**子 shell / 子进程**（如 bash、python 脚本、其他命令）均可访问。
+- **声明方式**：通过 `export` 关键字导出（临时生效），或写入配置文件持久化。
+```bash
 
 ```
 ### 2.1.4 变量基本操作
