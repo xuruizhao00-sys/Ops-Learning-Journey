@@ -2828,5 +2828,136 @@ echo "USER_BIN = $USER_BIN"  # 输出：/home/user/bin
 #### 2.2.3.2 嵌套实践
 ##### 2.2.3.2.1 验证本地变量无法传递给子 shell
 ```bash
+21:37:35 root@redis01:~# cat test01.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test01.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+unset local_var  # 先清空可能残留的变量，避免干扰
+
+echo "===== 示例1：本地变量的隔离性 ====="
+
+# 父Shell定义本地变量（仅本地，未export）
+local_var="父Shell的本地变量"
+declare -p local_var
+echo "父Shell中 local_var = $local_var"  # 验证父Shell能看到
+
+# 方式1：执行bash命令启动子Shell，查看变量
+echo -e "\n1. 子Shell中查看本地变量："
+bash -c 'echo "子Shell内 local_var = $local_var"'  # 输出为空（不可见）
+
+# 方式2：脚本直接执行（本质是启动子Shell）
+cat > sub_script1.sh << EOF
+#!/bin/bash
+echo "脚本sub_script1.sh（子Shell）内 local_var = \$local_var"
+EOF
+chmod +x sub_script1.sh
+echo -e "\n3. 脚本直接执行（子Shell）查看本地变量："
+./sub_script1.sh  # 输出为空（不可见）
+rm -f sub_script1.sh  # 清理测试脚本
+21:37:36 root@redis01:~# bash test01.sh
+===== 示例1：本地变量的隔离性 =====
+declare -- local_var="父Shell的本地变量"
+父Shell中 local_var = 父Shell的本地变量
+
+1. 子Shell中查看本地变量：
+子Shell内 local_var = 
+
+2. 脚本直接执行（子Shell）查看本地变量：
+脚本sub_script1.sh（子Shell）内 local_var = 
+```
+##### 2.2.3.2.2 export 环境变量传递给子 Shell
+```bash
+21:39:19 root@redis01:~# cat test02.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 示例2：export环境变量可传递给子Shell
+echo "===== 示例2：export环境变量的传递性 ====="
+
+# 父Shell定义并export环境变量
+export env_var="父Shell的环境变量"
+
+# 方式1：bash命令启动子Shell
+echo -e "\n1. 子Shell中查看环境变量："
+bash -c 'echo "子Shell内 env_var = $env_var"'  # 可见
+
+
+# 方式2：脚本直接执行
+cat > sub_script2.sh << EOF
+#!/bin/bash
+echo "脚本sub_script2.sh（子Shell）内 env_var = \$env_var"
+EOF
+chmod +x sub_script2.sh
+echo -e "\n3. 脚本直接执行（子Shell）查看环境变量："
+./sub_script2.sh  # 可见
+rm -f sub_script2.sh
+
+21:39:21 root@redis01:~# bash test02.sh
+===== 示例2：export环境变量的传递性 =====
+
+1. 子Shell中查看环境变量：
+子Shell内 env_var = 父Shell的环境变量
+
+2. 脚本直接执行（子Shell）查看环境变量：
+脚本sub_script2.sh（子Shell）内 env_var = 父Shell的环境变量
+```
+
+##### 2.2.3.2.3 子 Shell 修改环境变量不影响父 Shell 
+```bash
+21:40:41 root@redis01:~# cat test03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 示例3：环境变量的单向传递（子改不影响父）
+echo "===== 示例3：环境变量的单向传递 ====="
+
+# 父Shell定义并export环境变量
+export env_var="初始值（父Shell）"
+echo "父Shell初始值：env_var = $env_var"
+
+# 子Shell修改环境变量
+echo -e "\n1. 子Shell内修改环境变量："
+bash -c '
+    echo "子Shell修改前：env_var = $env_var"
+    env_var="修改后（子Shell）"  # 仅修改子Shell自身的环境表
+    echo "子Shell修改后：env_var = $env_var"
+'
+
+# 父Shell再次查看变量
+echo -e "\n2. 父Shell查看变量（不受子Shell修改影响）："
+echo "父Shell当前值：env_var = $env_var"  # 仍为初始值
+
+21:40:42 root@redis01:~# bash test03.sh
+===== 示例3：环境变量的单向传递 =====
+父Shell初始值：env_var = 初始值（父Shell）
+
+1. 子Shell内修改环境变量：
+子Shell修改前：env_var = 初始值（父Shell）
+子Shell修改后：env_var = 修改后（子Shell）
+
+2. 父Shell查看变量（不受子Shell修改影响）：
+父Shell当前值：env_var = 初始值（父Shell）
+```
+
+##### 2.2.3.2.4 多层嵌套 Shell 的环境变量传递
+```bash
 
 ```
