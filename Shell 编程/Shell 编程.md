@@ -2959,7 +2959,46 @@ echo "父Shell当前值：env_var = $env_var"  # 仍为初始值
 
 ##### 2.2.3.2.4 多层嵌套 Shell 的环境变量传递
 ```bash
+22:11:16 root@redis01:~# cat test04.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# # 父 Shell 定义 export 变量
+export root_var="根变量（父Shell）"
 
+# 父→子→孙：子 Shell 定义新的 export 变量，再传给孙 Shell
+echo -e "\n1. 多层嵌套执行："
+bash -c '
+    # 子 Shell：查看父传递的变量，定义新的 export 变量
+    echo "子Shell：root_var = $root_var"
+    export child_var="子变量（子Shell）"
+
+    # 孙 Shell：查看父（子 Shell）传递的变量
+    bash -c "
+        echo \"孙Shell：root_var = \$root_var\"
+        echo \"孙Shell：child_var = \$child_var\"
+        export grandchild_var=\"孙变量（孙Shell）\"
+    "
+'
+
+# 父 Shell 查看孙 Shell 定义的变量（不可见，仅子→孙传递）
+echo -e "\n2. 父Shell查看孙Shell定义的变量："
+echo "父Shell：grandchild_var = ${grandchild_var}"  # 输出为空
+22:11:18 root@redis01:~# bash test04.sh
+
+1. 多层嵌套执行：
+子Shell：root_var = 根变量（父Shell）
+孙Shell：root_var = 根变量（父Shell）
+孙Shell：child_var = 子变量（子Shell）
+
+2. 父Shell查看孙Shell定义的变量：
+父Shell：grandchild_var = 
 ```
 
 #### 子 shell 创建机制
