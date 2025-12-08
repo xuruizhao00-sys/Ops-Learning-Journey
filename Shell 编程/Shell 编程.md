@@ -3002,6 +3002,59 @@ echo "父Shell：grandchild_var = ${grandchild_var}"  # 输出为空
 ```
 
 ##### 2.2.3.2.5 source 与直接执行的嵌套变量差异
+```bash
+11:29:37 root@redis01:~# cat test06.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test06.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 示例5：source（同进程）vs 直接执行（子Shell）的变量传递
+echo "===== 示例5：source vs 直接执行 ====="
+
+# 父Shell定义变量
+test_var="父Shell变量"
+
+# 编写测试脚本
+cat > test_source.sh << EOF
+#!/bin/bash
+echo "脚本内：test_var = \$test_var"
+test_var="脚本内修改后"
+echo "脚本内修改后：test_var = \$test_var"
+EOF
+chmod +x test_source.sh
+
+# 方式1：直接执行（子Shell，变量隔离）
+echo -e "\n1. 直接执行脚本（子Shell）："
+./test_source.sh
+echo "父Shell（直接执行后）：test_var = $test_var"  # 仍为原值
+
+# 方式2：source执行（同进程，变量共享）
+echo -e "\n2. source执行脚本（同进程）："
+source test_source.sh
+echo "父Shell（source后）：test_var = $test_var"  # 被脚本修改
+
+rm -f test_source.sh
+
+11:29:39 root@redis01:~# bash test06.sh
+===== 示例5：source vs 直接执行 =====
+
+1. 直接执行脚本（子Shell）：
+脚本内：test_var = 
+脚本内修改后：test_var = 脚本内修改后
+父Shell（直接执行后）：test_var = 父Shell变量
+
+2. source执行脚本（同进程）：
+脚本内：test_var = 父Shell变量
+脚本内修改后：test_var = 脚本内修改后
+父Shell（source后）：test_var = 脚本内修改后
+```
+
+##### 2.2.3.2.6 export 数组的注意事项（Bash 4.0+）
 
 #### 子 shell 创建机制
 ##### () 创建子 shell 和 bash -c 创建子 shell 区分
