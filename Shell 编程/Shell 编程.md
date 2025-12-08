@@ -3071,8 +3071,39 @@ rm -f test_source.sh
 - `(...)` 中的命令在 **子 shell** 中执行；
 - 子 shell 对变量的修改不会影响父 shell；
 - 这是 bash 最常用的子 shell 方式。
+```bash
+11:43:58 root@redis01:~# cat demo01.sh 
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo01.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+echo "父 shell PID：$BASHPID"
 
+x=1
 
+(
+  echo "子 shell PID：$BASHPID"
+  x=2
+  echo "子 shell 内 x=$x"
+)
+
+echo "父 shell 内 x=$x"
+11:43:59 root@redis01:~# bash demo01.sh
+父 shell PID：5358
+子 shell PID：5359
+子 shell 内 x=2
+父 shell 内 x=1
+11:44:00 root@redis01:~# 
+```
+###### ✅ 方式 2：命令替换 $( … ) 或 …（会隐式创建子 shell）
+```bash
+
+```
 
 ##### () 创建子 shell 和 bash -c 创建子 shell 区分
 **`()` 子 Shell (Subshell)** 和 **`bash -c` (独立子进程)** 虽然都是“子进程”，但它们的**产生方式和内存继承机制完全不同**。
