@@ -1,7 +1,20 @@
 {
-  "Blue-Topaz-Codebox-Highlight@@code-theme-selection": "code-theme-dracula",
+  "Blue-Topaz-Codebox-Highlight@@code-theme-selection": "code-theme-bt-default",
   "Blue-Topaz-Codebox-Highlight@@code-line-number": true,
   "blue-topaz-theme@@rainbow-checklist": false,
   "blue-topaz-theme@@thino-view-background": "thino-background-color",
-  "blue-topaz-theme@@color-scheme-options": "color-scheme-options-avocado-topaz"
+  "blue-topaz-theme@@color-scheme-options": "color-scheme-options-simplicity-topaz",
+  "blue-topaz-theme@@background-settings-workplace-background-image": false,
+  "blue-topaz-theme@@background-image-settings-switch": false,
+  "blue-topaz-theme@@toggle-nonoverlapping-bg": false,
+  "blue-topaz-theme@@background-image-settings-markdown-page-options": "background-image-settings-markdown-page-transparent",
+  "blue-topaz-theme@@background-image-settings-command-palette-switch": false,
+  "blue-topaz-theme@@background-image-settings-command-palette-custom": true,
+  "blue-topaz-theme@@background-image-settings-command-palette-same-as-workplace": false,
+  "blue-topaz-theme@@toggle-bg-panel-page": false,
+  "blue-topaz-theme@@bg-panel-page-option-dark": "panel-page-bg-theme-dark-plant",
+  "blue-topaz-theme@@left-ribbon-style": "bt-bubble-ribbon",
+  "Blue-Topaz-Codebox-Highlight@@mute-code-indent-line": true,
+  "Blue-Topaz-Codebox-Highlight@@letter-space-code": 0.3,
+  "Blue-Topaz-Codebox-Highlight@@code-normal@@dark": "#D4D4D4A3"
 }

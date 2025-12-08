@@ -4,5 +4,6 @@
   "promptDelete": false,
   "tabSize": 2,
   "readableLineLength": true,
-  "showLineNumber": true
+  "showLineNumber": true,
+  "foldIndent": false
 }
