@@ -3295,18 +3295,6 @@ bash -c 'echo "子 shell PID: $BASHPID"'
 ```
 
 ##### 2.2.3.3.2 ❌ 不属于子 shell 的方式（容易混淆）
-| 写法                                         | 是否子 Shell               | 能否修改父变量                         | 典型用途                    |      |
-| ------------------------------------------ | ----------------------- | ------------------------------- | ----------------------- | ---- |
-| `(**( commands )**)`                       | **\x1b[32m✔ 是\x1b[0m**  | **\x1b[31m❌ 不行\x1b[0m**         | 隔离环境、临时运算               |      |
-| `**$( commands )**`                        | **\x1b[32m✔ 是\x1b[0m**  | **\x1b[31m❌ 不行\x1b[0m**         | 命令替换                    |      |
-| `` **commands** ``                         | **\x1b[32m✔ 是\x1b[0m**  | **\x1b[31m❌ 不行\x1b[0m**         | 老式命令替换                  |      |
-| `**cmd                                     | cmd**`（管道）              | **\x1b[32m✔ 是（管道段独立进程）\x1b[0m** | **\x1b[31m❌ 不行\x1b[0m** | 文本处理 |
-| `**./script.sh**`                          | **\x1b[32m✔ 是\x1b[0m**  | **\x1b[31m❌ 不行\x1b[0m**         | 运行脚本                    |      |
-| `**bash script.sh**`                       | **\x1b[32m✔ 是\x1b[0m**  | **\x1b[31m❌ 不行\x1b[0m**         | 指定 shell 执行脚本           |      |
-| `**bash -c "commands"**`                   | **\x1b[32m✔ 是\x1b[0m**  | **\x1b[31m❌ 不行\x1b[0m**         | 动态执行字符串命令               |      |
-| `**command &**`                            | **\x1b[32m✔ 是\x1b[0m**  | **\x1b[31m❌ 不行\x1b[0m**         | 后台任务                    |      |
-| `**{ commands; }**`                        | **\x1b[33m❌ 不是\x1b[0m** | **\x1b[32m✔ 可以\x1b[0m**         | 当前 shell 执行多条命令         |      |
-| `**source script.sh**` / `**. script.sh**` | **\x1b[33m❌ 不是\x1b[0m** | **\x1b[32m✔ 可以\x1b[0m**         | 在当前 shell 加载脚本          |      |
 
 | 写法                 | 是否是子 shell   | 说明                        |
 | ------------------ | ------------ | ------------------------- |
@@ -3353,7 +3341,22 @@ bash -c 'echo "子 shell PID: $BASHPID"'
                  └─────────────────────────────────────────────┘
 
 ```
-##### () 创建子 shell 和 bash -c 创建子 shell 区分
+
+##### 2.2.3.3.4 📘 子 Shell 速查表（Cheat Sheet
+| 写法 | 子 Shell？ | 是否能修改父变量 | 用途说明 |
+|------|------------|------------------|-----------|
+| `( commands )` | 🟢 **是** | 🔴 **不行** | 创建子 shell、隔离环境执行 |
+| `$( commands )` | 🟢 **是** | 🔴 **不行** | 命令替换（子 shell 执行） |
+| `` commands `` | 🟢 **是** | 🔴 **不行** | 旧式命令替换（不推荐） |
+| `cmd \| cmd`（管道） | 🟢 **是**（管道段独立进程） | 🔴 **不行** | 文本处理、数据传递 |
+| `./script.sh` | 🟢 **是** | 🔴 **不行** | 执行外部脚本 |
+| `bash script.sh` | 🟢 **是** | 🔴 **不行** | 指定解释器运行脚本 |
+| `bash -c "commands"` | 🟢 **是** | 🔴 **不行** | 动态执行字符串命令 |
+| `command &` | 🟢 **是** | 🔴 **不行** | 后台执行任务 |
+| `{ commands; }` | 🟡 **否（当前 shell）** | 🟢 **可以** | 组合多条命令但不生成子 shell |
+| `source script.sh` / `. script.sh` | 🟡 **否（当前 shell）** | 🟢 **可以** | 加载脚本并在当前 shell 执行 |
+#### 2.2.3.4 子 shell 创建注意事项
+##### 2.2.3.4.1 () 创建子 shell 和 bash -c 创建子 shell 区分
 **`()` 子 Shell (Subshell)** 和 **`bash -c` (独立子进程)** 虽然都是“子进程”，但它们的**产生方式和内存继承机制完全不同**。
 ###### 核心原因：Fork 与 Exec 的区别
 
@@ -3405,3 +3408,87 @@ local_var="Original"
 echo "Outside: $local_var"  # 这里依然是 "Original"
 ```
 `()` 之所以能获取到 `local_var`，是因为它本质上是父 Shell 进程的一个**内存克隆**，它继承了父 Shell 所有的内部状态，而不仅仅是环境变量。
+##### 2.2.3.4.2 父子 shell PID 打印问题
+```bash
+# 测试脚本
+# 这里的 () 开启了子 shell，但是打印的 PID 号却是完全相同的
+echo "父 shell PID: $$"
+X=1
+
+(
+    echo "子 shell PID: $$"
+    X=2
+    echo "子 shell 内 X=$X"
+)
+
+echo "父 shell 中 X=$X"
+```
+###### ✅ 首先：\$\$ 的含义
+在 **bash 脚本文件中执行时**
+
+|场景|`$$` 的值|
+|---|---|
+|脚本启动后|永远是脚本进程的 PID（固定）|
+|subshell `()` 内|`$$` 不变，仍是脚本 PID|
+👉 因为在 **脚本中**，bash **不会改变 `$$` 的值**，即使进入 subshell，也保持为脚本自己的 PID。
+###### 🔍 为什么 subshell（子 shell）里 \$$(PID) 不会改变？
+因为 POSIX 规定：
+
+> **在脚本中执行时，`$$` 必须保持脚本的 PID，不随 subshell 改变。**
+
+bash 确实是这样实现的：
+
+**✔ subshell 会改变进程 ID（PID）**
+
+但
+
+**❌ 在脚本内 `$$` 不会更新为新的 PID！**
+
+也就是说：
+
+- subshell（`()`）确实 fork 了一个新进程。
+    
+- 但 `$$` 是 shell 启动时设定的变量，在脚本中是固定值。
+###### 🧪 用实验验证（真正的子进程 PID）
+在 subshell 内打印真实 PID，需要用：
+
+`echo "真实 pid: $(/bin/ps -o pid= -p $$)"`
+
+或者更简单用：
+
+`echo $BASHPID`
+
+`$BASHPID` 是 bash 内部变量，会随 subshell 改变。
+
+###### ✔ 例子
+```bash
+
+echo "父 shell BASHPID: $BASHPID"
+(
+    echo "子 shell BASHPID: $BASHPID"
+)
+父 shell BASHPID: 12345
+子 shell BASHPID: 12346
+```
+
+###### 📌 如果在交互式 shell 执行呢？
+在 interactive shell（命令行直接输入）中 `$$` **会随着 subshell 改变**：
+```bash
+$ echo $$
+1000
+$ (echo $$)
+1001
+```
+
+##### 2.2.3.4.3 export 数组问题
+Bash 到现在（5.x）为止都 _不支持_ 把数组真正 `export` 成环境变量
+```bash
+declare -a arr_parent=(a b c)
+export arr_parent
+bash -c 'echo "子Shell数组：${arr_parent[@]}"'
+```
+实际上：
+- `export arr_parent` 只是把 **变量 `arr_parent` 的 _字符串值_** 放进环境里；
+- 环境变量本质上就是一串 `name=value` 字符串，没有数组这种类型；
+- 子 bash 进程拿到的是一个普通的标量变量，而不是数组。
+这里的 `${arr_parent[@]}` 对一个标量来说，效果和 `$arr_parent` 一样，只是打印一串字符串，并没有真正的“数组元素”概念。
