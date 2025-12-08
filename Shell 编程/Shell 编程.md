@@ -3640,6 +3640,44 @@ Bash 提供强大的字符串操作能力。
 | `${var//pattern/repl}` | 替换全部匹配     | ${a//a/A}    | A bc A bc     |
 #### 2.3.2.2 **📘 示例：常用字符串处理**
 ```bash
+17:31:30 root@redis01:~/note# cat test03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+name="linux_shell_study.txt"
 
+echo ${#name}         # 字符串长度
+echo ${name:0:5}      # 前 5 个字符
+echo ${name%.txt}     # 删除后缀
+echo ${name#*_}       # 删除第一个下划线前内容（shell_study.txt）
+echo ${name//_/ }     # 替换所有下划线为空格
+
+17:31:32 root@redis01:~/note# bash test03.sh
+21
+linux
+linux_shell_study
+shell_study.txt
+linux shell study.txt
+```
+
+#### 2.3.2.3 📊 截取示意图（图解）
+```pgsql
+index 0 1 2 3 4 5 6 7 8 9 10
+text  l i n u x _ s h e l l
+
+${text:2:4}
+
+l i n u x _ s h e l l
+    |-------|
+       ↑  ↑
+       2  4 个字符
+nux_       
+       
 ```
 ### 2.3.2 默认值相关
