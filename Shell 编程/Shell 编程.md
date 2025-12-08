@@ -3001,6 +3001,8 @@ echo "父Shell：grandchild_var = ${grandchild_var}"  # 输出为空
 父Shell：grandchild_var = 
 ```
 
+##### 2.2.3.2.5 source 与直接执行的嵌套变量差异
+
 #### 子 shell 创建机制
 ##### () 创建子 shell 和 bash -c 创建子 shell 区分
 **`()` 子 Shell (Subshell)** 和 **`bash -c` (独立子进程)** 虽然都是“子进程”，但它们的**产生方式和内存继承机制完全不同**。
