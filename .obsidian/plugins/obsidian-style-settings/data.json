@@ -1,9 +1,8 @@
 {
-  "Blue-Topaz-Codebox-Highlight@@code-theme-selection": "code-theme-bt-default",
   "Blue-Topaz-Codebox-Highlight@@code-line-number": true,
   "blue-topaz-theme@@rainbow-checklist": false,
   "blue-topaz-theme@@thino-view-background": "thino-background-color",
-  "blue-topaz-theme@@color-scheme-options": "color-scheme-options-simplicity-topaz",
+  "blue-topaz-theme@@color-scheme-options": "color-scheme-options-flamingo",
   "blue-topaz-theme@@background-settings-workplace-background-image": false,
   "blue-topaz-theme@@background-image-settings-switch": false,
   "blue-topaz-theme@@toggle-nonoverlapping-bg": false,
@@ -16,5 +15,6 @@
   "blue-topaz-theme@@left-ribbon-style": "bt-bubble-ribbon",
   "Blue-Topaz-Codebox-Highlight@@mute-code-indent-line": true,
   "Blue-Topaz-Codebox-Highlight@@letter-space-code": 0.3,
-  "Blue-Topaz-Codebox-Highlight@@code-normal@@dark": "#D4D4D4A3"
+  "Blue-Topaz-Codebox-Highlight@@code-normal@@dark": "#D4D4D4A3",
+  "Blue-Topaz-Codebox-Highlight@@code-box-style-option": "codebox-default-style"
 }
