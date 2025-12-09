@@ -3848,3 +3848,49 @@ su的相关参数
     `exec bash`
 #### 3.1.1.6 配套代码示例
 ##### 3.1.1.6.1 非登录场景下环境差异实践
+###### 3.1.1.6.1.1 Rocky Linux
+```bash
+[root rockylinux-1 ~] WORK 0 # echo "echo '1 - /etc/profile'" >> /etc/profile
+echo "echo '2 - /etc/profile.d/2.sh'" >> /etc/profile.d/2.sh
+echo "echo '3 - /etc/bashrc'" >> /etc/bashrc
+echo "echo '4 - ~/.bash_profile'" >> ~/.bash_profile
+echo "echo '5 - ~/.bashrc'" >> ~/.bashrc
+[root rockylinux-1 ~] WORK 0 # su - test01
+2 - /etc/profile.d/2.sh
+3 - /etc/bashrc
+1 - /etc/profile
+3 - /etc/bashrc
+[test01 rockylinux-1 ~] WORK 0 # su root
+Password: 
+2 - /etc/profile.d/2.sh
+3 - /etc/bashrc
+5 - ~/.bashrc
+```
+###### 3.1.1.6.1.2 Ubuntu Linux
+```bash
+[root rockylinux-1 ~] WORK 0 # echo "echo '1 - /etc/profile'" >> /etc/profile
+echo "echo '2 - /etc/profile.d/2.sh'" >> /etc/profile.d/2.sh
+echo "echo '3 - /etc/bashrc'" >> /etc/bashrc
+echo "echo '4 - ~/.bash_profile'" >> ~/.bash_profile
+echo "echo '5 - ~/.bashrc'" >> ~/.bashrc
+13:18:19 root@redis01:~# su - test01
+2 - /etc/profile.d/2.sh
+1 - /etc/profile
+test01@redis01:~$ su root
+Password: 
+2 - /etc/profile.d/2.sh
+1 - /etc/profile
+5 - ~/.bashrc
+```
+Login shell 加载顺序（Debian/Ubuntu 特性）
+```ini
+/etc/profile
+   ↳ /etc/profile.d/*.sh
+~/.bash_profile     (如果存在则只读它)
+~/.profile          (如果没有 bash_profile 才读)
+```
+**不会自动加载：**
+
+- `/etc/bashrc`（在 RHEL/CentOS 才有）
+    
+- `~/.bashrc`
