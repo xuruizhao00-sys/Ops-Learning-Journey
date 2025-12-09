@@ -1,0 +1,8 @@
+{
+  "mySetting": "txt,nfo,json,sh,conf,log,host",
+  "mySettingArray": [
+    "txt",
+    "nfo",
+    "json"
+  ]
+}
