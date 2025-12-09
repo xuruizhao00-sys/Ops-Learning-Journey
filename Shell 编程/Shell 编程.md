@@ -3901,18 +3901,60 @@ Login shell 加载顺序（Debian/Ubuntu 特性）
 `read [选项] 变量名`
 常用选项说明：
 
-|选项|意义|
-|---|---|
-|`-p`|指定提示信息|
-|`-t`|限制等待输入的秒数（超时）|
-|`-n`|限制读取的字符数|
-|`-s`|静默输入（常用于密码）|
-|`-r`|读取原始输入，不解析反斜杠|
+| 选项   | 意义            |
+| ---- | ------------- |
+| `-p` | 指定提示信息        |
+| `-t` | 限制等待输入的秒数（超时） |
+| `-n` | 限制读取的字符数      |
+| `-s` | 静默输入（常用于密码）   |
+| `-r` | 读取原始输入，不解析反斜杠 |
 
 默认情况下，`read` 从键盘读取一整行并存入变量。
 #### 3.2.1.2 命令简单实践
-##### 3.2.1.2.1 
+##### 3.2.1.2.1 读取单个变量
+```bash
+15:08:59 root@redis01:~/shell/lesson02# cat demo01.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo01.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+read name
 
+echo "Hello $name"
+
+15:09:01 root@redis01:~/shell/lesson02# bash demo01.sh
+aaaa
+Hello aaaa
+15:09:04 root@redis01:~/shell/lesson02# 
+```
+##### 3.2.1.2.2 读取多个变量
+```bash
+15:10:02 root@redis01:~/shell/lesson02# cat demo02.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+read a b c
+echo "A=$a B=$b C=$c"
+
+15:10:03 root@redis01:~/shell/lesson02# bash demo02.sh
+1
+A=1 B= C=
+15:10:07 root@redis01:~/shell/lesson02# bash demo02.sh
+1 2 3
+A=1 B=2 C=3
+```
+#### 3.2.1.2.3 
 #### 3.2.1.3 信息提示
 
 #### 3.2.1.4 其他实践
