@@ -4576,5 +4576,21 @@ expr: syntax error: unexpected argument ‘note’
 ##### 4.1.3.1.4 条件表达式 [ ... ] / test
 `[` 和 `]` 都是命令，因此所有元素必须分隔开：
 ```bash
+23:04:36 root@redis01:~# echo $a
+3
+
+23:06:29 root@redis01:~# if [ $a -eq 1 ];then 
+> echo true
+> else
+> echo flase
+> fi
+flase
+23:06:56 root@redis01:~# if [ $a-eq1 ];then  echo true; else echo flase; fi
+true
+23:07:03 root@redis01:~#
+```
+##### 4.1.3.1.5 双中括号 \[\[ ... ]]（bash 扩展）
+虽然 bash 会自动处理很多情况，但仍建议运算符分隔：
+```bash
 
 ```
