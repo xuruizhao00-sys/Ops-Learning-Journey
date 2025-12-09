@@ -517,6 +517,9 @@ echo "日志清理完成！保留最近${KEEP_DAYS}天的日志"
 在讲解执行方式前，先明确两个关键概念：
 
 1. **子 Shell**：执行脚本时新建的 Shell 进程，子 Shell 的环境变量 / 修改不会同步到父 Shell；
+		var="string"   父 shell
+		var						 子 shell
+		var="aaaa"     子 shell 中修改，父 shell 是否回收到影响
 2. **执行权限**：脚本文件需具备`x`（执行）权限（`chmod +x`），部分方式可绕过；
 3. **当前 Shell 环境**：终端当前的进程环境（如已定义的变量、别名等）。
 
