@@ -3736,9 +3736,114 @@ ${var:=default}
 
 # 三、脚本交互
 ## 3.1 基础知识
-
 ### 3.1.1 shell 登录解读
-
 #### 3.1.1.1 shell 配置文件
+Shell（以 Bash 为例）常见的配置文件如下：
 
-#### 3.1.1.1 shell 登录方式
+|配置文件|作用|生效场景|
+|---|---|---|
+|`/etc/profile`|系统级初始化配置|登录 shell|
+|`/etc/bashrc` 或 `/etc/bash.bashrc`|系统级 bash 配置|非登录 shell|
+|`~/.bash_profile`|用户级登录配置（优先）|登录 shell|
+|`~/.bash_login`|用户级登录配置（次优先）|登录 shell|
+|`~/.profile`|用户级登录配置（最末）|登录 shell|
+|`~/.bashrc`|交互式、非登录 shell 配置|终端打开 Bash 时|
+常见内容
+
+- 设置环境变量：`PATH`、`LANG` 等
+- 设置别名：`alias ll='ls -l'`
+- 设置提示符：`PS1`
+- 加载函数、脚本等
+📌 **小提示**：多数 Linux 默认在 `~/.bash_profile` 中再加载 `~/.bashrc`，确保登录/非登录行为一致。
+🗂️ **常见 Shell 配置文件结构示意图**
+![](assets/Shell%20编程/file-20251208221944908.png)
+
+#### 3.1.1.2 shell 登录方式
+##### 3.1.1.2.1 🔐 登录 shell（Login Shell）
+![](assets/Shell%20编程/file-20251208222001111.png)
+触发方式：
+
+- SSH 登录
+- 控制台登录（tty）
+- `bash --login`
+- `su - username`
+
+会读取：
+```bash
+/etc/profile → ~/.bash_profile → ~/.bashrc
+```
+
+##### 3.1.1.2.2 🧩 非登录 shell（Not-login Shell）
+触发方式：
+
+- 图形界面打开终端（默认非登录）
+- `su username`
+- 在 shell 中执行 `bash`
+- 运行脚本时的 Shell
+```bash
+/etc/bashrc → ~/.bashrc
+
+```
+
+#### 3.1.1.3 shell 配置文件生效顺序
+```powershell
+登录shell的文件生效流程
+
+/etc/profile.d/*.sh
+
+-> /etc/profile
+
+-> /etc/bashrc
+
+-> ~/.bashrc
+
+-> ~/.bash_profile
+
+非登录shell的文件生效流程
+
+/etc/profile.d/*.sh
+
+-> /etc/bashrc
+
+-> ~/.bashrc
+
+注意：
+
+若多配置文件中设置相同的变量，则后面配置文件中变量的值会覆盖前面配置文件中同一变量的值。
+```
+#### 3.1.1.4 su 命令生效行为
+```bash
+su的相关参数
+
+-：当前用户不仅切换为指定用户的身份，同时所用的工作环境也切换为此用户的环境。
+
+-l：同 - 的使用类似，完整切换工作环境，后面需要添加欲切换的使用者账号。
+
+-p：表示切换为指定用户的身份，但不改变当前的工作环境（不使用切换用户的配置文件）。
+
+-m：和 -p 一样；
+
+-c 命令：仅切换用户执行一次命令，执行后自动切换回来，该选项后通常会带有要执行的命令
+```
+
+|命令|类型|配置文件加载|
+|---|---|---|
+|`su user`|非登录 shell|加载 `~/.bashrc`|
+|`su - user`|登录 shell|加载 `/etc/profile` + 用户全部登录文件|
+
+示例说明：
+
+- `su user`：保留原用户环境变量
+    
+- `su - user`：模拟完整登录环境
+#### 3.1.1.5 配置文件如何生效
+- **重新登录**
+    
+- 使用 `source` 或 `.`
+    
+    `source ~/.bashrc`
+    
+- 使用 `exec` 重启当前 shell
+    
+    `exec bash`
+#### 3.1.1.6 配套代码示例
