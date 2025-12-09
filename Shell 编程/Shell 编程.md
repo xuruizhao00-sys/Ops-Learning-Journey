@@ -4135,3 +4135,132 @@ echo "连续三次失败，锁定登录！"
 exit 1
 ```
 #### 3.2.2.2 堡垒机实践
+```bash
+18:34:18 root@redis01:~/shell/lesson02# cat jumpserver_module.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: jumpserver_module.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+
+# ===============================
+# 🏰 简易堡垒机 Jump Server Script
+# ===============================
+
+# ---- 用户认证（可接 DB / LDAP）----
+admin_user="admin"
+admin_pass="123456"
+
+log_file="/tmp/jumpserver.log"
+
+echo "====== 🏰 服务器堡垒机 Login ======"
+for i in {1..3}
+do
+    read -p "👤 用户名: " u
+    read -s -p "🔒 密码: " p
+    echo
+
+    if [[ "$u" == "$admin_user" && "$p" == "$admin_pass" ]]; then
+        echo "✅ 登录成功，欢迎你 $u"
+        echo "$(date +"%F %T") 登录成功: 用户 $u" >> "$log_file"
+        break
+    else
+        echo "❌ 登录失败（第 $i 次）"
+        echo "$(date +"%F %T") 登录失败: 用户 $u" >> "$log_file"
+    fi
+done
+
+if [[ "$u" != "$admin_user" || "$p" != "$admin_pass" ]]; then
+    echo "🚫 三次失败，拒绝访问！"
+    exit 1
+fi
+
+# ---- 主机清单（可扩展）----
+declare -A host_list=(
+    [1]="10.1.1.10 WebServer"
+    [2]="10.1.1.20 Database"
+    [3]="10.1.1.30 Redis"
+    [4]="172.16.1.99 TestServer"
+)
+
+# ---- 主菜单 ----
+while true
+do
+    echo
+    echo "====== 🖥️ 请选择要访问的服务器 ======"
+    for key in "${!host_list[@]}"; do
+        ip=$(echo "${host_list[$key]}" | awk '{print $1}')
+        name=$(echo "${host_list[$key]}" | awk '{print $2}')
+        echo "$key) 💻 $name ($ip)"
+    done
+    echo "0) ❌ 退出"
+    echo "=================================="
+
+    read -p "请输入编号: " choice
+
+    # ---- 阻止非数字输入 ----
+    if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+        echo "⚠️ 请输入数字编号！"
+        continue
+    fi
+
+    if [[ "$choice" -eq 0 ]]; then
+        echo "👋 已退出堡垒机，再见！"
+        exit 0
+    fi
+
+    if [[ -z "${host_list[$choice]}" ]]; then
+        echo "⚠️ 无效的编号，请重新输入！"
+        continue
+    fi
+
+    # ---- 解析 ip 和主机名 ----
+    ip=$(echo "${host_list[$choice]}" | awk '{print $1}')
+    name=$(echo "${host_list[$choice]}" | awk '{print $2}')
+
+    echo "🔗 正在连接到 $name ($ip)..."
+
+    # ---- 输入 SSH 用户 ----
+    read -p "SSH 用户名: " ssh_user
+    read -s -p "SSH 密码: " ssh_pass
+    echo
+
+    echo "$(date +"%F %T") 访问主机: $name ($ip) 用户:$ssh_user" >> "$log_file"
+
+    # ---- 真实登录方式（可选 3 种）----
+    echo
+    echo "🟦 请选择登录方式："
+    echo "1) sshpass 自动登录"
+    echo "2) expect 自动登录"
+    echo "3) 手动 ssh 登录（推荐高安全）"
+    read -p "请选择: " login_type
+
+    case $login_type in
+        1)
+            echo "⚡ 使用 sshpass 登录 (需要系统安装 sshpass)"
+            sshpass -p "$ssh_pass" ssh -o StrictHostKeyChecking=no "$ssh_user@$ip"
+            ;;
+        2)
+            echo "⚡ 使用 expect 自动登录"
+            expect << EOF
+spawn ssh "$ssh_user@$ip"
+expect "password:"
+send "$ssh_pass\r"
+interact
+EOF
+            ;;
+        3)
+            echo "✋ 请手动输入密码"
+            ssh "$ssh_user@$ip"
+            ;;
+        *)
+            echo "❌ 无效登录方式！"
+            ;;
+    esac
+done
+```
