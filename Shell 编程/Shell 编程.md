@@ -4445,6 +4445,70 @@ Bash 原生 **不支持浮点**，需借助 `bc` 或 `awk`。
 20:12:29 root@redis01:~# 
 ```
 #### 4.1.2.2 let
+- 内置命令，支持整数运算
+- 可以用双引号或不加引号
+```bash
+22:37:00 root@redis01:~# cat test01.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test01.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+a=5
+b=7
+let c=a*b
+echo "c=$c"
 
+let d=a+b
+echo "d=$d"
+
+22:37:02 root@redis01:~# bash test01.sh
+c=35
+d=12
+22:37:05 root@redis01:~#
+```
 #### 4.1.2.3 (())
+- 推荐的算术运算方式
+- 不返回输出，但可以用于条件判断
+```bash
+22:38:50 root@redis01:~# cat test02.sh 
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+a=10
+b=20
+((a += b))
+echo "a += b => $a"
+
+if (( a > 25 )); then
+  echo "a 大于 25"
+fi
+
+22:38:57 root@redis01:~# bash test02.sh
+a += b => 30
+a 大于 25
+```
 #### 4.1.2.4 $(())
+- 最常用，**返回计算结果**
+- 可直接赋值或输出
+```bash
+#!/bin/bash
+a=8
+b=3
+c=$((a**b))
+echo "a 的 b 次方 = $c"
+
+d=$((a+b*2))
+echo "a+b*2=$d"
+
+```
