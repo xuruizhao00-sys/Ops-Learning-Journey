@@ -3954,12 +3954,143 @@ A=1 B= C=
 1 2 3
 A=1 B=2 C=3
 ```
-#### 3.2.1.2.3 
+#### 3.2.1.2.3 带提示符
+```bash
+15:13:25 root@redis01:~/shell/lesson02# cat demo03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+read -rp "你的年龄是：" age
+echo "你输入的年龄是 $age"
+
+15:13:41 root@redis01:~/shell/lesson02# bash demo03.sh
+你的年龄是：12
+你输入的年龄是 12
+15:13:46 root@redis01:~/shell/lesson02# bash demo03.sh
+你的年龄是：1/2
+你输入的年龄是 1/2
+15:13:54 root@redis01:~/shell/lesson02# bash demo03.sh
+你的年龄是：1\2
+你输入的年龄是 1\2
+15:13:58 root@redis01:~/shell/lesson02#
+```
+##### 3.2.1.2.4 静默读取密码
+```bash
+15:15:55 root@redis01:~/shell/lesson02# cat demo04.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+read -rsp "请输入密码: " pass
+echo        # -s 会吞掉换行，手动补一个
+echo "你的密码长度是 ${#pass} 位"
+
+15:15:56 root@redis01:~/shell/lesson02# bash demo04.sh
+请输入密码: 
+你的密码长度是 3 位
+15:16:00 root@redis01:~/shell/lesson02#
+```
 #### 3.2.1.3 信息提示
+```bash
+15:16:40 root@redis01:~/shell/lesson02# cat demo05.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 颜色函数
+red(){ echo -e "\033[31m$*\033[0m"; }
+green(){ echo -e "\033[32m$*\033[0m"; }
+
+read -rp "$(green '>>> 请输入文件名: ')" file
+[[ -f $file ]] && green "文件存在" || red "文件不存在"
+
+
+15:16:45 root@redis01:~/shell/lesson02# bash demo05.sh
+>>> 请输入文件名: aaa.sh
+文件不存在
+15:16:51 root@redis01:~/shell/lesson02#
+```
 
 #### 3.2.1.4 其他实践
+##### 3.2.1.4.1 指定分隔符
+```bash
+15:17:52 root@redis01:~/shell/lesson02# cat demo06.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo06.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+IFS=, read -rp "请输入用逗号分隔的 学科-分数: " subject score
+echo "学科=$subject, 分数=$score"
 
+15:17:53 root@redis01:~/shell/lesson02# bash demo06.sh
+请输入用逗号分隔的 学科-分数: Linux,88
+学科=Linux, 分数=88
+15:18:04 root@redis01:~/shell/lesson02#
+```
+##### 3.2.1.4.2 限时输入
+```bash
+15:18:45 root@redis01:~/shell/lesson02# cat demo07.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo07.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+if read -t 3 -rp "3 秒内输入 YES: " ans && [[ $ans == YES ]]; then
+    echo "快速通过！"
+else
+    echo "超时或输入错误！"
+fi
+
+15:18:47 root@redis01:~/shell/lesson02# bash demo07.sh
+3 秒内输入 YES: yes
+超时或输入错误！
+15:18:55 root@redis01:~/shell/lesson02# bash demo07.sh
+3 秒内输入 YES: YES
+快速通过！
+15:19:00 root@redis01:~/shell/lesson02# bash demo07.sh
+3 秒内输入 YES: 超时或输入错误！
+15:19:04 root@redis01:~/shell/lesson02#
+```
 ### 3.2.2 案例
 #### 3.2.2.1 登录模拟实验
+```bash
+USER_OK=admin
+PASS_OK=123456
 
+red(){  echo -e "\033[31m$*\033[0m"; }
+green(){ echo -e "\033[32m$*\033[0m"; }
+
+read -rp "账号: " user
+read -rsp "密码: " pass
+echo
+
+[[ $user == "$USER_OK" && $pass == "$PASS_OK" ]] &&
+    green "登录成功！" ||
+    red "账号或密码错误！"
+```
 #### 3.2.2.2 堡垒机实践
