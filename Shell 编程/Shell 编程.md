@@ -4543,4 +4543,38 @@ echo "a+b*2=$d"
 -bash: syntax error near unexpected token `('
 ```
 
-##### 4.1.3.1.2 算术扩展$(())
+##### 4.1.3.1.2 let
+不需要空格
+```bash
+23:02:44 root@redis01:~# let a=1+2
+23:02:49 root@redis01:~# echo $a
+3
+
+# 带空格时需加引号
+23:03:01 root@redis01:~# let "a = 1 + 4"
+23:03:04 root@redis01:~# echo $a
+5
+23:03:06 root@redis01:~#
+```
+
+##### 4.1.3.1.3 expr
+必须在变量和运算符之间加空格
+```bash
+23:04:16 root@redis01:~# a=3
+23:04:19 root@redis01:~# expr $a+1
+3+1
+23:04:24 root@redis01:~# expr $a + 1
+4
+23:04:26 root@redis01:~# expr $a * 2
+expr: syntax error: unexpected argument ‘note’
+23:04:33 root@redis01:~# expr $a \* 2
+6
+23:04:36 root@redis01:~#
+```
+注意：`*` 需要用 `\*` 或引号避免被 shell 展开
+
+##### 4.1.3.1.4 条件表达式 [ ... ] / test
+`[` 和 `]` 都是命令，因此所有元素必须分隔开：
+```bash
+
+```
