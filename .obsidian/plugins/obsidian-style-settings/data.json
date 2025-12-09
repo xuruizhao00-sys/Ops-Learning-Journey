@@ -16,5 +16,7 @@
   "Blue-Topaz-Codebox-Highlight@@mute-code-indent-line": true,
   "Blue-Topaz-Codebox-Highlight@@letter-space-code": 0.3,
   "Blue-Topaz-Codebox-Highlight@@code-normal@@dark": "#D4D4D4A3",
-  "Blue-Topaz-Codebox-Highlight@@code-box-style-option": "codebox-default-style"
+  "Blue-Topaz-Codebox-Highlight@@code-box-style-option": "codebox-default-style",
+  "blue-topaz-theme@@scrollbar-style-option": "default-scrollbar",
+  "blue-topaz-theme@@bt-status-on": false
 }
