@@ -4986,9 +4986,49 @@ Shell 中的逻辑表达式用于 **将多个条件组合在一起**，以便在
 |OR|`-o`|
 |NOT|`!`|
 ```bash
+16:28:47 root@redis01:~# cat test05.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+read -p "请输入一个数字：" num
+
+if [ $num -ge 18 -a $num -lt 60 ];then
+  echo "成年了"
+else
+  echo "未成年"
+fi
+
+if [ "$user" == "root" -o "$user" == "admin" ];then
+  echo "管理员"
+fi
+
+if [ ! -e /etc/test.txt ];then
+  echo "/etc/test.txt not exists"
+else
+  echo "/etc/test.txt exists"
+fi
+
+16:28:49 root@redis01:~# bash test05.sh
+请输入一个数字：23
+成年了
+/etc/test.txt not exists
+16:28:53 root@redis01:~# 
+```
+##### 4.2.2.2.2 \[\[]]
+|操作|写法|
+|---|---|
+|AND|`&&`|
+|OR|`\|`|
+|NOT|`!`|
+```bash
 
 ```
-
 #### 4.2.2.3 逻辑表达式组合使用
 逻辑表达式可以组合形成复杂条件判断。  
 以下表格展示各测试语法的逻辑组合写法：
