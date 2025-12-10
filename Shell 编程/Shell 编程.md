@@ -4708,5 +4708,147 @@ a= (1 2 3)   ✘ 错误 (`a=` 和 `(` 不可分离)
 | **`[[ ]]`**  | 扩展条件判断（bash/ksh）              | 更安全、更强大的条件判断               | ✅ 推荐（在 bash/zsh 中）  |
 | **`$[ ]`**   | 旧式算术扩展                        | 和 `$(( ))` 类似              | ❌ 不推荐，已弃用           |
 ```bash
+00:04:18 root@redis01:~# cat test04.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+# UTF-8 safe script demo
+# Demonstrates: $(( )), (( )), $(), [ ], [[ ]], and deprecated $[]
 
+echo "==============================="
+echo "  Bash Syntax Demonstration"
+echo "==============================="
+
+a=3
+echo
+echo "Initial variable: a=$a"
+
+echo
+echo "--------------------------------"
+echo "1. \$(( ))   -- Arithmetic expansion (outputs result)"
+echo "--------------------------------"
+echo "echo \$(( a + 2 )) → $(echo $(( a + 2 )))"
+echo "Variable not modified: a=$a"
+
+b=$(( a * 3 + 1 ))
+echo "b=\$(( a * 3 + 1 )) → b=$b"
+
+echo
+echo "--------------------------------"
+echo "2. (( ))   -- Arithmetic evaluation (no output, modifies variable)"
+echo "--------------------------------"
+(( a = a + 5 ))
+echo "After (( a = a + 5 )) → a=$a"
+echo "Exit status: $?   (0 = true, non-zero = false)"
+
+(( a - 8 ))   # Expression equals 0
+echo "Exit status after (( a - 8 )): $? (non-zero = false)"
+
+echo
+echo "--------------------------------"
+echo "3. \$()   -- Command substitution"
+echo "--------------------------------"
+now=$(date +%H:%M:%S)
+echo "Time now: $now"
+
+lines=$(wc -l < "$0")
+echo "This script has $lines lines."
+
+echo
+echo "--------------------------------"
+echo "4. [ ]   -- Test command (old style)"
+echo "--------------------------------"
+x=""
+if [ -z "$x" ]; then
+    echo "x is empty"
+else
+    echo "x is not empty"
+fi
+
+if [ $a -gt 3 ]; then
+    echo "a > 3"
+fi
+
+echo
+echo "--------------------------------"
+echo "5. [[ ]]   -- Modern test command (advanced and safer)"
+echo "--------------------------------"
+name="abc123"
+
+if [[ $name == a* ]]; then
+    echo "name starts with 'a'"
+fi
+
+if [[ $name =~ ^[a-z]+[0-9]+$ ]]; then
+    echo "name matches regex: letters + digits"
+fi
+
+echo
+echo "--------------------------------"
+echo "6. \$[ ]   -- Deprecated arithmetic expansion (avoid using)"
+echo "--------------------------------"
+echo "\$[ 1 + 2 ] → $[ 1 + 2 ]"
+echo "Use \$(( 1 + 2 )) instead."
+
+echo
+echo "==============================="
+echo "         End of Demo"
+echo "==============================="
+
+
+00:04:25 root@redis01:~# bash test04.sh
+===============================
+  Bash Syntax Demonstration
+===============================
+
+Initial variable: a=3
+
+--------------------------------
+1. $(( ))   -- Arithmetic expansion (outputs result)
+--------------------------------
+echo $(( a + 2 )) → 5
+Variable not modified: a=3
+b=$(( a * 3 + 1 )) → b=10
+
+--------------------------------
+2. (( ))   -- Arithmetic evaluation (no output, modifies variable)
+--------------------------------
+After (( a = a + 5 )) → a=8
+Exit status: 0   (0 = true, non-zero = false)
+Exit status after (( a - 8 )): 1 (non-zero = false)
+
+--------------------------------
+3. $()   -- Command substitution
+--------------------------------
+Time now: 00:04:29
+This script has 94 lines.
+
+--------------------------------
+4. [ ]   -- Test command (old style)
+--------------------------------
+x is empty
+a > 3
+
+--------------------------------
+5. [[ ]]   -- Modern test command (advanced and safer)
+--------------------------------
+name starts with 'a'
+name matches regex: letters + digits
+
+--------------------------------
+6. $[ ]   -- Deprecated arithmetic expansion (avoid using)
+--------------------------------
+$[ 1 + 2 ] → 3
+Use $(( 1 + 2 )) instead.
+
+===============================
+         End of Demo
+===============================
 ```
