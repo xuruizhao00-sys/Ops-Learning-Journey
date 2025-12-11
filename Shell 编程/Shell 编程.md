@@ -1223,7 +1223,21 @@ echo "总和：$sum"
 ###### 1.2.5.5.1.2 安装（Linux）
 ```bash
 # CentOS/RHEL
-yum install -y shellcheck
+# 安装 EPEL 源（Rocky 8/9 通用）
+dnf install epel-release -y
+# 更新 dnf 缓存（确保能识别新仓库的包）
+dnf makecache
+dnf install shellcheck -y
+
+# 如果是 rocky8+ 系统在安装时可能会出现如下报错
+Last metadata expiration check: 0:00:53 ago on Thu 11 Dec 2025 11:33:10 AM CST. Error: Problem: conflicting requests - nothing provides libffi.so.6()(64bit) needed by ShellCheck-0.6.0-3.el8.x86_64 from epel (try to add '--skip-broken' to skip uninstallable packages or '--nobest' to use not only best candidate packages)
+
+这是由于 libffi.so.6()(64bit) 依赖缺失，是因为 Rocky Linux 8 后期版本 / 9 版本中，系统默认的 libffi 库版本升级为 libffi.so.7（或更高），但 EPEL 仓库中适配 el8 的 ShellCheck 0.6.0 版本仍依赖旧版的 libffi.so.6，导致依赖冲突
+# 我们可以直接在 GitHub 中下载预编译的二进制包
+scversion="stable" # or "v0.4.7", or "latest"
+wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv
+cp "shellcheck-${scversion}/shellcheck" /usr/bin/
+shellcheck --version
 
 # Ubuntu/Debian
 apt update
