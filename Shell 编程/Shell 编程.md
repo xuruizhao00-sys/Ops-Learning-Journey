@@ -1300,6 +1300,8 @@ shellcheck bad_script.sh
 - **强制规则**：
     1. 小写字母 + 下划线（`_`）组合，禁止大写 / 空格 / 特殊字符（如 `-` 尽量避免，易与参数混淆）；
     2. 后缀统一为 `.sh`（便于识别，非强制但推荐）；
+	    1. windows .txt .md .py
+	    2. linux .xxx  demo01.py bash demo01.py 
     3. 命名体现脚本功能（如 `log_clean.sh` 而非 `test1.sh`）；
     4. 批量脚本按模块前缀分类（如 `db_backup_mysql.sh`、`db_backup_postgres.sh`）。
 - **正确示例**：`system_monitor.sh`、`file_batch_rename.sh`
