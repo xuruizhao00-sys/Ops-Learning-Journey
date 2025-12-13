@@ -5512,7 +5512,7 @@ if [[ $var == abc ]]; then
 #### 4.2.3.4 综合案例
 以下综合案例结合了：
 
-- 空值判断
+- <mark style="background: #ADCCFFA6;">空值判断</mark>
 - 内容比较
 - 多条件判断
 - 用户输入
