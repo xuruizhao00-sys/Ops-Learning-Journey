@@ -1,9 +1,9 @@
 {
   "baseFontSizeAction": true,
   "accentColor": "#2fe4ae",
-  "interfaceFontFamily": "Lucida Console",
-  "textFontFamily": "Lucida Console",
+  "interfaceFontFamily": "霞鹜文楷 屏幕阅读版",
+  "textFontFamily": "霞鹜文楷 屏幕阅读版",
   "cssTheme": "Blue Topaz",
-  "monospaceFontFamily": "Consolas",
-  "baseFontSize": 19
+  "monospaceFontFamily": "霞鹜文楷 屏幕阅读版",
+  "baseFontSize": 21
 }
