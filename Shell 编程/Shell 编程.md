@@ -6262,4 +6262,119 @@ fi
 17:14:13 root@redis01:~/shell/expression# bash demo03.sh
 a 开头，长度为 2
 ```
+##### 4.3.1.2.2 正则表达式匹配 `=~`
+`[[ STRING =~ REGEX ]]
+⚠ 注意：
+- 正则 **不要加引号**
+- 仅支持 ERE（扩展正则）
+###### 4.3.1.2.2.1 判断是否为数字
+```bash
+17:48:06 root@redis01:~/shell/expression# cat demo04.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+input="12345"
+
+if [[ $input =~ ^[0-9]+$ ]]; then
+    echo "纯数字"
+fi
+
+17:48:08 root@redis01:~/shell/expression# bash demo04.sh
+纯数字
+17:48:10 root@redis01:~/shell/expression# 
+```
+###### 4.3.1.2.2.2 邮件格式判断
+```bash
+17:48:56 root@redis01:~/shell/expression# cat demo05.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+email="test@example.com"
+
+if [[ $email =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+    echo "合法邮箱"
+fi
+
+17:48:57 root@redis01:~/shell/expression# bash demo05.sh
+合法邮箱
+17:48:59 root@redis01:~/shell/expression#
+```
+##### 4.3.1.2.3 总结
+|匹配方式|操作符|适用场景|
+|---|---|---|
+|字符串相等|`==`|精确匹配|
+|通配符|`== pattern`|文件名、前后缀|
+|正则|`=~`|输入验证|
 #### 4.3.1.3 文件匹配实践
+`[[ ]]` 在文件判断中更安全，支持逻辑组合。
+##### 4.3.1.3.1 基础文件匹配
+```bash
+file="/etc/passwd"
+
+if [[ -f $file ]]; then
+    echo "普通文件"
+fi
+```
+##### 4.3.1.3.2 组合条件判断
+```bash
+if [[ -f "$file" && -r "$file" ]]; then
+    echo "文件存在且可读"
+fi
+```
+##### 4.3.1.3.3 通配符结合文件判断
+```bash
+for f in /var/log/*.log; do
+    if [[ -s $f ]]; then
+        echo "$f 非空"
+    fi
+done
+```
+##### 4.3.1.3.4 综合案例：脚本文件检查
+```bash
+#!/bin/bash
+
+script="$1"
+
+if [[ -z $script ]]; then
+    echo "请指定脚本文件"
+    exit 1
+fi
+
+if [[ ! -f $script ]]; then
+    echo "文件不存在"
+    exit 2
+fi
+
+if [[ ! -x $script ]]; then
+    echo "文件不可执行"
+    exit 3
+fi
+
+echo "脚本检查通过，可执行"
+
+```
+##### 4.3.1.3.5 文件匹配实践总结表
+| 判断需求 | 推荐写法                       |
+| ---- | -------------------------- |
+| 文件存在 | `[[ -e file ]]`            |
+| 普通文件 | `[[ -f file ]]`            |
+| 可执行  | `[[ -x file ]]`            |
+| 多条件  | `[[ -f file && -x file ]]` |
+| 否定判断 | `[[ ! -f file ]]`          |
+#### 4.3.1.4  最佳实践
+✔ 在 Bash 中 **优先使用 `[[ ]]`**  
+✔ 使用 `&& || !` 代替 `-a -o`  
+✔ 内容匹配首选通配符，复杂校验用正则  
+✔ 文件判断与逻辑组合放在一个 `[[ ]]` 中
