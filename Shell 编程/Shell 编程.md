@@ -5738,11 +5738,84 @@ fi
 /usr/bin/vi is soft link file
 11:45:21 root@redis01:~/shell# 
 ```
-##### 4.2.4.2.5 判断文件时候为空`-s`
+##### 4.2.4.2.5 判断文件是否非空`-s`
 ```bash
+11:50:54 root@redis01:~/shell# cat file_test_is_not-empty.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: file_test_is_null.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+file_path=/etc/passwd
+empty_path=/root/empty.txt
+touch ${empty_path}
+if [[ -s ${file_path} ]];then
+  echo "${file_path} is not empty"
+else
+  echo "${file_path} is  empty"
+fi
 
+
+if [[ -s ${empty_path} ]];then
+  echo "${empty_path} is not empty"
+else
+  echo "${empty_path} is  empty"
+fi
+11:50:55 root@redis01:~/shell# bash file_test_is_not-empty.sh
+/etc/passwd is not empty
+/root/empty.txt is  empty
+11:50:58 root@redis01:~/shell#
 ```
-
+##### 4.2.4.2.6 总结
+|表达式|判断内容|
+|---|---|
+|`-e FILE`|是否存在|
+|`-f FILE`|是否为普通文件|
+|`-d FILE`|是否为目录|
+|`-L FILE`|是否符号链接|
+|`-s FILE`|文件是否非空|
 #### 4.2.4.3 权限判断
+用于判断文件是否具备读、写、执行权限。
+##### 4.2.4.3.1 判断可读`-r`
+```bash
+11:53:53 root@redis01:~/shell# cat file_test_is_readable.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: file_test_is_readable.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+if [[ -r "/etc/passwd" ]]; then
+    echo "文件可读"
+fi
+
+11:53:55 root@redis01:~/shell# bash file_test_is_readable.sh
+文件可读
+11:53:56 root@redis01:~/shell# 
+```
+##### 4.2.4.3.2 判断可写`-w`
+```bash
+11:55:02 root@redis01:~/shell# cat file_test_is_writeable.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: file_test_is_writeable.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+if [[ -w "./demo1.sh" ]]; then
+    echo "文件可写"
+fi
+```
+##### 4.2.4.3.3 判断可执行`-x`
 
 #### 4.2.4.4 其他判断
