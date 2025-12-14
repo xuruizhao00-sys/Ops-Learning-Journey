@@ -5685,6 +5685,40 @@ fi
 /etc/passwd is a general file
 11:02:40 root@redis01:~/shell# 
 ```
+##### 4.2.4.2.3 判断是否为目录`-d`
+```bash
+11:06:43 root@redis01:~/shell# cat file_test_is_dir.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: file_test_is_dir.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+file_path=/etc/passwd
+dir_path=/etc
+if [[ -d ${file_path} ]];then
+  echo "${file_path} is a dir"
+else
+  echo "${file_path} is not  a dir"
+fi
+
+
+if [[ -d ${dir_path} ]];then
+  echo "${dir_path} is a dir"
+else
+  echo "${dir_path} is not  a dir"
+fi
+11:06:45 root@redis01:~/shell# bash file_test_is_dir.sh
+/etc/passwd is not  a dir
+/etc is a dir
+11:06:46 root@redis01:~/shell# 
+```
+##### 4.2.4.2.4 判断是否为符号链接`-L`
+
+
 #### 4.2.4.3 权限判断
 
 #### 4.2.4.4 其他判断
