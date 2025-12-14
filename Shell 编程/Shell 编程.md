@@ -5640,7 +5640,32 @@ Shell 提供了一组测试文件状态的表达式，可用于 test、[ ] 和 \
 #### 4.2.4.2 属性判断
 属性判断用于确定文件的存在状态、类型等。
 ##### 4.2.4.2.1 文件存在性判断`-e`
+```bash
+10:57:30 root@redis01:~/shell# cat demo05.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+file_path=/etc/passwd
+if [[ -e ${file_path} ]];then
+  echo "${file_path} exists"
+else
+  echo "${file_path} not exists"
+fi
 
+10:57:31 root@redis01:~/shell# bash demo05.sh
+/etc/passwd exists
+10:57:33 root@redis01:~/shell#
+```
+##### 4.2.4.2.2 判断是否为普通文件`-f`
+```bash
+
+```
 #### 4.2.4.3 权限判断
 
 #### 4.2.4.4 其他判断
