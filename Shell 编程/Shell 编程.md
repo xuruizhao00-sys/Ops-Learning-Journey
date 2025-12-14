@@ -5976,5 +5976,129 @@ fi
 |`(( ))`|⭐ 强烈推荐|直观、支持运算|
 #### 4.2.5.2 具体实践
 ##### 4.2.5.2.1 等值与大小判断
+```bash
+14:08:01 root@redis01:~/shell/num# cat demo01.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo01.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+num=10
+if [[ ${num} -eq 10 ]];then
+  echo "num 等于 10"
+fi
 
+14:08:02 root@redis01:~/shell/num# bash demo01.sh
+num 等于 10
+14:08:04 root@redis01:~/shell/num# 
+```
+##### 4.2.5.2.1 使用 (()) 进行判断
+```bash
+14:08:45 root@redis01:~/shell/num# cat demo02.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+num=20
+
+if (( num > 10 )); then
+    echo "num 大于 10"
+fi
+
+14:08:48 root@redis01:~/shell/num# bash demo02.sh
+num 大于 10
+14:08:50 root@redis01:~/shell/num# 
+```
+##### 4.2.5.2.2 数字范围判断
+```bash
+14:09:39 root@redis01:~/shell/num# cat demo03.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+score=85
+
+if (( score >= 60 && score < 90 )); then
+    echo "成绩合格"
+fi
+
+14:09:41 root@redis01:~/shell/num# bash demo03.sh
+成绩合格
+```
+##### 4.2.5.2.3 结合用户输入的数字判断
+```bash
+14:11:22 root@redis01:~/shell/num# cat demo04.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+read -p "请输入一个数字：" n
+
+if (( n % 2 == 0 )); then
+    echo "偶数"
+else
+    echo "奇数"
+fi
+
+
+14:11:23 root@redis01:~/shell/num# bash demo04.sh 
+请输入一个数字：3
+奇数
+14:11:28 root@redis01:~/shell/num# bash demo04.sh 
+请输入一个数字：4
+偶数
+14:11:30 root@redis01:~/shell/num#
+```
 #### 4.2.5.3 脚本执行判断
+脚本中常通过 **退出状态码（exit code）** 判断命令是否执行成功。
+##### 4.2.5.3.1 什么是`$?`
+- `$?` 表示 **上一条命令的退出状态**
+- `0` ：成功
+- `非 0` ：失败
+##### 4.2.5.3.2 使用 `$?` 判断执行结果
+```bash
+14:12:49 root@redis01:~/shell/num# cat demo05.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+ls /tmp >/dev/null 2>&1
+
+if [[ $? -eq 0 ]]; then
+    echo "命令执行成功"
+else
+    echo "命令执行失败"
+fi
+
+14:12:50 root@redis01:~/shell/num# bash demo05.sh
+命令执行成功
+14:12:51 root@redis01:~/shell/num#
+```
+##### 4.2.5.3.3 推荐写法：直接在 if 中判断
+```bash
+
+```
