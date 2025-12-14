@@ -6180,6 +6180,86 @@ echo "网络正常"
 [[ 条件表达式 ]]
 [[ -f file && -r file ]]
 ```
-#### 4.3.1.2 内容匹配实践
+##### 4.3.1.1.3 逻辑运算符（仅 `[[ ]]` 支持）
+| 运算符    | 含义  |
+| ------ | --- |
+| `&&`   | 逻辑与 |
+| `\|\|` | 逻辑或 |
+| `!`    | 逻辑非 |
 
+`[[ -f file && -x file ]]`
+#### 4.3.1.2 内容匹配实践
+`[[ ]]` 支持 **通配符匹配** 和 **正则匹配**，非常适合字符串判断。
+##### 4.3.1.2.1 通配符匹配（模式匹配）
+支持的通配符：
+
+|符号|含义|
+|---|---|
+|`*`|任意长度字符串|
+|`?`|单个字符|
+|`[abc]`|字符集合|
+###### 4.3.1.2.1.1 前缀匹配
+```bash
+17:12:35 root@redis01:~/shell/expression# cat demo01.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo01.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+str="user_admin"
+
+if [[ $str == user* ]]; then
+    echo "以 user 开头"
+fi
+
+17:12:37 root@redis01:~/shell/expression# /bin/bash demo01.sh
+以 user 开头
+17:12:44 root@redis01:~/shell/expression# 
+```
+###### 4.3.1.2.1.2 后缀匹配
+```bash
+17:13:29 root@redis01:~/shell/expression# cat demo02.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+file="log_2024.txt"
+
+if [[ $file == *.txt ]]; then
+    echo "文本文件"
+fi
+17:13:31 root@redis01:~/shell/expression# bash demo02.sh
+文本文件
+17:13:33 root@redis01:~/shell/expression#
+```
+###### 4.3.1.2.1.3 单字符匹配
+```bash
+17:14:10 root@redis01:~/shell/expression# cat demo03.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+code="a1"
+
+if [[ $code == a? ]]; then
+    echo "a 开头，长度为 2"
+fi
+
+17:14:13 root@redis01:~/shell/expression# bash demo03.sh
+a 开头，长度为 2
+```
 #### 4.3.1.3 文件匹配实践
