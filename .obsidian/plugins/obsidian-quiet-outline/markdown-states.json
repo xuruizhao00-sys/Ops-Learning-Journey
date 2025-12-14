@@ -1,13 +1,13 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 6076.047332185886,
+    "scroll": 6150.3051966161565,
     "cursor": {
       "from": {
-        "line": 6102,
+        "line": 6168,
         "ch": 0
       },
       "to": {
-        "line": 6102,
+        "line": 6168,
         "ch": 0
       }
     },
@@ -29,7 +29,9 @@
       "item-3-385",
       "item-4-386",
       "item-4-389",
-      "item-4-394"
+      "item-4-394",
+      "item-2-401",
+      "item-3-402"
     ]
   },
   "Python/python.md": {

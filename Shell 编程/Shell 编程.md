@@ -6100,5 +6100,71 @@ fi
 ```
 ##### 4.2.5.3.3 推荐写法：直接在 if 中判断
 ```bash
+14:18:00 root@redis01:~/shell/num# cat demo06.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo06.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+if ls /tmp >/dev/null 2>&1; then
+    echo "命令执行成功"
+else
+    echo "命令执行失败"
+fi
 
+
+14:18:00 root@redis01:~/shell/num# bash demo06.sh
+命令执行成功
+14:18:02 root@redis01:~/shell/num#
 ```
+##### 4.2.5.3.4 结合 exit 状态的完整示例
+```bash
+14:19:15 root@redis01:~/shell/num# cat demo07.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: demo07.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+ping -c 1 192.168.121.2 >/dev/null 2>&1
+
+if [[ $? -ne 0 ]]; then
+    echo "网络不可达"
+    exit 1
+fi
+
+echo "网络正常"
+
+14:19:18 root@redis01:~/shell/num# bash demo07.sh
+网络不可达
+14:19:29 root@redis01:~/shell/num#
+```
+##### 4.2.5.3.5 脚本执行判断总结表
+|判断方式|示例|说明|
+|---|---|---|
+|`$?`|`[[ $? -eq 0 ]]`|判断上一条命令|
+|if 直接判断|`if command; then`|⭐ 推荐|
+|exit 码|`exit 1`|自定义错误状态|
+#### 4.2.5.4 总结
+|场景|推荐写法|
+|---|---|
+|数字比较|`(( a > b ))`|
+|等值判断|`(( a == b ))`|
+|多条件|`(( a > 0 && b < 10 ))`|
+|判断命令成功|`if command; then`|
+|判断退出状态|`[[ $? -eq 0 ]]`|
+## 4.3 表达式进阶
+### 4.3.1 [\[\]] 测试进阶
+#### 4.3.1.1 基础知识
+
+
+#### 4.3.1.2 内容匹配实践
+
+#### 4.3.1.3 文件匹配实践
