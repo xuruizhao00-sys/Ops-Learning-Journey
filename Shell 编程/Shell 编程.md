@@ -5817,5 +5817,79 @@ if [[ -w "./demo1.sh" ]]; then
 fi
 ```
 ##### 4.2.4.3.3 判断可执行`-x`
+```bash
+12:00:44 root@redis01:~/shell# cat file_test_is_executable.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: file_test_is_executable.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+if [[ -x "/usr/bin/bash" ]]; then
+    echo "文件可执行"
+fi
 
+12:00:46 root@redis01:~/shell# bash file_test_is_executable.sh
+文件可执行
+12:00:48 root@redis01:~/shell#
+```
+##### 4.2.4.3.3 总结
+|表达式|含义|
+|---|---|
+|`-r FILE`|文件可读|
+|`-w FILE`|文件可写|
+|`-x FILE`|文件可执行|
 #### 4.2.4.4 其他判断
+除了属性和权限，Shell 还提供一些其他测试功能。
+##### 4.2.4.4.1 判断文件是否更新（比另一个文件新）`FILE1 -nt FILE2`
+```bash
+12:02:59 root@redis01:~/shell# cat file_test_newer.sh 
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: file_test_newer.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+if [[ "./a.txt" -nt "./b.txt" ]]; then
+    echo "a.txt 较新"
+fi
+
+12:03:05 root@redis01:~/shell# touch b.txt
+12:03:12 root@redis01:~/shell# touch a.txt
+12:03:14 root@redis01:~/shell# bash file_test_newer.sh 
+a.txt 较新
+12:03:22 root@redis01:~/shell# 
+```
+##### 4.2.4.4.2 判断两个文件是否属于同一设备 inode `FILE1 -ef FILE2`
+```bash
+12:04:04 root@redis01:~/shell# cat file_test_inode.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: file_test_inode.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+if [[ "/bin/sh" -ef "/usr/bin/sh" ]]; then
+    echo "两个路径指向同一个文件"
+fi
+
+12:04:05 root@redis01:~/shell# bash file_test_inode.sh
+两个路径指向同一个文件
+12:04:06 root@redis01:~/shell# 
+```
+##### 4.2.4.4.3 总结
+| 表达式               | 说明                                |
+| ----------------- | --------------------------------- |
+| `FILE1 -nt FILE2` | FILE1 比 FILE2 新                   |
+| `FILE1 -ot FILE2` | FILE1 比 FILE2 旧                   |
+| `FILE1 -ef FILE2` | FILE1 与 FILE2 是同一个文件（硬链接或同 inode） |
+#### 4.2.4.5 综合案例
