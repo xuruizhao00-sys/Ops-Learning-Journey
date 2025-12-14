@@ -5718,6 +5718,28 @@ fi
 ```
 ##### 4.2.4.2.4 判断是否为符号链接`-L`
 ```bash
+11:45:18 root@redis01:~/shell# cat file_test_is_softlink.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: file_test_is_softlink.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+file_path=/usr/bin/vi
+if [[ -L ${file_path} ]];then
+  echo "${file_path} is soft link file"
+else
+  echo "${file_path} is not soft link file"
+fi
+11:45:19 root@redis01:~/shell# bash file_test_is_softlink.sh
+/usr/bin/vi is soft link file
+11:45:21 root@redis01:~/shell# 
+```
+##### 4.2.4.2.5 判断文件时候为空`-s`
+```bash
 
 ```
 
