@@ -164,14 +164,14 @@
     ]
   },
   "Prometheus/Prometheus.md": {
-    "scroll": 131.92816635160682,
+    "scroll": 130.91865079365078,
     "cursor": {
       "from": {
-        "line": 0,
-        "ch": 0
+        "line": 139,
+        "ch": 73
       },
       "to": {
-        "line": 0,
+        "line": 139,
         "ch": 0
       }
     },
@@ -196,5 +196,36 @@
       }
     },
     "expandedKeys": []
+  },
+  "redis/redis.md": {
+    "scroll": 0,
+    "cursor": {
+      "from": {
+        "line": 0,
+        "ch": 0
+      },
+      "to": {
+        "line": 0,
+        "ch": 0
+      }
+    },
+    "expandedKeys": [
+      "item-3-2",
+      "item-2-1",
+      "item-1-0",
+      "item-3-25",
+      "item-2-21",
+      "item-3-150",
+      "item-2-149",
+      "item-1-71",
+      "item-4-364",
+      "item-3-360",
+      "item-2-350",
+      "item-1-254",
+      "item-4-374",
+      "item-3-373",
+      "item-4-379",
+      "item-1-383"
+    ]
   }
 }
