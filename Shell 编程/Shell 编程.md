@@ -6378,3 +6378,289 @@ echo "脚本检查通过，可执行"
 ✔ 使用 `&& || !` 代替 `-a -o`  
 ✔ 内容匹配首选通配符，复杂校验用正则  
 ✔ 文件判断与逻辑组合放在一个 `[[ ]]` 中
+### 4.3.2 集合基础（逻辑运算）
+在 Shell 条件判断中，“集合”通常指 **多个条件的组合判断**。  
+通过 **或（OR）**、**与（AND）**、**非（NOT）**，可以构建复杂的判断逻辑。
+#### 4.3.2.1 基础知识
+##### 4.3.2.1.1 三种基本逻辑关系
+|逻辑|含义|符号|
+|---|---|---|
+|或|满足任意一个条件|`|
+|与|必须同时满足所有条件|`&&`|
+|非|取反条件|`!`|
+##### 4.3.2.1.2 常见写法对比
+| 场景    | 推荐写法             | 不推荐写法          |
+| ----- | ---------------- | -------------- |
+| 多条件判断 | `[[ A && B ]]`   | `[[ A -a B ]]` |
+| 或判断   | `[[ A \|\| B ]]` | `[ A -o B ]`   |
+| 非判断   | `[[ ! A ]]`      | `! [[ A ]]`    |
+📌 **原因**：
+- `-a`、`-o` 易产生歧义
+- `[[ ]]` 更安全，支持复杂表达式
+##### 4.3.2.1.3 真值表
+|A|B|A \| B|A && B|
+|---|---|---|---|
+|真|真|真|真|
+|真|假|真|假|
+|假|真|真|假|
+|假|假|假|假|
+
+#### 4.3.2.2 或与非
+##### 或（OR）`||`
+
+`[[ 条件1 || 条件2 ]]`
+
+##### 与（AND）`&&`
+
+`[[ 条件1 && 条件2 ]]`
+
+##### 非（NOT）`!`
+
+`[[ ! 条件 ]]`
+##### 运算优先级
+1. `!`（非）
+2. `&&`（与）
+3. `||`（或）
+必要时使用 `()` 增强可读性：
+`[[ ( A || B ) && C ]]`
+#### 4.3.2.3 或实践
+##### 🎯 场景：判断用户输入是否合法
+```bash
+21:20:24 root@redis01:~/shell# cat test01.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: test01.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+read -p "请输入 yes 或 no：" input
+
+if [[ "$input" == "yes" || "$input" == "no" ]]; then
+    echo "输入合法"
+else
+    echo "非法输入"
+fi
+
+
+21:20:25 root@redis01:~/shell# bash test01.sh
+请输入 yes 或 no：yes
+输入合法
+21:20:28 root@redis01:~/shell# bash test01.sh
+请输入 yes 或 no：no
+输入合法
+21:20:31 root@redis01:~/shell# bash test01.sh
+请输入 yes 或 no：asdasdsadsad
+非法输入
+21:20:34 root@redis01:~/shell# 
+
+```
+##### 🎯 场景：文件不存在或不可读
+```bash
+21:22:03 root@redis01:~/shell# cat test02.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: test02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+file="/etc/passwd"
+
+if [[ ! -x "${file}" ||  ! -e "$file" || ! -r "$file" ]]; then
+    echo "文件不存在或不可读或不可执行"
+fi
+
+21:22:04 root@redis01:~/shell# bash test02.sh
+文件不存在或不可读或不可执行
+21:22:06 root@redis01:~/shell# 
+```
+##### 📊 OR 实践总结
+| 条件        | 逻辑            |
+| --------- | ------------- |
+| A 或 B     | `A \|\| b`    |
+| 非 A 或 非 B | `! A \|\| B ` |
+#### 4.3.2.4 与实践
+##### 🎯 场景：文件存在且可执行
+```bash
+21:23:09 root@redis01:~/shell# cat test03.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: test03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+file="./run.sh"
+
+if [[ -f "$file" && -x "$file" ]]; then
+    echo "可执行脚本"
+fi
+
+
+21:23:12 root@redis01:~/shell# touch run.sh
+21:23:18 root@redis01:~/shell# chmod +x run.sh
+21:23:22 root@redis01:~/shell# bash test03.sh
+可执行脚本
+21:23:26 root@redis01:~/shell# 
+```
+##### 🎯 场景：成绩范围判断
+```bash
+21:23:53 root@redis01:~/shell# cat test04.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: test04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+score=85
+
+if (( score >= 60 && score <= 100 )); then
+    echo "成绩合格"
+fi
+
+21:23:55 root@redis01:~/shell# bash test04.sh
+成绩合格
+21:24:00 root@redis01:~/shell#
+```
+##### 📊 AND 实践总结
+|场景|示例|
+|---|---|
+|多条件同时满足|`[[ A && B ]]`|
+|数字区间|`(( x >= a && x <= b ))`|
+#### 4.3.2.5 非实践
+##### 🎯 场景：变量为空判断
+```bash
+21:24:43 root@redis01:~/shell# cat test05.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: test05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+var=""
+
+if [[ ! -n "$var" ]]; then
+    echo "变量为空"
+fi
+
+21:24:46 root@redis01:~/shell# bash test05.sh
+变量为空
+21:24:53 root@redis01:~/shell# 
+```
+##### 🎯 场景：文件不是目录
+```bash
+21:25:19 root@redis01:~/shell# cat test06.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: test06.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+path="/etc/passwd"
+
+if [[ ! -d "$path" ]]; then
+    echo "不是目录"
+fi
+
+21:25:21 root@redis01:~/shell# bash test06.sh
+不是目录
+21:25:23 root@redis01:~/shell#
+```
+##### 🎯 场景：非法用户输入
+```bash
+21:25:23 root@redis01:~/shell# vim test07.sh
+21:25:52 root@redis01:~/shell# cat test07.sh
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: test07.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+read -p "请输入数字：" num
+
+if [[ ! $num =~ ^[0-9]+$ ]]; then
+    echo "非法输入（非数字）"
+fi
+
+21:25:55 root@redis01:~/shell# bash test07.sh
+请输入数字：99
+21:25:59 root@redis01:~/shell# bash test07.sh
+请输入数字：asdsadsa
+非法输入（非数字）
+21:26:01 root@redis01:~/shell# 
+```
+
+##### 📊 NOT 实践总结
+
+|逻辑|示例|
+|---|---|
+|非存在|`[[ ! -e file ]]`|
+|非目录|`[[ ! -d path ]]`|
+|非匹配|`[[ ! str =~ regex ]]`|
+#### 4.3.2.6 综合案例
+```bash
+21:27:39 root@redis01:~/shell# cat test08.sh 
+#!/bin/bash
+# ==============================================================================
+# Script basic information
+# filename: test08.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+file="$1"
+
+if [[ -z "$file" ]]; then
+    echo "未指定文件"
+    exit 1
+fi
+
+if [[ ! -f "$file" || ! -r "$file" ]]; then
+    echo "文件不存在或不可读"
+    exit 2
+fi
+
+if [[ -f "$file" && -x "$file" ]]; then
+    echo "文件可直接执行"
+else
+    echo "文件不可执行"
+fi
+
+21:27:47 root@redis01:~/shell# bash test08.sh
+未指定文件
+21:27:50 root@redis01:~/shell# bash test08.sh run.sh
+文件可直接执行
+21:27:53 root@redis01:~/shell# bash test08.sh run.shsss
+文件不存在或不可读
+21:27:59 root@redis01:~/shell#
+```
+#### 4.3.2.6 最佳实践总结表
+
+| 需求      | 推荐写法                    |
+| ------- | ----------------------- |
+| 或       | `[[ A \|\| B ]]`        |
+| 与       | `[[ A && B ]]`          |
+| 非       | `[[ ! A ]]`             |
+| 组合      | `[[ (A \|\| B) && C ]]` |
+| Bash 判断 | `[[ ]]`                 |
