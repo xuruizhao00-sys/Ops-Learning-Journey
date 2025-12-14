@@ -5664,7 +5664,26 @@ fi
 ```
 ##### 4.2.4.2.2 判断是否为普通文件`-f`
 ```bash
+11:02:38 root@redis01:~/shell# cat file_test_general-file.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: file_test_general-file.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+file_path=/etc/passwd
+if [[ -f ${file_path} ]];then
+  echo "${file_path} is a general file"
+else
+  echo "${file_path} is not a general file"
+fi
 
+11:02:39 root@redis01:~/shell# bash file_test_general-file.sh
+/etc/passwd is a general file
+11:02:40 root@redis01:~/shell# 
 ```
 #### 4.2.4.3 权限判断
 
