@@ -3640,18 +3640,12 @@ done
 ###### 🔥 **几乎所有情况下都推荐使用 `"$@"`**
 
 原因：
-
 - 保留参数边界
-    
 - 不会破坏包含空格的参数
-    
 - 与函数参数传递保持一致
-    
 - 脚本可移植性强
-    
 
 而：
-
 ###### ⚠ `"$*"` 在循环中几乎永远不该使用
 
 因为它会把所有参数变成一个。
@@ -6930,7 +6924,7 @@ user[age]=18
 ✔ 文件列表使用 `mapfile -t`  
 ✔ 关联数组必须 `declare -A`  
 ✔ 含空格内容一定加双引号
-## 5.3 数组遍历取值
+## 5.3 索引数组遍历取值
 在 Bash 中，**数组本身不难，难点在“访问”和“遍历”**。  
 90% 的数组 Bug 都出现在：  
 👉 **没加引号**  
@@ -7128,3 +7122,113 @@ for i in "${arr[*]}"; do
 ```bash
 for i in "${arr[@]}"; do
 ```
+### 5.3.5  数组访问与遍历速查表
+|需求|推荐写法|
+|---|---|
+|单个元素|`${arr[0]}`|
+|所有元素|`"${arr[@]}"`|
+|数组长度|`${#arr[@]}`|
+|所有下标|`${!arr[@]}`|
+|安全遍历|`for i in "${arr[@]}"`|
+|带下标遍历|`for i in "${!arr[@]}"`|
+## 5.4 关联数组访问与遍历
+### 5.4.1 定义与取值
+```bash
+# 关联数组定义
+declare -A user
+
+# 关联数组赋值
+user[name]="tom"
+user[age]=18
+user[city]="beijing"
+
+# 访问某一个值
+echo "${user[age]}"
+```
+### 5.4.2 遍历关联数组
+#### 5.4.2.1 遍历 key
+```bash
+17:33:43 root@redis02:~# cat demo02.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+declare -A user
+user[name]="zhangsan"
+user[age]=12
+user[city]="beijing"
+
+for key in "${!user[@]}";
+do
+        echo "$key"
+done
+17:33:44 root@redis02:~# bash demo02.sh
+city
+age
+name
+17:33:46 root@redis02:~#
+```
+#### 5.4.2.2 遍历 value
+```bash
+17:34:25 root@redis02:~# cat demo02.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+declare -A user
+user[name]="zhangsan"
+user[age]=12
+user[city]="beijing"
+
+for value in "${user[@]}";
+do
+        echo "$value"
+done
+17:34:26 root@redis02:~# bash demo02.sh
+beijing
+12
+zhangsan
+17:34:28 root@redis02:~#
+```
+#### 5.4.2.3 遍历 key + value
+```bash
+17:35:10 root@redis02:~# cat demo02.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+declare -A user
+user[name]="zhangsan"
+user[age]=12
+user[city]="beijing"
+for key in "${!user[@]}"; do
+    echo "$key => ${user[$key]}"
+done
+17:35:11 root@redis02:~# bash demo02.sh
+city => beijing
+age => 12
+name => zhangsan
+17:35:13 root@redis02:~# 
+```
+### 5.4.3 总结
+|操作|写法|
+|---|---|
+|所有 key|`${!arr[@]}`|
+|所有 value|`${arr[@]}`|
+|单个值|`${arr[key]}`|
+|删除 key|`unset arr[key]`|
