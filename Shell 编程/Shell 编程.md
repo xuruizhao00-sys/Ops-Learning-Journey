@@ -7605,7 +7605,28 @@ CPU 15min 平均负载为: 0.00
 shell 中的 if 语句支持多种条件的决策形式：
 ![](assets/Shell%20编程/file-20251217202247083.png)
 #### 6.1.1.2 if 语法格式
+##### 6.1.1.2.1 单路模式
 ```powershell
-
+if [ condition ]; then
+    # 如果条件为真，执行此部分代码
+fi
+```
+##### 6.1.1.2.2 双路模式
+```powershell
+if [ condition ]; then
+    # 如果条件为真，执行此部分代码
+else
+    # 如果条件为假，执行此部分代码
+fi
+```
+##### 6.1.1.2.3 多路模式
+```bash
+if [ condition1 ]; then
+    # 如果条件1为真，执行此部分代码
+elif [ condition2 ]; then
+    # 如果条件2为真，执行此部分代码
+else
+    # 如果所有条件都为假，执行此部分代码
+fi
 ```
 ## 6.2 循环逻辑
