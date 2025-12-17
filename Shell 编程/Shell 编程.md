@@ -6896,6 +6896,8 @@ a
 📌 作用：
 - 明确变量类型
 - 提高脚本可读性
+- -a 定义索引数组
+- -A 定义关联数组
 ```bash
 declare -a arr
 arr=(x y z)
@@ -7232,3 +7234,29 @@ name => zhangsan
 |所有 value|`${arr[@]}`|
 |单个值|`${arr[key]}`|
 |删除 key|`unset arr[key]`|
+## 5.5 数组元素操作
+### 5.5.1 数组的修改操作
+#### 5.5.1.1 修改指定下标的元素
+```bash
+17:35:13 root@redis02:~# arr=(a b c d)
+17:43:05 root@redis02:~# echo "${arr[@]}"
+a b c d
+17:43:16 root@redis02:~# arr[0]=aaaa
+17:43:22 root@redis02:~# echo "${arr[@]}"
+aaaa b c d
+17:43:23 root@redis02:~#
+17:43:23 root@redis02:~# arr[4]=e
+17:43:47 root@redis02:~# echo "${arr[@]}"
+aaaa b c d e
+17:43:49 root@redis02:~# arr[10]=aaa
+17:43:54 root@redis02:~# echo "${arr[@]}"
+aaaa b c d e aaa
+17:43:56 root@redis02:~# 
+```
+📌 特点：
+- 下标存在 → 覆盖
+- 下标不存在 → 自动新增
+#### 5.5.1.2 追加元素
+```bash
+
+```
