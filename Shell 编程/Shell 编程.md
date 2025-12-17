@@ -7449,6 +7449,58 @@ done
 ```
 ### 5.6.5 服务管理
 ```bash
+18:12:47 root@redis02:~# cat service_manager.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: service_manager.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 定义关联数组，存储服务动作与命令的映射
+declare -A service_actions=(
+    [start]="start"
+    [stop]="stop"
+    [restart]="restart"
+    [reload]="reload"
+    [status]="status"
+)
+
+# 定义索引数组，存储所有的服务动作
+actions=("start" "stop" "restart" "reload" "status")
+
+# 提示用户选择服务动作
+echo "请选择服务管理动作："
+select action in "${actions[@]}"; do
+    # 如果选择了一个有效的动作
+    if [[ -n "$action" ]]; then
+        # 提示用户输入服务名
+        read -p "请输入服务名称: " service_name
+        # 输出对应的 systemctl 命令
+        echo "systemctl ${service_actions[$action]} $service_name"
+        break
+    else
+        echo "无效选择，请重新选择！"
+    fi
+done
+
+
+18:12:49 root@redis02:~# bash service_manager.sh
+请选择服务管理动作：
+1) start
+2) stop
+3) restart
+4) reload
+5) status
+#? 1
+请输入服务名称: dsdasd
+systemctl start dsdasd
+```
+### 5.6.6 信息收集
+```bash
 
 ```
 ## 5.7 数组操作速查总表
