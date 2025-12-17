@@ -7067,3 +7067,64 @@ echo ${arr[*]}
 | ------------- | ---------- |
 | `"${arr[@]}"` | ⭐ 每个元素一个   |
 | `"${arr[*]}"` | ❌ 所有元素当成一个 |
+#### 5.3.3.3 示例
+```bash
+13:40:08 root@redis02:~# cat test05.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+arr=("hello world" "shell script")
+for i in "${arr[@]}"; do
+    echo "$i"
+done
+for i in "${arr[*]}"; do
+    echo "$i"
+done
+13:40:11 root@redis02:~# bash test05.sh
+hello world
+shell script
+hello world shell script
+13:40:14 root@redis02:~# 
+```
+### 5.3.4 数组访问与遍历的常见错误（重点）
+#### 5.3.4.1 忘记双引号
+```bash
+for i in ${arr[@]}; do
+    echo "$i"
+done
+```
+❗ 问题：
+- 遇到空格直接拆分
+- 非法数据
+✔ 正确：
+```bash
+for i in "${arr[@]}"; do
+```
+#### 5.3.4.2 直接 echo 数组名
+```bash
+echo $arr
+```
+❗ 结果：
+- 只输出第一个元素
+
+✔ 正确：
+```bash
+echo "${arr[@]}"
+```
+#### 5.3.4.3 误用 `${arr[*]}`
+```bash
+for i in "${arr[*]}"; do
+```
+❗ 结果：
+- 整个数组只循环一次
+
+✔ 正确：
+```bash
+for i in "${arr[@]}"; do
+```
