@@ -7345,3 +7345,121 @@ c d e f
 |---|---|
 |跳过前 N 个|`${arr[@]:N}`|
 |取子集|`${arr[@]:start:len}`|
+
+## 5.6 脚本案例
+### 5.6.1 批量主机处理
+```bash
+18:03:43 root@redis02:~# cat host_list.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: host_list.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+hosts=(web1 web2 db1 cache1)
+
+for host in "${hosts[@]}"; do
+    echo "正在处理 $host"
+done
+```
+### 5.6.2 批量检查文件是否存在
+```bash
+18:04:15 root@redis02:~# cat file_list.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: file_list.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+files=(/etc/passwd /etc/shadow /etc/hosts)
+
+for f in "${files[@]}"; do
+    if [[ -e "$f" ]]; then
+        echo "$f 存在"
+    else
+        echo "$f 不存在"
+    fi
+done
+
+18:04:16 root@redis02:~# bash file_list.sh
+/etc/passwd 存在
+/etc/shadow 存在
+/etc/hosts 存在
+18:04:20 root@redis02:~#
+```
+### 5.6.3 使用关联数组管理配置
+```bash
+18:05:04 root@redis02:~# cat config.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: config.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+declare -A service_port=(
+    [nginx]=80
+    [mysql]=3306
+    [redis]=6379
+)
+
+for service in "${!service_port[@]}"; do
+    echo "$service 使用端口 ${service_port[$service]}"
+done
+
+18:05:05 root@redis02:~# bash config.sh
+nginx 使用端口 80
+redis 使用端口 6379
+mysql 使用端口 3306
+18:05:06 root@redis02:~# 
+```
+### 5.6.4 参数转数组（脚本开发常用）
+```bash
+18:06:52 root@redis02:~# cat demo03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+args=("$@")
+
+for i in "${!args[@]}"; do
+    echo "参数$i = ${args[$i]}"
+done
+18:06:55 root@redis02:~# bash demo03.sh 1 2 3 4 5
+参数0 = 1
+参数1 = 2
+参数2 = 3
+参数3 = 4
+参数4 = 5
+18:07:03 root@redis02:~# 
+```
+### 5.6.5 服务管理
+```bash
+
+```
+## 5.7 数组操作速查总表
+|需求|推荐写法|
+|---|---|
+|定义数组|`arr=(a b c)`|
+|访问元素|`${arr[0]}`|
+|所有元素|`"${arr[@]}"`|
+|所有下标|`"${!arr[@]}"`|
+|数组长度|`${#arr[@]}`|
+|追加|`arr+=(x y)`|
+|删除元素|`unset arr[i]`|
+|切片|`${arr[@]:1:2}`|
+|关联数组|`declare -A arr`|
