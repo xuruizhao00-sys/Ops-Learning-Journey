@@ -6765,3 +6765,98 @@ name ==> tom
 |使用场景|列表、队列|配置、映射关系|
 
 ## 5.2 数组定义
+在 Bash 中，数组属于 **变量的一种扩展形式**。  
+数组的定义方式灵活，不同定义方式适合不同使用场景。
+### 5.2.1 直接赋值定义
+```bash
+11:54:54 root@redis02:~# cat test03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+arr=(a b c d)
+echo "${arr[0]}"
+
+11:54:56 root@redis02:~# bash test03.sh
+a
+11:54:57 root@redis02:~#
+```
+📌 特点：
+- 最简洁、最常用
+- 自动从下标 `0` 开始
+### 5.2.2 指定下标赋值
+📌 特点：
+- 下标可不连续
+- 适合动态赋值
+```bash
+11:56:15 root@redis02:~# cat test03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+arr[0]=apple
+arr[1]=banana
+arr[2]=orange
+arr[10]=grape
+
+echo "${arr[10]}"
+11:56:16 root@redis02:~# bash test03.sh
+grape
+11:56:18 root@redis02:~#
+```
+### 5.2.3 使用命令替换生成数组
+```bash
+11:58:00 root@redis02:~# cat test03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+files=($(ls))
+echo "${files[0]}"
+11:58:01 root@redis02:~# ls
+aa.sh  init.sh  test02.sh  test03.sh  test.sh
+11:58:03 root@redis02:~# bash test03.sh 
+aa.sh
+11:58:07 root@redis02:~# 
+```
+📌 说明：
+- 每个“空格分隔项”作为数组元素
+- 对空格敏感
+
+⚠️ **风险**：
+- 文件名包含空格会被拆分
+
+✔ 更安全的写法（推荐）：
+```bash
+11:58:56 root@redis02:~# cat test03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+mapfile -t files < <(ls)
+echo "${files[1]}"
+11:58:57 root@redis02:~# bash test03.sh
+init.sh
+11:59:00 root@redis02:~#
+```
+### 5.2.4 使用 read 定义数组
