@@ -7501,7 +7501,65 @@ systemctl start dsdasd
 ```
 ### 5.6.6 信息收集
 ```bash
+18:18:35 root@redis02:~# cat info.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: info.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
 
+# =======================================
+# CPU Load 监控脚本
+# 功能：获取 CPU Load 1/5/15分钟的负载，并根据阈值进行告警。
+# 使用关联数组和索引数组来实现负载管理。
+# =======================================
+
+# 1. 定义阈值 (可以根据实际情况调整)
+HIGH_LOAD_THRESHOLD=1.00  # 当负载大于此值时发送告警
+ALERT_EMAIL="admin@example.com"  # 假设需要发送邮件给管理员
+
+# 2. 定义索引数组：表示不同时间的负载
+periods=("1min" "5min" "15min")
+
+# 3. 定义关联数组：映射周期到数组中的下标
+declare -A index_map=(
+    [1min]=0
+    [5min]=1
+    [15min]=2
+)
+
+# 4. 获取系统的 CPU load（1/5/15分钟）
+loads=($(uptime | awk -F'load average: ' '{print $2}' | tr ',' ' '))
+
+# 5. 输出当前 CPU Load 和检查是否超过阈值
+echo "当前系统负载："
+for p in "${periods[@]}"; do
+    idx=${index_map[$p]}
+    load="${loads[$idx]}"
+
+    # 打印 CPU 负载
+    printf "CPU %-5s 平均负载为: %.2f\n" "$p" "$load"
+
+    # 检查是否超过负载阈值
+    if (( $(echo "$load > $HIGH_LOAD_THRESHOLD" | bc -l) )); then
+        echo "警告: $p 负载超出阈值！当前负载为 $load"
+        # 如果负载超过阈值，发送告警邮件（此处使用 mail 命令，确保系统已配置邮件服务）
+        echo "CPU $p 负载已达到 $load，请注意检查系统状态。" | mail -s "CPU Load Alert: $p" "$ALERT_EMAIL"
+    fi
+done
+
+# 6. 返回 0 表示脚本成功执行
+exit 0
+
+18:18:36 root@redis02:~# bash info.sh
+当前系统负载：
+CPU 1min  平均负载为: 0.03
+CPU 5min  平均负载为: 0.02
+CPU 15min 平均负载为: 0.00
 ```
 ## 5.7 数组操作速查总表
 |需求|推荐写法|
