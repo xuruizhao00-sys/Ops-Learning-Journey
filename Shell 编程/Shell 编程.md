@@ -7258,5 +7258,90 @@ aaaa b c d e aaa
 - 下标不存在 → 自动新增
 #### 5.5.1.2 追加元素
 ```bash
-
+17:43:56 root@redis02:~# echo "${arr[@]}"
+aaaa b c d e aaa
+17:50:46 root@redis02:~# arr+=(g h)
+17:50:54 root@redis02:~# echo "${arr[@]}"
+aaaa b c d e aaa g h
+17:50:55 root@redis02:~# 
 ```
+#### 5.5.1.3 批量修改
+```bash
+17:52:22 root@redis02:~# cat demo02.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+arr=(a b c d)
+for i in "${!arr[@]}"; do
+    arr[$i]="${arr[$i]}_new"
+done
+echo "${arr[@]}"
+17:52:23 root@redis02:~# bash demo02.sh
+a_new b_new c_new d_new
+17:52:25 root@redis02:~# 
+```
+### 5.5.2 数据的删除操作
+#### 5.5.2.1 删除指定元素
+```bash
+17:53:19 root@redis02:~# echo "${arr[@]}"
+aaaa b c d e aaa g h
+17:53:23 root@redis02:~# unset arr[1]
+17:53:26 root@redis02:~# echo "${arr[@]}"
+aaaa c d e aaa g h
+17:53:27 root@redis02:~# 
+```
+⚠ 注意：
+- **不会自动重排下标**
+```bash
+17:53:27 root@redis02:~# arr=(x y z)
+17:53:59 root@redis02:~# unset arr[1]
+17:54:13 root@redis02:~# echo "${!arr[@]}"
+0 2
+17:54:23 root@redis02:~# echo "${arr[1]}"
+
+17:54:35 root@redis02:~# echo "${arr[0]}"
+x
+17:54:37 root@redis02:~# echo "${arr[2]}"
+z
+17:54:39 root@redis02:~# 
+```
+#### 5.5.2.2 删除整个数组
+```bash
+unset arr
+```
+#### 5.5.2.3 删除后重新整理下标（技巧）
+```bash
+17:55:12 root@redis02:~# arr=(x y z)
+17:55:50 root@redis02:~# unset arr[1]
+17:55:56 root@redis02:~# echo "${!arr[@]}"
+0 2
+17:56:10 root@redis02:~# arr=("${arr[@]}")
+17:56:25 root@redis02:~# echo "${!arr[@]}"
+0 1
+17:56:28 root@redis02:~# 
+```
+### 5.5.3 数组切片
+#### 5.5.3.1 基本切片语法
+```bash
+${arr[@]:起始位置:长度}
+```
+#### 5.5.3.2 示例
+```bash
+17:56:28 root@redis02:~# arr=(a b c d e f)
+17:57:31 root@redis02:~# echo "${arr[@]:1:3}"
+b c d
+17:57:43 root@redis02:~# echo "${arr[@]:2}"
+c d e f
+17:58:11 root@redis02:~# 
+```
+
+|场景|示例|
+|---|---|
+|跳过前 N 个|`${arr[@]:N}`|
+|取子集|`${arr[@]:start:len}`|
