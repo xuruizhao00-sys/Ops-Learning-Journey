@@ -6860,3 +6860,67 @@ init.sh
 11:59:00 root@redis02:~#
 ```
 ### 5.2.4 使用 read 定义数组
+```bash
+13:12:59 root@redis02:~# cat test04.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+read -p "请输入多个值："  -a arr
+echo "${arr[0]}"
+13:13:00 root@redis02:~# bash test04.sh
+请输入多个值：a b c d
+a
+13:13:05 root@redis02:~# 
+```
+### 5.2.5 通过变量扩展定义数组
+==将已有变量转为数组==
+```bash
+13:14:25 root@redis02:~# cat test04.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+str="a b c"
+arr=($str)
+echo "${arr[0]}"
+13:14:26 root@redis02:~# bash test04.sh
+a
+13:14:29 root@redis02:~#
+```
+### 5.2.6 使用 declare 明确定义数组
+📌 作用：
+- 明确变量类型
+- 提高脚本可读性
+```bash
+declare -a arr
+arr=(x y z)
+```
+### 5.2.7 定义关联数组（扩展）
+```bash
+declare -A user
+user[name]="tom"
+user[age]=18
+```
+📌 特点：
+- 下标是字符串
+- Bash 4.0+ 支持
+### 5.2.8 总结
+|定义方式|示例|适用场景|
+|---|---|---|
+|直接赋值|`arr=(a b c)`|固定数据|
+|下标赋值|`arr[0]=a`|动态赋值|
+|命令替换|`arr=($(cmd))`|命令结果|
+|read 输入|`read -a arr`|用户输入|
+|declare|`declare -a arr`|明确类型|
+|关联数组|`declare -A arr`|键值对|
