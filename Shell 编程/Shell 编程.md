@@ -8103,5 +8103,38 @@ for item in "${array[@]}"; do
 done
 ```
 ```bash
+13:43:00 root@redis02:~# cat test10.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test10.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 定义一个数组
+fruits=("apple" "banana" "cherry" "date")
 
+# 遍历数组中的元素
+for fruit in "${fruits[@]}"; do
+    echo "水果是: $fruit"
+done
+
+13:43:01 root@redis02:~# bash test10.sh
+水果是: apple
+水果是: banana
+水果是: cherry
+水果是: date
+13:43:04 root@redis02:~# 
 ```
+##### 6.1.1.2.4 总结
+| 生成方式                      | 描述                                   | 示例代码                                               |
+| ------------------------- | ------------------------------------ | -------------------------------------------------- |
+| 基本数字范围 `{start..end}`     | 生成从 `start` 到 `end` 的数字列表            | `for i in {1..5}; do ... done`                     |
+| 数字范围 `{start..end..step}` | 生成带步长的数字列表                           | `for i in {1..10..2}; do ... done`                 |
+| `seq` 命令生成列表              | 使用 `seq` 命令生成从 `start` 到 `end` 的数字范围 | `for num in $(seq 1 1 5); do ... done`             |
+| 文件列表 `*`                  | 生成指定目录下的文件列表                         | `for file in *; do ... done`                       |
+| 数组生成列表                    | 使用数组的元素生成列表                          | `for item in "${arr[@]}"; do ... done`             |
+| 命令输出生成列表                  | 使用命令输出的结果生成列表                        | `for file in $(ls); do ... done`                   |
+| `find` 命令生成列表             | 使用 `find` 命令查找符合条件的文件生成列表            | `for file in $(find . -name "*.txt"); do ... done` |

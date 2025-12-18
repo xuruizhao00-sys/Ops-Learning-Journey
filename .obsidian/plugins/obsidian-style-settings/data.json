@@ -22,6 +22,6 @@
   "blue-topaz-theme@@table-style-options": "table-style-default",
   "blue-topaz-theme@@full-width-table": false,
   "blue-topaz-theme@@toggle-table-transition": true,
-  "blue-topaz-theme@@table-format-options": "no-wrapped-table-cell",
+  "blue-topaz-theme@@table-format-options": "no-wrapped-table",
   "blue-topaz-theme@@show-border-table": false
 }
