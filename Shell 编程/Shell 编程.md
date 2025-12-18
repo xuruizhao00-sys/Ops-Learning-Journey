@@ -8426,4 +8426,33 @@ done
 - 如果备份成功，记录到日志文件。如果失败，发送邮件通知管理员。
 - 每 24 小时执行一次备份任务
 ### 6.2.3 until 循环
-until 命令本质上与 while 循环一致，区别在于 until 走循环之前会对输入的值进行条件判断，如果不满足条件的话，才会进入到循环体中执行对应的语句，否则的话就退出循环。
+`until` 循环是另一种用于循环执行命令的控制结构，它与 `while` 循环类似，但有一个关键的区别：`until` 循环会在条件为 **假** 时继续执行，直到条件变为 **真** 为止。
+#### 6.2.3.1 语法结构
+```bash
+until [ condition ]
+do
+    # 执行的命令
+done
+```
+- `condition` 是条件表达式。
+- `until` 循环会一直执行循环体内的命令，直到 `condition` 为 **真**。
+- 只有在 `condition` 为 **假** 时，`until` 循环才会继续执行。
+#### 6.2.3.2  `until` 循环与 `while` 循环的对比
+- `while` 循环：在条件为 **真** 时，执行循环体，条件变为 **假** 时退出。
+- `until` 循环：在条件为 **假** 时，执行循环体，条件变为 **真** 时退出。
+```bash
+# while 循环示例
+counter=1
+while [ $counter -le 5 ]; do
+    echo "数字是: $counter"
+    ((counter++))
+done
+
+# until 循环示例
+counter=1
+until [ $counter -gt 5 ]; do
+    echo "数字是: $counter"
+    ((counter++))
+done
+```
+在这两个例子中，`while` 和 `until` 循环的执行效果相同，但它们的条件判断方式不同。`while` 只要条件为真就执行，而 `until` 只要条件为假就执行。
