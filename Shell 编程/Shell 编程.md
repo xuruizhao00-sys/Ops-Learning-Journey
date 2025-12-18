@@ -7651,10 +7651,279 @@ fi
 ##### 6.1.1.3.3 `(( cmd ))`
 代替 let 命令来测试数值表达式
 #### 6.1.1.4 单路分支实践
+```bash
+13:12:52 root@redis02:~# cat test01.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test01.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 获取用户输入的数字
+echo "请输入一个数字:"
+read num
 
+# 判断数字是否大于10
+if [ $num -gt 10 ]; then
+    echo "数字大于 10"
+fi
+
+13:12:53 root@redis02:~# bash test01.sh
+请输入一个数字:
+123
+数字大于 10
+13:12:59 root@redis02:~# 
+```
+<mark style="background: #FFB8EBA6;">解释：</mark>
+- `if` 语句判断 `$num` 是否大于 10。
+- 如果条件为真，输出 "数字大于 10"；否则，不执行任何操作。
 #### 6.1.1.5 双路分支实践
+```bash
+13:13:41 root@redis02:~# cat test02.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test02.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
 
+# 获取用户输入的数字
+echo "请输入一个数字:"
+read num
+
+# 判断数字是否大于10
+if [ $num -gt 10 ]; then
+    echo "数字大于 10"
+else
+    echo "数字小于或等于 10"
+fi
+
+13:13:43 root@redis02:~# bash test02.sh
+请输入一个数字:
+4342432432
+数字大于 10
+13:13:48 root@redis02:~# bash test02.sh
+请输入一个数字:
+10
+数字小于或等于 10
+13:13:53 root@redis02:~#
+```
+<mark style="background: #ADCCFFA6;">解释：</mark>
+- `if` 语句判断 `$num` 是否大于 10。
+- 如果条件为真，输出 "数字大于 10"。
+- 如果条件为假，输出 "数字小于或等于 10"。
 #### 6.1.1.6 多路分支实践
+```bash
+13:14:26 root@redis02:~# cat test03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
 
+# 获取用户输入的数字
+echo "请输入一个数字:"
+read num
+
+# 多路分支判断数字的范围
+if [ $num -gt 10 ]; then
+    echo "数字大于 10"
+elif [ $num -eq 10 ]; then
+    echo "数字等于 10"
+else
+    echo "数字小于 10"
+fi
+13:14:27 root@redis02:~# bash test03.sh
+请输入一个数字:
+3
+数字小于 10
+13:14:30 root@redis02:~# 
+```
+<mark style="background: #FFF3A3A6;">解释：</mark>
+- 使用 `if-elif-else` 语句来处理多个判断条件。
+- 根据输入的数字判断其是大于、等于还是小于 10。
 #### 6.1.1.7 if 总结实践
+<mark style="background: #ABF7F7A6;">需求：</mark>
+我们有一组数字，要求：
+1. 判断每个数字是奇数还是偶数。
+2. 判断数字是否大于 50。
+3. 输出符合条件的数字。
+```bash
+13:18:00 root@redis02:~# cat test04.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 定义一个数字数组
+numbers=(12 25 48 53 76 33 17 8 91 60)
+
+# 遍历数字数组
+for num in "${numbers[@]}"; do
+    # 判断是否大于 50
+    if [ $num -gt 50 ]; then
+        echo "$num 是大于 50 的数字"
+
+    # 判断是否是偶数
+    elif [ $((num % 2)) -eq 0 ]; then
+        echo "$num 是偶数"
+
+    # 判断是否是奇数
+    else
+        echo "$num 是奇数"
+    fi
+done
+
+
+13:18:01 root@redis02:~# bash test04.sh
+12 是偶数
+25 是奇数
+48 是偶数
+53 是大于 50 的数字
+76 是大于 50 的数字
+33 是奇数
+17 是奇数
+8 是偶数
+91 是大于 50 的数字
+60 是大于 50 的数字
+13:18:02 root@redis02:~#
+```
+
+|分支类型|语法结构|示例代码|
+|---|---|---|
+|单路分支|`if [ condition ]; then ... fi`|`if [ $num -gt 10 ]; then ... fi`|
+|双路分支|`if [ condition ]; then ... else ... fi`|`if [ $num -gt 10 ]; then ... else ... fi`|
+|多路分支|`if [ condition ]; then ... elif ... else ... fi`|`if [ $num -gt 10 ]; then ... elif ... fi`|
+|总结实践|综合应用多个 `if` 条件判断|`if [ $age -ge 18 ]; then ... fi`|
+### 6.1.2 case 
+case 命令是一个多路分支的命令，它可以来代替 if/elif 相关的命令，在 case 语句中，它通过引入一个变量接收用户输入的数据，然后依次与相关的值进行匹配判断，一旦找到对应的匹配值后，就执行相关的语句。
+#### 6.1.2.1 case 语法
+```bash
+case "$variable" in
+    pattern1)
+        # 如果变量匹配 pattern1，执行此部分代码
+        ;;
+    pattern2)
+        # 如果变量匹配 pattern2，执行此部分代码
+        ;;
+    *)
+        # 如果没有匹配到任何模式，执行此部分代码
+        ;;
+esac
+```
+- `case` 语句用于根据变量的值进行模式匹配。
+- `"$variable"` 是要检查的变量。
+- `pattern1`, `pattern2`, 等是待匹配的模式，可以是字符串、正则表达式等。
+- `;;` 用来标记每个模式的结束。
+- `*` 是通配符，表示所有其他未匹配的情况
+#### 6.1.2.2 示例
+```bash
+13:23:31 root@redis02:~# cat test05.sh 
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 服务名
+SERVICE_NAME="myservice"
+
+# 打印帮助信息
+print_help() {
+    echo "Usage: $0 {start|stop|restart|status}"
+    echo "start   - 启动服务"
+    echo "stop    - 停止服务"
+    echo "restart - 重启服务"
+    echo "status  - 查看服务状态"
+}
+
+# 检查服务是否正在运行
+check_service_status() {
+    systemctl is-active --quiet $SERVICE_NAME
+    return $?  # 0表示服务正在运行，非0表示服务没有运行
+}
+
+# 启动服务
+start_service() {
+    echo "启动服务 $SERVICE_NAME ..."
+    systemctl start $SERVICE_NAME
+    if [ $? -eq 0 ]; then
+        echo "服务 $SERVICE_NAME 已启动"
+    else
+        echo "启动服务 $SERVICE_NAME 失败"
+    fi
+}
+
+# 停止服务
+stop_service() {
+    echo "停止服务 $SERVICE_NAME ..."
+    systemctl stop $SERVICE_NAME
+    if [ $? -eq 0 ]; then
+        echo "服务 $SERVICE_NAME 已停止"
+    else
+        echo "停止服务 $SERVICE_NAME 失败"
+    fi
+}
+
+# 重启服务
+restart_service() {
+    echo "重启服务 $SERVICE_NAME ..."
+    systemctl restart $SERVICE_NAME
+    if [ $? -eq 0 ]; then
+        echo "服务 $SERVICE_NAME 已重启"
+    else
+        echo "重启服务 $SERVICE_NAME 失败"
+    fi
+}
+
+# 查看服务状态
+status_service() {
+    if check_service_status; then
+        echo "服务 $SERVICE_NAME 正在运行"
+    else
+        echo "服务 $SERVICE_NAME 没有运行"
+    fi
+}
+
+# 解析用户输入的命令
+case "$1" in
+    start)
+        start_service
+        ;;
+    stop)
+        stop_service
+        ;;
+    restart)
+        restart_service
+        ;;
+    status)
+        status_service
+        ;;
+    *)
+        print_help
+        ;;
+esac
+```
 ## 6.2 循环逻辑
+### 6.2.1 for 循环
+生产工作中，我们有可能会遇到一种场景，需要重复性的执行相同的动作，我们在 shell 编程的过程中，我们可以借助于循环逻辑的方法来进行处理。
+![](assets/Shell%20编程/file-20251218132644116.png)
