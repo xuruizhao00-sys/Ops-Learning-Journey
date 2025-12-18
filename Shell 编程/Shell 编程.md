@@ -7927,3 +7927,11 @@ esac
 ### 6.2.1 for 循环
 生产工作中，我们有可能会遇到一种场景，需要重复性的执行相同的动作，我们在 shell 编程的过程中，我们可以借助于循环逻辑的方法来进行处理。
 ![](assets/Shell%20编程/file-20251218132644116.png)
+#### 6.2.1.1 for 循环语法
+```bash
+for variable in value1 value2 value3 ...; do
+    # 执行的代码
+done
+```
+- `variable` 是用来依次获取 `value1`, `value2`, `value3` 等的变量。
+- `value1`, `value2`, `value3` 是循环中每次迭代时给 `variable` 赋的值。
