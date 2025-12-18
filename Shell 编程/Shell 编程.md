@@ -8532,4 +8532,5 @@ done
 
 echo "程序结束！"
 ```
-### 6.2.4 循环控制`break continue` 
+### 6.2.4 循环控制`break continue`
+在 Shell 脚本中，`break` 和 `continue` 是两个用于控制循环流的关键字。它们通常与 `for`、`while` 或 `until` 循环一起使用，能够帮助我们更精确地控制循环的执行。
