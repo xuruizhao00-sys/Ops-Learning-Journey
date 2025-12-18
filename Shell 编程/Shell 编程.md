@@ -8456,3 +8456,72 @@ until [ $counter -gt 5 ]; do
 done
 ```
 在这两个例子中，`while` 和 `until` 循环的执行效果相同，但它们的条件判断方式不同。`while` 只要条件为真就执行，而 `until` 只要条件为假就执行。
+
+#### 6.2.3.3 `until` 循环的常见示例
+
+##### 6.2.3.3.1 打印从 1 到 5 的数字
+打印从 1 到 5 的数字。
+```bash
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test17.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+counter=1
+
+# 使用 until 循环
+until [ $counter -gt 5 ]; do
+    if [ $counter -eq 3 ]; then
+        echo "达到了计数值 3，退出循环"
+        break
+    fi
+    echo "数字是: $counter"
+    ((counter++))
+done
+```
+---
+
+##### 6.2.3.3.2 用户输入条件判断
+不断读取用户输入，直到输入 "exit" 时退出。
+```bash
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test17.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+```
+
+### 4.3 示例 3：文件存在检查
+
+#### 需求：
+
+检查文件是否存在，直到文件存在为止，每隔 5 秒检查一次。
+
+`#!/bin/bash  # 文件路径 FILE="/path/to/file.txt"  # 使用 until 循环检查文件是否存在 until [ -f "$FILE" ]; do     echo "文件 $FILE 不存在，等待 5 秒..."     sleep 5 done  echo "文件已找到！"`
+
+#### 输出：
+
+`文件 /path/to/file.txt 不存在，等待 5 秒... 文件 /path/to/file.txt 不存在，等待 5 秒... 文件已找到！`
+
+---
+
+### 4.4 示例 4：监控系统磁盘空间
+
+#### 需求：
+
+监控系统磁盘空间，直到某个分区的使用率低于指定阈值。
+
+`#!/bin/bash  # 磁盘分区路径 PARTITION="/dev/sda1" THRESHOLD=80  # 使用 until 循环监控磁盘使用率 until [ $(df $PARTITION | awk 'NR==2 {print $5}' | sed 's/%//') -lt $THRESHOLD ]; do     echo "$(date): $PARTITION 使用率超过 $THRESHOLD%，等待 5 分钟..."     sleep 300  # 每 5 分钟检查一次 done  echo "$(date): $PARTITION 使用率已低于 $THRESHOLD%，继续正常运行"`
+
+#### 输出：
+
+`Tue Dec 17 12:00:00 2025: /dev/sda1 使用率超过 80%，等待 5 分钟... Tue Dec 17 12:05:00 2025: /dev/sda1 使用率已低于 80%，继续正常运行`
