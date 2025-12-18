@@ -8007,6 +8007,59 @@ done
 偶数是: 10
 13:35:59 root@redis02:~#
 ```
+###### 6.1.1.2.1.3 使用`seq`生成列表
+`seq` 命令可以生成指定范围内的数字列表，它允许更灵活地控制步长，生成的列表可以直接在 `for` 循环中使用。
+```bash
+for i in $(seq start step end); do
+    # 执行的代码
+done
+```
+- `seq start end` 用于生成从 `start` 到 `end` 的数字列表。
+- `seq start step end` 用于生成带步长的数字列表。
+```bash
+13:40:45 root@redis02:~# cat test09.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test09.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 使用 seq 生成从 1 到 5 的数字列表
+for num in $(seq 1 1 5); do
+    echo "数字是: $num"
+done
+
+13:40:46 root@redis02:~# bash test09.sh
+数字是: 1
+数字是: 2
+数字是: 3
+数字是: 4
+数字是: 5
+13:40:48 root@redis02:~# vim test09.sh
+13:40:57 root@redis02:~# cat test09.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test09.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 使用 seq 生成从 1 到 5 的数字列表
+for num in $(seq 1 2 5); do
+    echo "数字是: $num"
+done
+
+13:40:58 root@redis02:~# bash test09.sh
+数字是: 1
+数字是: 3
+数字是: 5
+13:41:00 root@redis02:~#
+```
 ##### 6.1.1.2.2 生成文件列表
 ###### 6.1.1.2.2.1 使用通配符（`*`）生成文件列表
 Shell 中的通配符可以用来匹配指定模式的文件，`for` 循环可以用来遍历匹配的文件列表。
