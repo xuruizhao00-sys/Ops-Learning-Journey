@@ -8497,31 +8497,39 @@ done
 # v: LnxGuru
 # GitHub: xuruizhao00-sys
 # ==============================================================================
+# 提示用户输入
+echo "请输入命令 (输入 'exit' 退出)："
 
+# 使用 until 循环等待用户输入
+until [ "$input" == "exit" ]; do
+    read input
+    echo "你输入的是: $input"
+done
+
+echo "程序结束！"
 ```
 
-### 4.3 示例 3：文件存在检查
-
-#### 需求：
-
-检查文件是否存在，直到文件存在为止，每隔 5 秒检查一次。
-
-`#!/bin/bash  # 文件路径 FILE="/path/to/file.txt"  # 使用 until 循环检查文件是否存在 until [ -f "$FILE" ]; do     echo "文件 $FILE 不存在，等待 5 秒..."     sleep 5 done  echo "文件已找到！"`
-
-#### 输出：
-
-`文件 /path/to/file.txt 不存在，等待 5 秒... 文件 /path/to/file.txt 不存在，等待 5 秒... 文件已找到！`
-
----
-
-### 4.4 示例 4：监控系统磁盘空间
-
-#### 需求：
-
+##### 6.2.3.3.3 监控系统磁盘空间
 监控系统磁盘空间，直到某个分区的使用率低于指定阈值。
+```bash
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test17.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 提示用户输入
+echo "请输入命令 (输入 'exit' 退出)："
 
-`#!/bin/bash  # 磁盘分区路径 PARTITION="/dev/sda1" THRESHOLD=80  # 使用 until 循环监控磁盘使用率 until [ $(df $PARTITION | awk 'NR==2 {print $5}' | sed 's/%//') -lt $THRESHOLD ]; do     echo "$(date): $PARTITION 使用率超过 $THRESHOLD%，等待 5 分钟..."     sleep 300  # 每 5 分钟检查一次 done  echo "$(date): $PARTITION 使用率已低于 $THRESHOLD%，继续正常运行"`
+# 使用 until 循环等待用户输入
+until [ "$input" == "exit" ]; do
+    read input
+    echo "你输入的是: $input"
+done
 
-#### 输出：
-
-`Tue Dec 17 12:00:00 2025: /dev/sda1 使用率超过 80%，等待 5 分钟... Tue Dec 17 12:05:00 2025: /dev/sda1 使用率已低于 80%，继续正常运行`
+echo "程序结束！"
+```
+### 6.2.4 循环控制`break continue` 
