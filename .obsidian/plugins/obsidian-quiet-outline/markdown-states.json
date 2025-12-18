@@ -3,12 +3,12 @@
     "scroll": 8816.607981220657,
     "cursor": {
       "from": {
-        "line": 8829,
-        "ch": 69
+        "line": 8835,
+        "ch": 18
       },
       "to": {
-        "line": 8829,
-        "ch": 69
+        "line": 8835,
+        "ch": 18
       }
     },
     "expandedKeys": [
@@ -225,6 +225,20 @@
     ]
   },
   "字符串表达式.md": {
+    "scroll": 0,
+    "cursor": {
+      "from": {
+        "line": 0,
+        "ch": 0
+      },
+      "to": {
+        "line": 0,
+        "ch": 0
+      }
+    },
+    "expandedKeys": []
+  },
+  "MySQL/Untitled.md": {
     "scroll": 0,
     "cursor": {
       "from": {
