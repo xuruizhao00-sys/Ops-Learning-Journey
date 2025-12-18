@@ -7935,3 +7935,12 @@ done
 ```
 - `variable` 是用来依次获取 `value1`, `value2`, `value3` 等的变量。
 - `value1`, `value2`, `value3` 是循环中每次迭代时给 `variable` 赋的值。
+```bash
+for variable in {start..end}; do
+    # 执行的代码
+done
+```
+- `{start..end}` 是一个数字范围，从 `start` 开始，到 `end` 结束（包括 `end`）。
+- 这种语法适用于生成数字序列。
+#### 6.1.1.2 for 循环中列表生成
+##### 6.
