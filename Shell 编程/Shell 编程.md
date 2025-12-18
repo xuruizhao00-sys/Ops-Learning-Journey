@@ -8138,3 +8138,76 @@ done
 | 数组生成列表                    | 使用数组的元素生成列表                          | `for item in "${arr[@]}"; do ... done`             |
 | 命令输出生成列表                  | 使用命令输出的结果生成列表                        | `for file in $(ls); do ... done`                   |
 | `find` 命令生成列表             | 使用 `find` 命令查找符合条件的文件生成列表            | `for file in $(find . -name "*.txt"); do ... done` |
+#### 6.1.1.3 生产案例
+##### 6.1.1.3.1 批量备份文件
+定期备份某个目录下的所有文件，并将备份存储到另一个目录。
+```bash
+16:47:00 root@redis02:~# cat test11.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test11.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 源目录和目标备份目录
+SOURCE_DIR="/var/www/html"
+BACKUP_DIR="/backup/www"
+
+# 创建备份目录（如果不存在）
+mkdir -p $BACKUP_DIR
+
+# 当前时间戳，用于备份文件夹命名
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# 遍历源目录中的所有文件并复制到备份目录
+for file in $SOURCE_DIR/*; do
+    cp -r $file $BACKUP_DIR/$(basename $file)_$TIMESTAMP
+    echo "已备份: $file"
+done
+
+echo "备份完成！"
+```
+说明：
+- 使用 `for` 循环遍历源目录下的所有文件。
+- 每个文件被复制到备份目录，并在文件名中加上时间戳。
+- 可以根据需要调整文件或目录结构，定期执行该脚本进行备份。
+##### 6.1.1.3.2 批量处理日志文件
+从多个日志文件中提取特定信息并生成汇总报告。
+```bash
+16:48:10 root@redis02:~# cat test12.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test12.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 日志目录和汇总文件
+LOG_DIR="/var/log"
+REPORT_FILE="/var/reports/log_summary.txt"
+
+# 创建汇总文件（如果不存在）
+touch $REPORT_FILE
+echo "日志汇总报告" > $REPORT_FILE
+echo "====================" >> $REPORT_FILE
+
+# 遍历日志目录中的所有日志文件
+for log_file in $LOG_DIR/*.log; do
+    echo "正在处理日志: $log_file"
+
+    # 从日志文件中提取错误信息并添加到报告
+    grep "ERROR" $log_file >> $REPORT_FILE
+    echo "====================" >> $REPORT_FILE
+done
+
+echo "日志汇总完成，报告已生成：$REPORT_FILE"
+```
+##### 6.1.1.3.3 批量处理过期文件
+```bash
+
+```

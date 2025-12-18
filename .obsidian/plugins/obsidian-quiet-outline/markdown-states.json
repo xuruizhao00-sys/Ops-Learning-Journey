@@ -1,14 +1,14 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 8126.106434155141,
+    "scroll": 8188.891414141414,
     "cursor": {
       "from": {
-        "line": 8140,
-        "ch": 0
+        "line": 8210,
+        "ch": 7
       },
       "to": {
-        "line": 8140,
-        "ch": 0
+        "line": 8210,
+        "ch": 7
       }
     },
     "expandedKeys": [
@@ -61,7 +61,8 @@
       "item-3-532",
       "item-4-534",
       "item-5-535",
-      "item-5-539"
+      "item-5-539",
+      "item-4-542"
     ]
   },
   "Python/python.md": {
