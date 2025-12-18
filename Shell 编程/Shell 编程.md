@@ -7984,5 +7984,62 @@ done
 ```
 
 ```bash
+13:35:56 root@redis02:~# cat test07.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test07.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 输出从 1 到 10 的偶数
+for num in {2..10..2}; do
+    echo "偶数是: $num"
+done
 
+13:35:57 root@redis02:~# bash test07.sh
+偶数是: 2
+偶数是: 4
+偶数是: 6
+偶数是: 8
+偶数是: 10
+13:35:59 root@redis02:~#
+```
+##### 6.1.1.2.2 生成文件列表
+###### 6.1.1.2.2.1 使用通配符（`*`）生成文件列表
+Shell 中的通配符可以用来匹配指定模式的文件，`for` 循环可以用来遍历匹配的文件列表。
+```bash
+for file in /path/to/directory/*; do
+    # 执行的代码
+done
+```
+
+```bash
+13:37:21 root@redis02:~# cat test08.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test08.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 遍历当前目录下的所有文件
+for file in *; do
+    echo "文件名: $file"
+done
+
+13:37:22 root@redis02:~# bash test08.sh
+文件名: test01.sh
+文件名: test02.sh
+文件名: test03.sh
+文件名: test04.sh
+文件名: test05.sh
+文件名: test06.sh
+文件名: test07.sh
+文件名: test08.sh
+13:37:24 root@redis02:~# 
 ```
