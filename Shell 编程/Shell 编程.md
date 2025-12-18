@@ -7943,4 +7943,46 @@ done
 - `{start..end}` 是一个数字范围，从 `start` 开始，到 `end` 结束（包括 `end`）。
 - 这种语法适用于生成数字序列。
 #### 6.1.1.2 for 循环中列表生成
-##### 6.
+##### 6.1.1.2.1 基本数字方式生成
+###### 6.1.1.2.1.1  使用花括号 `{start..end}` 创建数字范围
+Shell 中使用花括号 `{start..end}` 可以轻松生成一个数字范围。生成的数字会按照升序顺序从 `start` 到 `end` 逐个列出。
+```bash
+for i in {start..end}; do
+    # 执行的代码
+done
+```
+```bash
+13:35:02 root@redis02:~# cat test06.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test06.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 输出从 1 到 5 的数字
+for num in {1..5}; do
+    echo "数字是: $num"
+done
+
+13:35:03 root@redis02:~# bash test06.sh
+数字是: 1
+数字是: 2
+数字是: 3
+数字是: 4
+数字是: 5
+13:35:04 root@redis02:~# 
+```
+###### 6.1.1.2.1.2 使用步长 `{start..end..step}` 创建带步长的数字范围
+除了 `start` 和 `end`，你还可以指定一个步长（`step`），用来决定每次循环的数字增量。
+```bash
+for i in {start..end..step}; do
+    # 执行的代码
+done
+```
+
+```bash
+
+```
