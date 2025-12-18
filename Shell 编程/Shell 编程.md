@@ -8208,6 +8208,222 @@ done
 echo "日志汇总完成，报告已生成：$REPORT_FILE"
 ```
 ##### 6.1.1.3.3 批量处理过期文件
+定期清理过期的文件，例如删除日志目录下 30 天前的文件。
 ```bash
+16:59:06 root@redis02:~# cat test13.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test13.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
 
+# 日志目录
+LOG_DIR="/var/log"
+
+# 清理过期文件的时间（30 天）
+DAYS=30
+
+# 遍历日志目录中的文件
+for file in $LOG_DIR/*; do
+    # 检查文件是否已超过指定天数
+    if [[ $(find $file -mtime +$DAYS -print) ]]; then
+        rm -f $file
+        echo "已删除过期文件: $file"
+    fi
+done
+
+echo "过期文件清理完成！"
 ```
+##### 6.1.1.3.4 批量处理数据库备份
+定期备份多个数据库，并将备份文件保存到指定目录。
+```bash
+17:00:43 root@redis02:~# cat test14.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test14.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 数据库信息
+DBS=("db1" "db2" "db3")
+BACKUP_DIR="/backups/db"
+
+# 当前时间戳，用于备份文件命名
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# 遍历数据库列表进行备份
+for db in "${DBS[@]}"; do
+    echo "正在备份数据库: $db..."
+
+    # 使用 mysqldump 进行数据库备份
+    mysqldump -u root -p'password' $db > $BACKUP_DIR/$db-$TIMESTAMP.sql
+
+    if [ $? -eq 0 ]; then
+        echo "数据库 $db 备份成功"
+    else
+        echo "数据库 $db 备份失败"
+    fi
+done
+
+echo "所有数据库备份完成！"
+```
+<mark style="background: #BBFABBA6;">说明：</mark>
+- 使用 `mysqldump` 命令备份多个数据库，并将备份文件保存到指定目录。
+- 每个备份文件使用当前时间戳来命名，避免文件覆盖。
+### 6.2.2 while 循环
+while 命令有点像 if/then 和 for 循环之间的结合，while 走循环之前会对输入的值进行条件判断，如果满足条件的话，才会进入到循环体中执行对应的语句，否则的话就退出循环。
+#### 6.2.2.1 while 语法解析
+##### 6.2.2.1.1 基本语法
+```bash
+while [ condition ]
+do
+    # 执行的命令
+done
+```
+- `condition` 是循环继续执行的条件表达式。
+- 当 `condition` 为 **真** 时，循环继续执行 `do` 和 `done` 之间的命令。
+- 一旦 `condition` 变为 **假**，循环终止。
+##### 6.2.2.1.2 结构说明
+- `while`：定义循环的开始。
+- `[ condition ]`：条件表达式，可以是数字比较、字符串比较或文件检查等。
+- `do`：开始执行循环体。
+- `done`：结束循环体。
+#### 6.2.2.2 while 循环条件
+条件支持的样式 命令、\[\[ 字符串表达式 ]]、(( 数字表达式 ))
+true 是一个特殊的条件，代表条件永远成立
+#### 6.2.2.3 while 实践
+##### 6.2.2.3.1 监控服务状态并自动重启
+定期检查指定服务的状态，如果服务没有运行，则自动重启该服务。
+```bash
+17:07:36 root@redis02:~# cat test15.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test15.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 服务名称
+SERVICE="apache2"
+
+# 重启服务的函数
+restart_service() {
+    echo "$(date): 服务 $SERVICE 未运行，正在重启..."
+    systemctl restart $SERVICE
+    if [ $? -eq 0 ]; then
+        echo "$(date): 服务 $SERVICE 重启成功"
+    else
+        echo "$(date): 服务 $SERVICE 重启失败"
+    fi
+}
+
+# 持续监控服务状态
+while true; do
+    # 检查服务是否正在运行
+    systemctl is-active --quiet $SERVICE
+    if [ $? -ne 0 ]; then
+        # 服务没有运行，进行重启
+        restart_service
+    fi
+    # 每隔 60 秒检查一次
+    sleep 60
+done
+```
+说明：
+- `systemctl is-active --quiet $SERVICE` 用于检查服务是否运行。
+- 如果服务没有运行，调用 `systemctl restart $SERVICE` 重启该服务。
+- `while true` 创建一个无限循环，每隔 60 秒检查一次服务状态。
+##### 6.2.2.3.2 磁盘空间监控
+持续监控服务器的磁盘空间使用情况，当某个磁盘分区使用率超过 90% 时，发送警告邮件给管理员。
+```bash
+17:09:21 root@redis02:~# cat test16.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test16.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 磁盘使用阈值
+THRESHOLD=90
+
+# 持续监控磁盘空间
+while true; do
+    # 获取所有分区的磁盘使用百分比
+    df -h | awk 'NR>1 {print $1 " " $5}' | while read line; do
+        # 提取分区名称和使用百分比
+        PARTITION=$(echo $line | awk '{print $1}')
+        USAGE=$(echo $line | awk '{print $2}' | sed 's/%//')
+
+        # 如果使用率超过阈值，发送邮件通知
+        if [ $USAGE -ge $THRESHOLD ]; then
+            echo "$(date): 磁盘分区 $PARTITION 使用率 $USAGE%，发送警告邮件" | mail -s "磁盘空间警告 - $PARTITION" admin@example.com
+        fi
+    done
+
+    # 每 10 分钟检查一次
+    sleep 600
+done
+
+17:09:22 root@redis02:~#
+```
+说明：
+- 使用 `df -h` 命令获取磁盘使用信息，通过 `awk` 和 `sed` 提取分区和使用百分比。
+- 如果某个分区的使用率超过设定阈值（如 90%），发送警告邮件给管理员。
+- 每 10 分钟检查一次磁盘使用情况。
+##### 6.2.2.3.3 数据库备份监控
+持续监控数据库备份的状态，并在备份失败时发送通知。每当备份任务完成时，记录备份日志。
+```bash
+17:10:41 root@redis02:~# cat test17.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: test17.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 数据库相关信息
+DB_NAME="my_database"
+DB_USER="root"
+DB_PASSWORD="password"
+BACKUP_DIR="/backups"
+LOG_FILE="/var/log/db_backup.log"
+
+# 持续监控数据库备份任务
+while true; do
+    echo "$(date): 开始备份数据库 $DB_NAME ..." >> $LOG_FILE
+
+    # 执行数据库备份
+    mysqldump -u $DB_USER -p$DB_PASSWORD $DB_NAME > $BACKUP_DIR/$DB_NAME-$(date +%Y%m%d%H%M%S).sql
+
+    if [ $? -eq 0 ]; then
+        echo "$(date): 数据库备份成功" >> $LOG_FILE
+    else
+        echo "$(date): 数据库备份失败" >> $LOG_FILE
+        # 发送邮件或通知管理员
+        echo "$(date): 备份失败，发送通知给管理员" | mail -s "数据库备份失败" admin@example.com
+    fi
+
+    # 每 24 小时备份一次
+    sleep 86400
+done
+```
+说明：
+- 使用 `mysqldump` 命令备份数据库。
+- 如果备份成功，记录到日志文件。如果失败，发送邮件通知管理员。
+- 每 24 小时执行一次备份任务
+### 6.2.3 until 循环
+until 命令本质上与 while 循环一致，区别在于 until 走循环之前会对输入的值进行条件判断，如果不满足条件的话，才会进入到循环体中执行对应的语句，否则的话就退出循环。
