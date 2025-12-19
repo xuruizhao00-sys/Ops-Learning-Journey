@@ -201,6 +201,48 @@ MySQL 可以通过多种方式进行安装，具体的安装方式取决于操�
 
 Dec 19 14:27:46 redis02 systemd[1]: Starting mysql.service - MySQL Community Server...
 Dec 19 14:28:29 redis02 systemd[1]: Started mysql.service - MySQL Community Server.
+
+# 安全配置（可选）
+mysql_secure_installation
+
+# 登录 MySQL
+14:48:41 root@redis02:~# mysql
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 13
+Server version: 8.0.44-0ubuntu0.24.04.2 (Ubuntu)
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> select version();
++-------------------------+
+| version()               |
++-------------------------+
+| 8.0.44-0ubuntu0.24.04.2 |
++-------------------------+
+1 row in set (0.01 sec)
+
+mysql> 
+```
+#### 1.5.1.2 在 CentOS/RHEL 上安装 MySQL
+```bash
+# 添加 MySQL 官方仓库
+rpm -Uvh https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+
+# 安装 MySQL 服务器
+yum install mysql-server -y
+
+# 启动 MySQL
+systemctl start mysqld
+systemctl status mysqld
+
+# 安全配置
+mysql_secure_installation
 ```
 
 #### MySQL 安装方式总结
