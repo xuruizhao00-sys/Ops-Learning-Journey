@@ -185,7 +185,22 @@ MySQL 可以通过多种方式进行安装，具体的安装方式取决于操�
 14:15:59 root@redis02:~# apt install mysql-server -y
 
 # 启动 MySQL 服务器
+14:41:04 root@redis02:~# systemctl start mysql
+14:41:11 root@redis02:~# systemctl status  mysql
+● mysql.service - MySQL Community Server
+     Loaded: loaded (/usr/lib/systemd/system/mysql.service; enabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 14:28:29 CST; 12min ago
+    Process: 40016 ExecStartPre=/usr/share/mysql/mysql-systemd-start pre (code=exited, status=0/SUCCESS)
+   Main PID: 40030 (mysqld)
+     Status: "Server is operational"
+      Tasks: 37 (limit: 2210)
+     Memory: 361.6M (peak: 378.7M)
+        CPU: 1min 21.826s
+     CGroup: /system.slice/mysql.service
+             └─40030 /usr/sbin/mysqld
 
+Dec 19 14:27:46 redis02 systemd[1]: Starting mysql.service - MySQL Community Server...
+Dec 19 14:28:29 redis02 systemd[1]: Started mysql.service - MySQL Community Server.
 ```
 
 #### MySQL 安装方式总结
