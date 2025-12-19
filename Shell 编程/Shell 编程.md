@@ -2462,7 +2462,30 @@ unset [选项] 变量名/数组名
 ```
 1. `unset` 可移除普通变量、数组、环境变量，但**无法移除只读变量**；
 2. 移除数组时：`unset 数组名` 移除整个数组，`unset 数组名[索引]` 移除指定元素；
-3. 移除环境变量后，该变量仅在当前 Shell 失效，子 Shell 不受影响。
+3. 移除环境变量后，该变量仅在当前 Shell 失效，已经存在的子 Shell 不受影响，新建的子 shell 无法获取。
+```bash
+bash   new  
+bash  export a=13  father shell  crontab unset age
+|
+|
+\
+ bash .....
+\
+ bash  son shell  当前位置
+
+# crontab
+crontab -e
+* * * * * /bin/bash unset age
+# 使用文件控制变量值
+echo 12 > /tmp/age
+
+while true;do
+	age=$(cat /tmp/age)
+done
+
+* * * * * /bin/bash rm -f /tmp/age
+```
+
 ```bash
 16:13:22 root@redis01:~# cat unset_variable.sh
 #!/bin/bash
