@@ -269,8 +269,34 @@ https://downloads.mysql.com/archives/community/
 root@ubuntu24:~# apt install libaio-dev numactl libnuma-dev libncurses-dev
 ```
 注意：ubuntu24 系统没有 libaio1 的包，需要单独去下载安装
+```bash
+15:17:59 root@redis02:~# curl -O http://launchpadlibrarian.net/646633572/libaio1_0.3.113-4_amd64.deb
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  6520  100  6520    0     0   2829      0  0:00:02  0:00:02 --:--:--  2831
+15:20:17 root@redis02:~# ls
+aa.sh  init.sh  libaio1_0.3.113-4_amd64.deb  test.sh
+15:20:19 root@redis02:~# dpkg -i libaio1_0.3.113-4_amd64.deb 
+Selecting previously unselected package libaio1:amd64.
+(Reading database ... 88359 files and directories currently installed.)
+Preparing to unpack libaio1_0.3.113-4_amd64.deb ...
+Unpacking libaio1:amd64 (0.3.113-4) ...
+Setting up libaio1:amd64 (0.3.113-4) ...
+Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
+```
+###### 1.5.1.2.2.2 用户管理
+创建用户组和用户
+```bash
+15:20:49 root@redis03:~# groupadd -r mysql
+15:21:23 root@redis03:~# useradd -r -g mysql -s /sbin/nologin mysql
+15:21:38 root@redis03:~# getent passwd mysql
+mysql:x:999:988::/home/mysql:/sbin/nologin
+15:21:42 root@redis03:~# 
+```
+###### 1.5.1.2.2.3 MySQL 目录配置
+```bash
 
-
+```
 ##### 1.5.1.2.3 在 Ubuntu 中安装 MySQL9.4.0
 #### MySQL 安装方式总结
 
