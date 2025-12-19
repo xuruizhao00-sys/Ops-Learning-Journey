@@ -500,5 +500,29 @@ mysql>
     - **优点**：用户可以选择最新版本的 MySQL，完全自定义编译选项，优化性能或增加特殊功能。
     - **缺点**：安装过程复杂，可能需要手动处理依赖问题，并且升级和维护变得更加困难。
 #### 1.5.1.3 源码编译安装
-
+如果你希望从源代码编译 MySQL，或者需要自定义编译选项，可以选择 **源码编译安装**。
+##### 1.5.1.3.1 安装依赖
+```bash
+apt-get install cmake gcc g++ libncurses5-dev bison
+```
+##### 1.5.1.3.2 下载 MySQL 源码
+![](assets/mysql_manager/file-20251219171958168.png)
+##### 1.5.1.3.3 解压源码包
+```bash
+tar -xvzf mysql-<version>.tar.gz
+cd mysql-<version>
+cmake .
+make
+sudo make install
+```
+##### 1.5.1.3.4 创建用户和用户组
+```bash
+groupadd mysql
+useradd -r -g mysql mysql
+```
+##### 1.5.1.3.5 初始化数据库
+```bash
+/usr/local/mysql/bin/mysqld --initialize --user=mysql
+/usr/local/mysql/bin/mysqld_safe --user=mysql &
+```
 ### 1.5.2 MySQL 配置
