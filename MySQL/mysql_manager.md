@@ -528,6 +528,7 @@ useradd -r -g mysql mysql
     - **缺点**：安装过程复杂，可能需要手动处理依赖问题，并且升级和维护变得更加困难。
 ### 1.5.2 MySQL 配置文件解析
 MySQL 的配置文件通常是 `/etc/my.cnf` 或 `/etc/mysql/my.cnf`，但是可以根据安装方式和操作系统不同而有所不同。该文件包含了 MySQL 的各种设置，分为 **客户端配置** 和 **服务器端配置** 两大部分。
+二进制安装默认没有配置文件，需要我们自己编写
 
 #### 1.5.2.1 配置文件生效顺序
 MySQL 配置文件的生效顺序如下：
@@ -664,6 +665,36 @@ mysql>
 ##### 1.5.2.5.5 备份策略
 - 定期使用 `mysqldump`、`mysqlpump` 或 **Percona XtraBackup** 进行全量或增量备份。
 - 配置合理的备份保留策略，确保数据的恢复和灾难恢复能力。
+## 1.6 数据库启动方式
+### 1.6.1 利用脚本启动
+
+```bash
+# 数据库程序为我们提供了一个启动 mysql 的脚本
+21:22:55 root@redis02:~# file /usr/local/mysql/support-files/mysql.server 
+/usr/local/mysql/support-files/mysql.server: POSIX shell script, ASCII text executable
+21:28:57 root@redis02:~# 
+
+# 移动该脚本到 ==/etc/init.d/mysqld== 位置
+21:22:55 root@redis02:~# cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+21:22:55 root@redis02:~# ll /etc/init.d/mysqld
+-rwxr-xr-x 1 root root 10576 Jun 25 09:40 /etc/init.d/mysqld
+
+#  利用脚本文件启停 mysql
+21:22:55 root@redis02:~# /etc/init.d/mysqld start
+```
+### 1.6.2 service 启动
+要想使用 service 方式启动，必须要保证 /etc/init.d/mysqld 存在
+```bash
+21:30:53 root@redis02:~# service mysqld start 
+21:31:08 root@redis02:~# ss -tunlp | grep 3306
+tcp   LISTEN 0      70                 *:33060            *:*    users:(("mysqld",pid=5986,fd=18))                      
+tcp   LISTEN 0      151                *:3306             *:*    users:(("mysqld",pid=5986,fd=20))                      
+21:31:16 root@redis02:~# 
+```
+### 1.6.3 systemctl 管理数据库
+```bash
+
+```
 ## 1.6 MySQL 多实例
 拿 MySQL 数据库来说明，就是在一台服务器上运行多个 MySQL 服务端进程，每个进程监听一个端口（3306，3307，3308），维护一套属于其自己的配置和数据，客户端使用不同的端口来连接具体服端进程，从而实现对不同的实例的操作。
 ### 1.6.1 MySQL 多实例优点
