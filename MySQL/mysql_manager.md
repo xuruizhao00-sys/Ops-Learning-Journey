@@ -258,6 +258,17 @@ https://downloads.mysql.com/archives/community/
 ![](assets/mysql_manager/file-20251219150929263.png)
 ![](assets/mysql_manager/file-20251219150952447.png)
 ##### 1.5.1.2.2 在 Ubuntu 中安装 MySQL8.4.0
+###### 1.5.1.2.2.1 安装必要依赖
+```bash
+# Rocky系统：
+
+[root@rocky9 ~]# yum -y install libaio numactl-libs ncurses-compat-libs
+
+# Ubuntu系统：
+
+root@ubuntu24:~# apt install libaio-dev numactl libnuma-dev libncurses-dev
+```
+注意：ubuntu24 系统没有 libaio1 的包，需要单独去下载安装
 
 
 ##### 1.5.1.2.3 在 Ubuntu 中安装 MySQL9.4.0
