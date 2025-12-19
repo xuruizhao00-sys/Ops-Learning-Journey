@@ -2480,7 +2480,10 @@ crontab -e
 echo 12 > /tmp/age
 
 while true;do
-	age=$(cat /tmp/age)
+	if [[ -f /tmp/age ]];then
+		export age=$(cat /tmp/age)
+	else
+		age=""
 done
 
 * * * * * /bin/bash rm -f /tmp/age
