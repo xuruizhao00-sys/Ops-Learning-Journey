@@ -229,7 +229,7 @@ mysql> select version();
 
 mysql> 
 ```
-#### 1.5.1.2 在 CentOS/RHEL 上安装 MySQL
+##### 1.5.1.1.2 在 CentOS/RHEL 上安装 MySQL
 ```bash
 # 添加 MySQL 官方仓库
 rpm -Uvh https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
@@ -243,10 +243,25 @@ systemctl status mysqld
 
 # 安全配置
 mysql_secure_installation
-```
 
+# 登录 MySQL
+mysql
+```
+#### 1.5.1.2 二进制安装（适用于 Linux / macOS / Windows）
+如果你不想使用包管理器安装，或者你想手动控制安装过程，可以选择 **二进制安装**。这种方法适用于所有操作系统，尤其适合需要定制化安装的用户。
+
+传统的二进制包安装需要进行三步：configure --- make  --- make install
+而mysql的二进制包是指己经编译完成【也就是说，make 已经做过了】，以压缩包提供下载的文件，下载到本地之后释放到自定义目录，再进行配置即可。
+##### 1.5.1.2.1 如何获取二进制包
+关于二进制包的下载位置 -- Download Archives
+https://downloads.mysql.com/archives/community/
+![](assets/mysql_manager/file-20251219150929263.png)
+![](assets/mysql_manager/file-20251219150952447.png)
+##### 1.5.1.2.2 在 Ubuntu 中安装 MySQL8.4.0
+
+
+##### 1.5.1.2.3 在 Ubuntu 中安装 MySQL9.4.0
 #### MySQL 安装方式总结
-# MySQL 编译安装方式对比
 
 | **安装方式**      | **适用场景**                                           | **优点**                                                                                  | **缺点**                                                                                          | **安装难度**  |
 |-------------------|------------------------------------------------------|-------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|---------------|
