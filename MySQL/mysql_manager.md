@@ -906,7 +906,7 @@ php 连接数据库驱动-phpmysql
  2025-06-25T03:13:47.972781Z 0 [ERROR] [MY-010119] [Server] Aborting  
  2025-06-25T03:13:49.539739Z 0 [System] [MY-010910] [Server] /usr/local/mysql/bin/mysqld: Shutdown complete (mysqld 8.0.36)  MySQL Community Server - GPL.  
  [root@db01 ~]#
- ~~~
+~~~
 
 ## 1.10 MySQL 命令行操作
 ### 1.10.1 MySQL 命令行工具
