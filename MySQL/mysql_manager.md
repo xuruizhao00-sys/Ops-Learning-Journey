@@ -840,3 +840,101 @@ tcp   LISTEN 0      151                *:3307             *:*    users:(("mysqld
 远程连接：利用网络协议（利用TCP/IP协议）
 ### 1.8.1 本地连接
 ==mysql -uroot -p012012 -h 数据库服务端地址 -P 数据服务端端口 -S "socket 文件"==
+### 1.8.2 客户端工具进行连接
+MySQL官方出品远程工具：MySQL workbench 
+[https://baijiahao.baidu.com/s?id=1778249322572053063&wfr=spider&for=pc](https://baijiahao.baidu.com/s?id=1778249322572053063&wfr=spider&for=pc)
+
+远程工具安装完毕，建立远程会话连接前，需要创建远程用户信息
+
+```sql
+with grant option ：可以对其他用户进行授权
+
+ create user root@'10.0.0.%' identified by '123456';  
+ grant all on . to root@'10.0.0.%' with grant option;
+```
+### 1.8.3 利用程序代码连接数据库
+
+python 连接数据库驱动-pymysql 
+golang 连接数据库驱动-gomysql 
+java 连接数据库驱动-jar 
+php 连接数据库驱动-phpmysql
+## 1.9 数据库错误日志管理
+错误日志路径 ==/data/3306/data/`hostname`.err==
+
+在数据库启动中出现的问题，我们是可以通过错误日志查找问题，因为在命令行界面，可能很多错误都是相同的提示，我们无法准确定性错误
+
+1.模拟配置文件错误
+
+1.1 配置文件虽然有错，但是可以启动数据库服务，但是不能连接数据库服务，例如：修改了 socket 文件位置，这一类错误，不需要去查看 `hostname`.err文件
+~~~bash
+ [root@db01 ~]# vim /etc/my.cnf  
+ [root@db01 ~]# cat /etc/my.cnf  
+ [mysqld]   
+ user=mysql  
+ basedir=/usr/local/mysql  
+ datadir=/data/3306/data  
+ socket=/tmp/mysql01.sock  
+ [root@db01 ~]#   
+ [root@db01 ~]# service mysqld start   
+ Starting MySQL... SUCCESS!   
+ [root@db01 ~]# mysql   
+ ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' (2)  
+ [root@db01 ~]# mysql -p123  
+ mysql: [Warning] Using a password on the command line interface can be insecure.  
+ ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' (2)  
+ [root@db01 ~]# 
+~~~
+1.2 配置文件错误，无法启动数据库服务
+~~~bash
+[root@db01 ~]# cat /etc/my.cnf  
+ [mysqld]   
+ use=mysql  
+ asedir=/usr/local/mysql  
+ datadir=/data/3306/data  
+ socket=/tmp/mysql.sock  
+ [root@db01 ~]# service mysqld start   
+ # 这里无法根据错误提示判断错误位置  
+ Starting MySQL..... ERROR! The server quit without updating PID file (/data/3306/data/db01.pid).  
+ ​  
+ # 这种情况就需要查看错误日志了  
+ [root@db01 ~]# cat /data/3306/data/db01.err   
+ 2025-06-25T03:13:45.768719Z 0 [System] [MY-010116] [Server] /usr/local/mysql/bin/mysqld (mysqld 8.0.36) starting as process 215617  
+ 2025-06-25T03:13:45.804395Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.  
+ 2025-06-25T03:13:47.112090Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.  
+ 2025-06-25T03:13:47.957021Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.  
+ 2025-06-25T03:13:47.957126Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.  
+ 2025-06-25T03:13:47.972528Z 0 [ERROR] [MY-000067] [Server] unknown variable 'use=mysql'.  
+ 2025-06-25T03:13:47.972781Z 0 [ERROR] [MY-010119] [Server] Aborting  
+ 2025-06-25T03:13:49.539739Z 0 [System] [MY-010910] [Server] /usr/local/mysql/bin/mysqld: Shutdown complete (mysqld 8.0.36)  MySQL Community Server - GPL.  
+ [root@db01 ~]#
+ ~~~
+
+## 1.10 MySQL 命令行操作
+### 1.10.1 MySQL 命令行工具
+MySQL 服务基于 C/S 架构，用户主要使用客户端工具来与远程服务端进行连接，从而与 MySQL 服务进行交互。
+
+MySQL 客户端常用选项
+```bash
+-V|--version #显示客户端版本
+-u|--user=name #指定远程连接用户名
+-p|--password[=name] #指定密码, 默认为空
+-h|--host=host     #指定服务端主机
+-P|--port=port #指定端口，默认3306
+-S|--socket=name #指定连接时使用的socket文件，该文件在服务端启动后生成
+-D|--database=db #指定数据库
+-H|--html         #以html格式输出
+-X|--xml           #以xml格式输出
+-t|--table #以table格式输出，默认项
+-E|--vertical #垂直显示执行结果
+-v|--verbose #显示详细信息，配合 -t 选项
+-C|--compress #启用压缩
+-G|--named-commands #启用长命令
+-e|--execute=sql #执行完就退出，非交互式运行
+--prompt=name #修改命令提示符
+--line-numbers     #输出行号
+--print-defaults #打印参数列表，放在最前面
+--connect-timeout=N #连接超时时长，单位S
+--max-allowed-packet=N #一次查交互发送或反回数据的大小，默认16MB，最大值为1GB，最小值为4096字节
+```
+1.2.6.2 命令基础
+mysql [OPTIONS] [database]
