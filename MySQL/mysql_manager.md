@@ -727,22 +727,22 @@ LimitNOFILE=5000
 Dec 19 21:33:28 redis02 systemd[1]: Started mysql.service - MySQL Server.
 21:33:33 root@redis02:~# 
 ```
-## 1.6 MySQL 多实例
+## 1.7 MySQL 多实例
 拿 MySQL 数据库来说明，就是在一台服务器上运行多个 MySQL 服务端进程，每个进程监听一个端口（3306，3307，3308），维护一套属于其自己的配置和数据，客户端使用不同的端口来连接具体服端进程，从而实现对不同的实例的操作。
-### 1.6.1 MySQL 多实例优点
+### 1.7.1 MySQL 多实例优点
 - 节约硬件资源：、
 	- 在某些场景下（比如说测试，调研，新旧业务并存等），需要配置不同的 MySQL 数据库版本，而又没有足够多的服务器资源，则可以选择在一台服务器上用不同的版本实现多开来满足需求。
 - 便于对比：
 	- 在一个完全相同的硬件环境中，运行不同的 MySQL 版本，使用相同的参数进行测试，调研时，可以最大程度的减少外部环境因素的影响，便于得出更准确的结论。
 - 便于管理：
 	- 在一台服务器上运行多个实例，同理，只需要在这一台服务器上配置安全规则，就可以完成对多个实例的访问授权，而且对于数据库的备份，停启等工作，也只需要在这一台服务器上完成。
-### 1.6.2 MySQL 多实例缺点
+### 1.7.2 MySQL 多实例缺点
 - 资源抢占：
 	- 一台服务器上运行多个服务实例，资源总量恒定，一个实例占用的资源无法被另一个实例所使用，在这种情况下，服务性能会受到影响，无法体现 MySQL 服务的实际性能。
 - 存在单点风险：
 	- 一台服务器上部署多个服务实例，如果该服务器当机，则这多个服务实例都会受影响。
 <mark style="background: #ABF7F7A6;">生产环境下，是不要安装多实例方式的。</mark>
-### 1.6.3 MySQL 多实例配置
+### 1.7.3 MySQL 多实例配置
 可以用不同的 MySQL 版本实现多实例，也可以用相同的 MySQL 版本实现多实例。
 ![](assets/mysql_manager/file-20251219210201265.png)
 ```bash
@@ -788,5 +788,48 @@ socket=/tmp/mysql3306.sock
 17:50:20 root@redis02:~# 
 
 # 编写 service 文件
+17:52:33 root@redis02:~# cat /lib/systemd/system/mysql330{6..7}.service
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
 
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=mysql
+Group=mysql
+ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/data/3306/my3306.cnf
+LimitNOFILE=5000
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=mysql
+Group=mysql
+ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/data/3307/my3307.cnf
+LimitNOFILE=5000
+
+
+# 启动服务
+17:52:42 root@redis02:~# systemctl daemon-reload 
+17:53:02 root@redis02:~# systemctl start mysql3306
+17:53:09 root@redis02:~# systemctl start mysql3307
+17:53:19 root@redis02:~# 
+17:53:19 root@redis02:~# ss -tunlp  |grep -E "3306|3307"
+tcp   LISTEN 0      70                 *:33060            *:*    users:(("mysqld",pid=13045,fd=18))                     
+tcp   LISTEN 0      151                *:3306             *:*    users:(("mysqld",pid=13045,fd=30))                     
+tcp   LISTEN 0      151                *:3307             *:*    users:(("mysqld",pid=13050,fd=28))                     
+17:53:30 root@redis02:~#
 ```
+## 1.8 数据库连接管理
