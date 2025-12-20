@@ -745,3 +745,48 @@ Dec 19 21:33:28 redis02 systemd[1]: Started mysql.service - MySQL Server.
 ### 1.6.3 MySQL 多实例配置
 可以用不同的 MySQL 版本实现多实例，也可以用相同的 MySQL 版本实现多实例。
 ![](assets/mysql_manager/file-20251219210201265.png)
+```bash
+192.168.121.132   3306   /data/3306/data   /data/3306/my3306.cnf    /tmp/mysql3306.sock 
+192.168.121.132   3307   /data/3307/data   /data/3307/my3307.cnf    /tmp/mysql3307.sock 
+```
+```bash
+# 初始化目录
+17:47:24 root@redis02:~# mkdir -pv /data/{3306..3307}/data
+mkdir: created directory '/data'
+mkdir: created directory '/data/3306'
+mkdir: created directory '/data/3306/data'
+mkdir: created directory '/data/3307'
+mkdir: created directory '/data/3307/data'
+17:47:35 root@redis02:~# tree /data/
+/data/
+├── 3306
+│   └── data
+└── 3307
+    └── data
+
+5 directories, 0 files
+
+# 初始化数据库
+17:47:41 root@redis02:~# mysqld --initialize-insecure --user=mysql --datadir=/data/3306/data --basedir=/usr/local/mysql
+17:48:18 root@redis02:~# mysqld --initialize-insecure --user=mysql --datadir=/data/3307/data --basedir=/usr/local/mysql
+
+# 编写配置文件
+17:50:08 root@redis02:~# cat /data/3307/my3307.cnf
+[mysqld]
+user=mysql
+port=3307
+basedir=/usr/local/mysql
+datadir=/data/3307/data
+socket=/tmp/mysql3307.sock
+17:50:15 root@redis02:~# cat /data/3306/my3306.cnf
+[mysqld]
+user=mysql
+port=3306
+basedir=/usr/local/mysql
+datadir=/data/3306/data
+socket=/tmp/mysql3306.sock
+17:50:20 root@redis02:~# 
+
+# 编写 service 文件
+
+```
