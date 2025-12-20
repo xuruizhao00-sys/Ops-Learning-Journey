@@ -908,7 +908,7 @@ php 连接数据库驱动-phpmysql
  [root@db01 ~]#
 ~~~
 
-## 1.10 MySQL 命令行操作
+## 1.10 MySQL 命令簇
 ### 1.10.1 MySQL 命令行工具
 MySQL 服务基于 C/S 架构，用户主要使用客户端工具来与远程服务端进行连接，从而与 MySQL 服务进行交互。
 
@@ -935,8 +935,7 @@ MySQL 客户端常用选项
 --connect-timeout=N #连接超时时长，单位S
 --max-allowed-packet=N #一次查交互发送或反回数据的大小，默认16MB，最大值为1GB，最小值为4096字节
 ```
-1.2.6.2 命令基础
-mysql [OPTIONS] [database]
+### 1.10
 
 
 # 二、
