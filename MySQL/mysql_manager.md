@@ -693,7 +693,39 @@ tcp   LISTEN 0      151                *:3306             *:*    users:(("mysqld
 ```
 ### 1.6.3 systemctl 管理数据库
 ```bash
+21:33:11 root@redis02:~# cat /usr/lib/systemd/system/mysql.service
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
 
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=mysql
+Group=mysql
+ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf
+LimitNOFILE=5000
+21:33:14 root@redis02:~# systemctl daemon-reload 
+21:33:21 root@redis02:~# systemctl start mysql
+21:33:28 root@redis02:~# systemctl status mysql
+● mysql.service - MySQL Server
+     Loaded: loaded (/usr/lib/systemd/system/mysql.service; disabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 21:33:28 CST; 5s ago
+       Docs: man:mysqld(8)
+             http://dev.mysql.com/doc/refman/en/using-systemd.html
+   Main PID: 6149 (mysqld)
+      Tasks: 36 (limit: 2210)
+     Memory: 429.8M (peak: 443.0M)
+        CPU: 3.013s
+     CGroup: /system.slice/mysql.service
+             └─6149 /usr/local/mysql/bin/mysqld --defaults-file=/usr/local/mysql/etc/my.cnf
+
+Dec 19 21:33:28 redis02 systemd[1]: Started mysql.service - MySQL Server.
+21:33:33 root@redis02:~# 
 ```
 ## 1.6 MySQL 多实例
 拿 MySQL 数据库来说明，就是在一台服务器上运行多个 MySQL 服务端进程，每个进程监听一个端口（3306，3307，3308），维护一套属于其自己的配置和数据，客户端使用不同的端口来连接具体服端进程，从而实现对不同的实例的操作。
