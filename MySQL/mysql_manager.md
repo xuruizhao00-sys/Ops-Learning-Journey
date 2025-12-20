@@ -983,6 +983,408 @@ For server side help, type 'help contents'
 ```
 #### 1.10.2.2 服务端命令
 ```sql
-
+mysql> help Contents
+You asked for help about help category: "Contents"
+For more information, type 'help <item>', where <item> is one of the following
+categories:
+   Account Management
+   Administration
+   Components
+   Compound Statements
+   Contents
+   Data Definition
+   Data Manipulation
+   Data Types
+   Functions
+   Geographic Features
+   Help Metadata
+   Language Structure
+   Loadable Functions
+   Plugins
+   Prepared Statements
+   Replication Statements
+   Storage Engines
+   Table Maintenance
+   Transactions
+   Utility
 ```
+查看详细帮助  help 服务端命令名，用于查看该部分的常见命令有哪些
+##### 1️⃣ **Account Management（账户管理）**
+
+👉 **管用户、管权限**
+**包含内容：**
+- `CREATE USER`
+- `ALTER USER`
+- `DROP USER`
+- `GRANT`
+- `REVOKE`
+- `SHOW GRANTS`
+
+**企业使用场景：**
+- 创建业务账号
+- 最小权限原则
+- 多环境账号隔离（dev / test / prod）
+
+---
+
+##### 2️⃣ **Administration（管理）**
+
+👉 **服务器级别管理命令**
+
+**包含内容：**
+- `SHOW VARIABLES`
+- `SHOW STATUS`
+- `SET GLOBAL`
+- `SHUTDOWN`
+- `RESET MASTER`    
+- `FLUSH`  
+
+**企业使用场景：**
+- 动态修改参数
+- 诊断性能问题
+- 主从复制维护
+
+---
+
+##### 3️⃣ **Components（组件）**
+
+👉 **MySQL 8.x 引入的新组件体系**
+
+**包含内容：**
+- 安装 / 卸载组件
+- 组件状态管理
+
+**企业使用场景：**
+- MySQL 内部功能模块化
+- 安全、监控类组件
+
+---
+
+##### 4️⃣ **Compound Statements（复合语句）**
+
+👉 **流程控制语句（类似编程语言）**
+
+**包含内容：**
+- `BEGIN ... END`
+- `IF`
+- `CASE`
+- `LOOP`
+- `WHILE`
+- `REPEAT`
+
+**企业使用场景：**
+- 存储过程
+- 复杂业务逻辑下沉到数据库
+
+---
+
+##### 5️⃣ **Contents**
+
+👉 **当前这个页面本身**
+
+**作用：**
+- 帮你“列目录”
+- 没有具体 SQL
+
+
+---
+
+##### 6️⃣ **Data Definition（数据定义 DDL）**
+
+👉 **定义结构，不是数据**
+
+**包含内容：**
+- `CREATE DATABASE`
+- `CREATE TABLE`
+- `ALTER TABLE`
+- `DROP TABLE`
+- `CREATE INDEX`
+
+**企业使用场景：**
+- 表结构设计
+- 表结构变更
+- 上线、迁移
+
+---
+
+##### 7️⃣ **Data Manipulation（数据操作 DML）**
+👉 **真正“操作数据”的 SQL**
+
+**包含内容：**
+- `SELECT`
+- `INSERT`
+- `UPDATE`
+- `DELETE`
+- `REPLACE`
+
+**企业使用场景：**
+- 所有业务 CRUD
+- 报表
+- 数据分析
+
+
+---
+
+##### 8️⃣ **Data Types（数据类型）**
+👉 **字段类型说明**
+
+**包含内容：**
+- 数值类型（INT / BIGINT）
+- 字符类型（VARCHAR / TEXT）
+- 时间类型（DATE / DATETIME / TIMESTAMP）
+- JSON
+
+**企业使用场景：**
+- 表设计
+- 性能与存储优化
+---
+
+##### 9️⃣ **Functions（函数）**
+👉 **内置函数大全**
+
+**包含内容：**
+- 字符串函数
+- 时间函数
+- 数学函数
+- 聚合函数
+
+**企业使用场景：**
+- SQL 计算
+- 报表
+- ETL
+
+---
+
+##### 🔟 **Geographic Features（地理信息）**
+👉 **GIS / 空间数据**
+
+**包含内容：**
+- POINT / LINESTRING
+- 空间函数
+- 地理索引
+
+**企业使用场景：**
+
+- 地图
+    
+- 定位
+    
+- LBS 服务
+    
+
+📌 **特定业务才会用**
+
+---
+
+##### 1️⃣1️⃣ **Help Metadata**
+
+👉 **HELP 系统本身的元数据**
+
+**包含内容：**
+- help 表结构
+- 分类定义
+
+---
+##### 1️⃣2️⃣ **Language Structure（语言结构）**
+👉 **SQL 语法规则**
+
+**包含内容：**
+- 语法关键字
+- 表达式
+- 运算符
+
+**企业使用场景：**
+- 写复杂 SQL
+- 理解 SQL 执行逻辑
+---
+
+##### 1️⃣3️⃣ **Loadable Functions（可加载函数）**
+
+👉 **用户自定义函数（UDF）**
+
+**包含内容：**
+- 自定义 C/C++ 函数
+- 函数注册
+
+**企业使用场景：**
+- 高性能计算
+- 特殊业务逻辑
+
+---
+
+##### 1️⃣4️⃣ **Plugins（插件）**
+👉 **MySQL 插件系统**
+
+**包含内容：**
+- 认证插件
+- 审计插件    
+- 密码插件    
+
+**企业使用场景：**
+- 安全    
+- 合规    
+- 扩展功能    
+---
+##### 1️⃣5️⃣ **Prepared Statements（预处理语句）**
+
+👉 **防 SQL 注入 & 提升性能**
+
+**包含内容：**
+- `PREPARE`    
+- `EXECUTE`    
+- `DEALLOCATE`    
+
+**企业使用场景：**
+- 应用程序数据库访问    
+- 高并发系统    
+---
+##### 1️⃣6️⃣ **Replication Statements（复制）**
+
+👉 **主从 / 集群**
+**包含内容：**
+- `CHANGE MASTER TO`    
+- `START SLAVE`    
+- `STOP SLAVE`    
+- `SHOW SLAVE STATUS`    
+
+**企业使用场景：**
+
+- 读写分离    
+- 高可用    
+- 容灾    
+---
+##### 1️⃣7️⃣ **Storage Engines（存储引擎）**
+
+👉 **InnoDB / MyISAM 等**
+
+**包含内容：**
+- 引擎特性
+- 引擎参数
+
+**企业使用场景：**
+- 性能调优
+- 架构设计
+
+---
+
+##### 1️⃣8️⃣ **Table Maintenance（表维护）**
+
+👉 **表级运维操作**
+**包含内容：**
+- `ANALYZE TABLE`
+- `OPTIMIZE TABLE`    
+- `CHECK TABLE`    
+- `REPAIR TABLE`    
+
+**企业使用场景：**
+- 性能维护    
+- 故障修复    
+---
+
+##### 1️⃣9️⃣ **Transactions（事务）**
+
+👉 **ACID / 并发控制**
+
+**包含内容：**
+- `BEGIN`    
+- `COMMIT`    
+- `ROLLBACK`    
+- 隔离级别    
+
+**企业使用场景：**
+- 金融    
+- 订单    
+- 强一致性业务    
+---
+##### 2️⃣0️⃣ **Utility（工具类命令）**
+
+👉 **辅助工具**
+
+**包含内容：**
+- `DESCRIBE`
+- `EXPLAIN`
+- `HELP`
+
+**企业使用场景：**
+
+- 排查 SQL
+- 分析执行计划
+#### 1.10.2.3 MySQL 客户端常用命令
+```bash
+#常用命令
+?|\?       #显示帮助
+help|\h   #显示帮助
+clear|\c  #清屏，直接使用无法生效，要配合 system 命令使用，清掉未执行的输入
+exit|\q    #退出客户端
+quit|\q   #退出客户端
+status|\s #显示当前状态
+use|\u #切换数据库
+system|\! #调用系统命令
+prompt|\R #修改提示符
+source|\. #执行SQL脚本文件
+connect|\r #客户端重新连接，使用之前的参数
+tee|\T #设置文件名，将输出结果同时保存一份到指定文件
+notee|\t #不保存输出结果至文件
+delimiter|\d #自定义SQL语句分隔符
+go|\g #将语句送到服务端执行
+ego|\G #将语句送到服务端执行，垂直显示
+print|\p #输出语句，但不执行
+warnings|\W #总是输出告警信息
+nowarning|\w #不输出告警信息
+charset|\C #设置编码
+edit|\e #先编辑SQL语句，再执行
+```
+
+```sql
+-- 显示当前的服务状态
+mysql> \s
+--------------
+mysql  Ver 8.4.0 for Linux on x86_64 (MySQL Community Server - GPL)
+
+Connection id:          12                                -- 连接 id
+Current database:                                        -- 当前所处的数据库，切换到其他的数据库，会有标识
+Current user:           root@localhost                -- 连接时使用的用户名
+SSL:                    Not in use                         -- 使用启动 SSL
+Current pager:          stdout
+Using outfile:          ''
+Using delimiter:        ;
+Server version:         8.4.0 MySQL Community Server - GPL  -- 服务类型
+Protocol version:       10                                                  -- 协议版本
+Connection:             Localhost via UNIX socket
+Server characterset:    utf8mb4                                        -- 服务器编码
+Db     characterset:    utf8mb4                                         -- 数据库编码
+Client characterset:    utf8mb4                                         -- 客户端编码
+Conn.  characterset:    utf8mb4
+UNIX socket:            /usr/local/mysql/data/mysql.sock           -- 连接时使用的 socket 文件
+Binary data as:         Hexadecimal
+Uptime:                 33 min 14 sec                              -- 当前服务器运行时长，每次重启后就会重置
+
+-- 性能负载相关内容
+Threads: 2  Questions: 12  Slow queries: 0  Opens: 155  Flush tables: 3  Open tables: 74  Queries per second avg: 0.006
+--------------
+
+
+Threads: 6
+这表示数据库当前有6个线程正在运行。这些线程可能是用于处理客户端连接的线程。
+
+Questions: 222
+这表示自数据库服务器启动以来，总共收到了222个查询请求。这个数值可以帮助你了解数据库的活跃
+度。
+
+Slow queries: 0
+这表示没有查询被认为是慢查询。慢查询通常是指执行时间超过某个阈值（如10秒）的查询。这个值为0表明所有查询都在合理的时间内完成，或者可能表示慢查询阈值设置得太高。
+
+Opens: 38
+这通常表示数据库表文件被打开的次数。这个数值可以帮助你了解数据库文件I/O的频繁程度。
+
+Flush tables: 1
+这表示自数据库服务器启动以来，执行了1次刷新表的操作。刷新表操作可以关闭所有打开的表文件，并重新打开它们，用于清理文件描述符缓存等目的。
+
+Open tables: 31
+这表示当前有31个表是打开的。打开的表可以更快地访问，因为它们已经在内存中。
+
+Queries per second avg: 0.072
+这表示平均每秒执行的查询数为0.072。这个数值较低，可能表明数据库当前的负载很低，或者服务器的性能没有被充分利用。
+```
+
 # 二、
