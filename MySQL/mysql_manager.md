@@ -1387,4 +1387,80 @@ Queries per second avg: 0.072
 这表示平均每秒执行的查询数为0.072。这个数值较低，可能表明数据库当前的负载很低，或者服务器的性能没有被充分利用。
 ```
 
-# 二、
+# 二、SQL 基本概念
+## 2.1 SQL 介绍
+SQL（Structured Query Language）是结构化查询语言，是一种用于管理关系型数据库的标准语言。SQL 用于与数据库进行交互，执行数据库的创建、查询、更新和删除等操作。SQL 使得开发人员、数据库管理员和数据分析师能够与数据库系统（如 MySQL、PostgreSQL、SQL Server、Oracle 等）进行通信。
+- **1970 年代**：SQL 起源于 IBM 的 **System R 项目**，由 Raymond Boyce 和 Donald Chamberlin 提出，并在 1974 年发布了第一个 SQL 规范。这个版本称为 **SEQUEL（Structured English Query Language）**，它的目标是使用户能通过类似英语的语句查询数据库。
+- **1986 年**：SQL 被 ANSI（美国国家标准协会）标准化，并在 1987 年成为 ISO（国际标准化组织）标准。
+- **当前**：SQL 是管理关系型数据库的通用标准，几乎所有现代数据库管理系统（DBMS）都支持 SQL。
+## 2.2 SQL 分类
+SQL 可以分为以下几种主要类别：
+
+- **数据定义语言（DDL，Data Definition Language）**：  
+    用于定义数据库结构的语言。它包括创建、修改和删除数据库对象（如表、视图、索引等）的语句。
+    - **CREATE**：创建数据库、表、视图等。
+    - **ALTER**：修改数据库结构（例如添加列、修改列类型等）。
+    - **DROP**：删除数据库、表、列等。
+    - **TRUNCATE**：删除表中的所有数据（但保留表结构）。
+- **数据操作语言（DML，Data Manipulation Language）**：  
+    用于操作数据库中的数据，包括插入、更新、删除和查询数据的语句。
+    - **SELECT**：查询数据库中的数据。
+    - **INSERT**：向表中插入数据。
+    - **UPDATE**：更新表中的现有数据。
+    - **DELETE**：删除表中的数据。
+- **数据控制语言（DCL，Data Control Language）**：  
+    用于定义数据库用户的权限和访问控制。
+    - **GRANT**：授予用户对数据库对象的权限。
+    - **REVOKE**：撤销用户的权限。
+- **事务控制语言（TCL，Transaction Control Language）**：  
+    用于管理数据库事务。
+    - **COMMIT**：提交事务，使修改生效。
+    - **ROLLBACK**：回滚事务，撤销修改。
+    - **SAVEPOINT**：设置事务的保存点，允许部分回滚。
+https://dev.mysql.com/doc/refman/8.0/en/sql-statements.html
+
+https://dev.mysql.com/doc/refman/5.7/en/sql-statements.html
+## 2.3 SQL 规范
+SQL 语法规则定义了如何编写合法的 SQL 语句。以下是一些基本的 SQL 语法规范：
+
+- **大小写**：SQL 本身对大小写不敏感（即 `SELECT` 和 `select` 功能相同），但表名、列名等的大小写敏感性取决于数据库系统的设置。例如，在 MySQL 中，表名通常是大小写敏感的，而列名是大小写不敏感的。
+- **分号（`;`）**：SQL 语句通常以分号结束，尤其是在多个语句连续执行时（如批处理脚本）。单条语句可以省略分号。
+- **空格和换行**：SQL 语句的空格和换行不影响语句的执行，通常使用空格来分隔关键字、表名、列名、值等，换行使代码更易于阅读。
+- **注释**：
+    - 单行注释：`-- 这是一个单行注释`
+    - 多行注释：`/* 这是一个多行注释 */`
+## 2.4 @ 符号
+### 2.4.1 **用户变量**
+
+在 **MySQL** 中，`@` 符号常用于表示 **用户变量**。用户变量允许你在 SQL 语句中临时存储和使用数据。
+- **声明用户变量**：  
+    用户变量以 `@` 开头，并且不需要显式的声明或初始化。可以直接使用赋值语句进行初始化。
+    `SET @my_var = 10; SELECT @my_var;`
+    这将在查询中返回值 `10`。
+- **在查询中使用用户变量**：  
+    用户变量在查询中可以像列一样使用，它们在整个会话中有效，直到连接关闭或显式清除。
+    `SET @sum = 0; SELECT @sum := @sum + amount FROM orders;`
+    在这个例子中，`@sum` 是一个用户变量，它会累加 `orders` 表中的 `amount` 列的值。
+    
+
+### 2.4.2 **系统变量**
+
+在 MySQL 中，`@` 符号也可以用于引用 **系统变量**，这些变量控制数据库的行为。
+- **查询系统变量**：
+    `SELECT @global.max_connections;`
+    这将返回当前全局最大连接数的值。MySQL 的系统变量通常使用 `@` 符号进行访问。
+
+# 三、MySQL 字符集设置
+## 3.1 查看 MySQL 支持的字符集
+```sql
+mysql> show charset;
+...
+| gb2312   | GB2312 Simplified Chinese       | gb2312_chinese_ci   |      2 |
+| gbk      | GBK Simplified Chinese          | gbk_chinese_ci      |      2 |
+| utf8mb3  | UTF-8 Unicode                   | utf8mb3_general_ci  |      3 |  
+| utf8mb4  | UTF-8 Unicode                   | utf8mb4_0900_ai_ci  |      4 |  
+...
+```
+utf8mb3 等价于早期的 utf8 字符编码 可以识别中文信息 每个字符占用3字节 utf8mb4 支持emoji 每个字符占用4字节
+
+# 四、MySQL 校对规则/排序规则
