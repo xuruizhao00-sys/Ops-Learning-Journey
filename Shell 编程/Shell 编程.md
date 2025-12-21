@@ -9266,3 +9266,63 @@ check_params "Alice" 30
 这些能力都是基于信号的机制来实现了
 
 linux 使用信号与系统上运行的进程进行通信，想要对 shell 的脚本控制，只需要传递相关信号给 shell 脚本即可
+
+| 信号值   | 信号名   | 信号作用                                          | 如何生成                                                      |
+|----------|----------|---------------------------------------------------|---------------------------------------------------------------|
+| `1`      | `SIGHUP` | 挂起信号，通常在终端关闭时发送，用于通知进程终止或重新加载配置文件 | `kill -SIGHUP <pid>` 或 关闭终端连接时自动发送                 |
+| `2`      | `SIGINT` | 中断信号，通常由 `Ctrl+C` 触发，用户请求终止进程        | `Ctrl+C` 或 `kill -SIGINT <pid>`                               |
+| `3`      | `SIGQUIT`| 退出信号，通常由 `Ctrl+\` 触发，进程退出并生成核心转储文件 | `Ctrl+\` 或 `kill -SIGQUIT <pid>`                              |
+| `9`      | `SIGKILL`| 强制终止信号，无法捕获或忽略，直接终止进程              | `kill -SIGKILL <pid>`                                           |
+| `15`     | `SIGTERM`| 终止信号，要求进程正常终止，能够捕获并执行清理工作      | `kill -SIGTERM <pid>` 或 默认 `kill <pid>`                     |
+| `19`     | `SIGSTOP`| 暂停信号，停止进程的执行                             | `kill -SIGSTOP <pid>`                                           |
+| `18`     | `SIGCONT`| 恢复信号，恢复被暂停的进程                           | `kill -SIGCONT <pid>`                                           |
+| `20`     | `SIGTSTP`| 停止信号，通常由 `Ctrl+Z` 触发，用于将进程放到后台     | `Ctrl+Z` 或 `kill -SIGTSTP <pid>`                              |
+| `17`     | `SIGCHLD`| 子进程终止信号，父进程收到子进程结束的通知              | 子进程终止时，自动发送                                           |
+| `10`     | `SIGUSR1`| 用户自定义信号，用于进程间的自定义通信                 | `kill -SIGUSR1 <pid>`                                           |
+| `12`     | `SIGUSR2`| 用户自定义信号，用于进程间的自定义通信                 | `kill -SIGUSR2 <pid>`                                           |
+| `14`     | `SIGALRM`| 定时信号，通常用于定时器到期后触发                     | `kill -SIGALRM <pid>` 或 使用 `alarm()` 系统调用触发           |
+| `11`     | `SIGSEGV`| 段错误信号，进程访问非法内存时触发                     | 由程序访问无效内存地址时自动触发                               |
+| `28`     | `SIGPIPE`| 管道破裂信号，写入一个无读进程的管道时触发               | 写入关闭的管道时自动触发                                        |
+| `22`     | `SIGTTOU`| 后台进程尝试读取终端时发送的信号                       | 通过后台进程读取终端时自动发送                                  |
+| `23`     | `SIGTTIN`| 后台进程尝试写入终端时发送的信号                       | 通过后台进程写入终端时自动发送                                  |
+| `24`     | `SIGBUS` | 总线错误信号，通常是硬件相关错误                         | 程序访问未映射的内存地址时触发                                  |
+默认情况下，bash shell 会忽略收到的任何 SIGQUIT(3) 和 SIGTERM(15) 信号（正因为这样交互式 shell 才不会被意外终止）。但是 bash shell 会处理收到的 SIGHUP(1) 和 SIGINT(2) 信号。
+
+如果 bash shell 收到 SIGHUP 信号，它会退出。但在退出之前，它会将信号传给 shell 启动的所有进程（比如 shell 脚本）。通过 SIGINT 信号，可以中断 shell，Linux 内核停止将 CPU 的处理时间分配给 shell，当这种情况发生时，shell 会将 SIGINT 信号传给 shell 启动的所有进程。
+### 8.1.2 生成信号
+```powershell
+终止进程：
+ctrl+c,
+
+暂停进程：
+ctrl+z,停止的进程继续保留在内存中，并能从停止的位置继续运行
+
+恢复进程:
+jobs查看运行任务，fg num 重新执行
+
+杀死进程:
+kill -9 pid
+```
+### 8.1.3 终止和挂起
+<mark style="background: #FFB8EBA6;">终止进程</mark>
+```bash
+20:58:28 root@redis02:~# sleep 1000
+^C
+21:13:09 root@redis02:~# 
+```
+<mark style="background: #FFB8EBA6;">挂起进程</mark>
+```bash
+21:13:09 root@redis02:~# sleep 1000
+^Z
+[1]+  Stopped                 sleep 1000
+21:13:49 root@redis02:~# ps -aux | grep sleep
+root       15212  0.1  0.0   5684  1920 pts/0    T    21:13   0:00 sleep 1000
+root       15214 18.7  0.1   6544  2304 pts/0    S+   21:13   0:00 grep --color=auto sleep
+21:13:58 root@redis02:~# jobs -l 
+[1]+ 15212 Stopped                 sleep 1000
+21:14:02 root@redis02:~# fg 1
+sleep 1000
+^C
+21:14:06 root@redis02:~# 
+```
+## 8.2 信号捕获
