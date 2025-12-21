@@ -8978,3 +8978,250 @@ echo "这行代码不会执行"  # 因为脚本已退出
 Shell 中有一个特殊的变量 `$?`，它保存着上一条命令或函数执行后的退出状态码。
 ####  7.2.2.1 获取函数的退出状态
 当函数执行完毕后，可以通过 `$?` 获取函数的退出状态码，进而判断函数是否执行成功。
+```bash
+20:41:10 root@redis02:~# cat demo03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+function my_function {
+    echo "执行一些操作"
+    return 2  # 返回 2，表示某种错误
+}
+
+# 调用函数
+my_function
+
+# 获取并输出函数的退出状态码
+echo "函数的退出状态码是: $?"
+
+
+20:41:14 root@redis02:~# bash demo03.sh
+执行一些操作
+函数的退出状态码是: 2
+20:43:55 root@redis02:~# echo $?
+0
+20:43:59 root@redis02:~# 
+```
+#### 7.2.2.2 使用退出状态进行条件判断
+通过退出状态码，Shell 脚本可以根据命令或函数的执行结果进行不同的处理。常见的做法是使用 `if` 语句来判断退出状态。
+```bash
+20:45:07 root@redis02:~# cat demo04.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 定义函数，判断文件是否存在
+function check_file {
+    if [ -f "$1" ]; then
+        return 0  # 文件存在，返回 0
+    else
+        return 1  # 文件不存在，返回 1
+    fi
+}
+
+# 调用函数并判断退出状态
+check_file "/path/to/file.txt"
+
+if [ $? -eq 0 ]; then
+    echo "文件存在"
+else
+    echo "文件不存在"
+fi
+
+20:45:10 root@redis02:~# bash demo04.sh
+文件不存在
+20:45:12 root@redis02:~# echo $?
+0
+20:45:15 root@redis02:~#
+```
+### 7.2.3 `return` 与 `exit` 的区别
+|特性|`return`|`exit`|
+|---|---|---|
+|**作用范围**|退出当前函数，返回指定的退出状态码|退出整个脚本，返回指定的退出状态码|
+|**退出状态**|返回一个整数（0-255），表示函数执行结果|返回一个整数（0-255），表示脚本执行结果|
+|**使用场景**|用于退出函数，并返回执行状态|用于退出脚本，通常在错误或特殊条件下使用|
+## 7.3 函数参数
+### 7.3.1 函数参数概述
+Shell 中的函数参数是通过 **位置参数** 来传递的。位置参数是指传递给脚本或函数的具体值，在函数内部可以通过 `$1`, `$2`, `$3` 等访问。Shell 函数的参数是传递给函数的一组值，这些参数可以是数字、字符串、文件名等。
+### 7.3.2 调用函数并传递参数
+通过 `function_name arg1 arg2 ...` 的方式传递参数。
+```bash
+function_name arg1 arg2 arg3
+```
+
+```bash
+20:48:44 root@redis02:~# cat demo05.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+
+# 定义一个函数，接受两个参数
+greet() {
+    echo "Hello, $1! You are $2 years old."
+}
+
+# 调用函数并传递两个参数
+greet "Alice" 30
+
+
+20:48:45 root@redis02:~# bash demo05.sh
+Hello, Alice! You are 30 years old.
+20:48:49 root@redis02:~# 
+```
+### 7.3.3 函数获取参数
+#### 7.3.3.1 获取单个函数
+Shell 函数的参数可以通过 `$1`, `$2`, `$3` 等方式获取，依次代表第一个、第二个、第三个参数。
+```bash
+#!/bin/bash
+
+# 定义函数，获取并输出第一个参数
+print_param() {
+    echo "第一个参数是: $1"
+}
+
+# 调用函数并传递一个参数
+print_param "Hello"
+
+```
+#### 7.3.3.2 获取所有参数
+<mark style="background: #FFF3A3A6;">示例：使用 `$@` 获取所有参数</mark>
+```bash
+20:53:45 root@redis02:~# cat demo06.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo06.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+
+# 定义函数，输出所有参数
+print_all_params() {
+    echo "所有参数是: $@"
+    for item in "$@";do
+            echo $item
+    done
+}
+
+# 调用函数并传递多个参数
+print_all_params "Alice" 30 "Engineer"
+
+
+20:53:46 root@redis02:~# bash demo06.sh
+所有参数是: Alice 30 Engineer
+Alice
+30
+Engineer
+```
+<mark style="background: #FF5582A6;">示例：使用 `$*` 获取所有参数</mark>
+```bash
+20:53:22 root@redis02:~# cat demo07.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo06.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+
+# 定义函数，输出所有参数
+print_all_params() {
+    echo "所有参数是: $*"
+    for item in "$*";do
+            echo $item
+    done
+}
+
+# 调用函数并传递多个参数
+print_all_params "Alice" 30 "Engineer"
+
+
+20:53:23 root@redis02:~# bash demo07.sh
+所有参数是: Alice 30 Engineer
+Alice 30 Engineer
+```
+#### 7.3.3.3 获取参数的数量
+Shell 提供了 `$#` 变量来获取传递给函数的参数个数
+```bash
+20:54:26 root@redis02:~# cat demo08.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo08.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 定义函数，输出参数个数
+print_param_count() {
+    echo "参数个数是: $#"
+}
+
+# 调用函数并传递多个参数
+print_param_count "Alice" 30 "Engineer"
+
+20:54:27 root@redis02:~# bash demo08.sh
+参数个数是: 3
+20:54:29 root@redis02:~#
+```
+### 7.3.4 默认值与参数检查
+#### 7.3.4.1 设置默认值
+如果某些参数未传递，可以通过在函数内部设置默认值来避免错误。
+```bash
+20:55:40 root@redis02:~# cat demo09.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo09.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 定义函数，设置默认值
+greet() {
+    name=${1:-"Guest"}  # 如果未传递参数，使用默认值 "Guest"
+    echo "Hello, $name!"
+}
+
+# 调用函数并传递参数
+greet "Alice"
+
+# 调用函数，不传递参数
+greet
+
+
+20:55:42 root@redis02:~# bash demo09.sh
+Hello, Alice!
+Hello, Guest!
+20:55:44 root@redis02:~#
+```
