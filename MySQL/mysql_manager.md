@@ -1462,5 +1462,27 @@ mysql> show charset;
 ...
 ```
 utf8mb3 等价于早期的 utf8 字符编码 可以识别中文信息 每个字符占用3字节 utf8mb4 支持emoji 每个字符占用4字节
+## 3.2 设置字符集
+### 3.2.1 查看数据库使用的字符集
+默认使用的是 utf8mb4
+```sql
+mysql> show create database mysql \G
+*************************** 1. row ***************************
+       Database: mysql
+Create Database: CREATE DATABASE `mysql` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> select @@character_set_server;
++------------------------+
+| @@character_set_server |
++------------------------+
+| utf8mb4                |
++------------------------+
+1 row in set (0.00 sec)
+
+mysql> 
+```
+### 3.2.2 修改数据库使用的字符集
 
 # 四、MySQL 校对规则/排序规则
