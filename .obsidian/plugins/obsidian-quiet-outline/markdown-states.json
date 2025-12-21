@@ -1,14 +1,14 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 2434.3333333333335,
+    "scroll": 8854.081401766005,
     "cursor": {
       "from": {
-        "line": 2530,
-        "ch": 32
+        "line": 8864,
+        "ch": 0
       },
       "to": {
-        "line": 2523,
-        "ch": 5
+        "line": 8864,
+        "ch": 0
       }
     },
     "expandedKeys": [
@@ -77,7 +77,8 @@
       "item-5-579",
       "item-4-581",
       "item-5-584",
-      "item-1-246"
+      "item-1-246",
+      "item-1-588"
     ]
   },
   "Python/python.md": {
@@ -254,7 +255,7 @@
     "expandedKeys": []
   },
   "MySQL/mysql_manager.md": {
-    "scroll": 1455.623670212766,
+    "scroll": 1460.3896276595744,
     "cursor": {
       "from": {
         "line": 1486,
