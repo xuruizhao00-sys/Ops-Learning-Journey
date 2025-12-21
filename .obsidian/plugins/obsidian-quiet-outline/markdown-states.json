@@ -3,11 +3,11 @@
     "scroll": 8951.401515151516,
     "cursor": {
       "from": {
-        "line": 8973,
+        "line": 8980,
         "ch": 0
       },
       "to": {
-        "line": 8973,
+        "line": 8980,
         "ch": 0
       }
     },
@@ -82,7 +82,8 @@
       "item-2-589",
       "item-3-590",
       "item-2-595",
-      "item-3-596"
+      "item-3-596",
+      "item-3-599"
     ]
   },
   "Python/python.md": {
