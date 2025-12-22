@@ -2575,8 +2575,11 @@ unset_variable.sh: line 45: unset: readonly_var: cannot unset: readonly variable
 定义全局变量方法一：
  变量=值
  export 变量
+ 
 定义全局变量方法二：（最常用）
  export 变量=值
+ 
+ 定义全局变量方法三：
  declare -x 
 ```
 #### 2.2.1.2 查看全局变量
