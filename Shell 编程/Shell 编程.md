@@ -9655,5 +9655,88 @@ expect eof
 #### 8.3.6.1 自动化 ssh 登录
 在通过 SSH 远程登录时，通常会要求输入密码。使用 `expect` 可以自动化这个过程，避免手动输入密码。
 ```bash
+[root rockylinux-1 ~] WORK 127 # cat demo02.sh 
+#!/usr/bin/expect
 
+# 设置超时时间为 10 秒
+set timeout 10
+
+# 远程服务器的登录信息
+set user "root"
+set host "192.168.121.132"
+set password "123"
+
+# 使用 spawn 命令启动 SSH 登录
+spawn ssh $user@$host
+
+# 捕获密码提示并自动发送密码
+expect "password:"
+send "$password\r"
+
+# 捕获登录后显示的 shell 提示符
+expect "$ "
+
+# 执行命令
+send "ls -l\r"
+
+# 等待命令执行完毕
+expect "$ "
+
+# 退出 SSH 会话
+send "exit\r"
+
+# 等待 SSH 进程结束
+expect eof
+
+[root rockylinux-1 ~] WORK 0 # expect demo02.sh
+spawn ssh root@192.168.121.132
+root@192.168.121.132's password: 
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-88-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Mon Dec 22 10:27:46 PM CST 2025
+
+  System load:  0.42               Processes:              225
+  Usage of /:   15.2% of 47.93GB   Users logged in:        1
+  Memory usage: 42%                IPv4 address for ens33: 192.168.121.132
+  Swap usage:   0%
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+58 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+*** System restart required ***
+
+Last login: Mon Dec 22 22:27:56 2025 from 192.168.121.180
+22:28:24 root@redis02:~# ls -l
+total 32
+-rw-r--r-- 1 root root  540 Dec 22 17:10 demo01.sh
+-rw-r--r-- 1 root root  567 Dec 22 17:11 demo02.sh
+-rw-r--r-- 1 root root  673 Dec 22 17:16 demo03.sh
+-rw-r--r-- 1 root root  647 Dec 22 17:17 demo04.sh
+-rw-r--r-- 1 root root  480 Dec 22 17:20 demo05.sh
+-rw-r--r-- 1 root root  543 Dec 22 17:25 demo06.sh
+-rw-r--r-- 1 root root 6520 Dec 19 15:20 libaio1_0.3.113-4_amd64.deb
+22:28:29 root@redis02:~# exit
+logout
+Connection to 192.168.121.132 closed.
+[root rockylinux-1 ~] WORK 0 #
 ```
+说明：
+- `spawn` 启动 SSH 连接。
+- `expect "password:"` 捕获密码提示，并用 `send` 发送密码。
+- 在登录后，脚本自动执行 `ls -l` 命令，并最终退出 SSH 会话。
+#### 8.3.6.2 自动化 FTP 登录与文件上传
