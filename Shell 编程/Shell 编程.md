@@ -9622,8 +9622,27 @@ expect version 5.45.4
 expect version 5.45.4
 ```
 ### 8.3.3 expect 符号标识
-
+|符号|含义|示例|
+|---|---|---|
+|`.`|匹配任何单个字符（不包括换行符）|`a.c` 匹配 "abc", "adc" 等|
+|`*`|匹配零个或多个字符|`ab*c` 匹配 "ac", "abc", "abbbbbc" 等|
+|`?`|匹配零个或一个字符|`a?b` 匹配 "ab" 或 "b"|
+|`[]`|匹配字符集中的任何一个字符|`[a-z]` 匹配任何小写字母|
+|`[^ ]`|匹配不在字符集中的任何一个字符|`[^0-9]` 匹配任何非数字字符|
+|`{n,m}`|匹配前一个字符或子表达式至少 `n` 次，最多 `m` 次|`a{3,5}` 匹配 "aaa", "aaaa", "aaaaa"|
+|`()`|用于分组，通常与 `|` 一起使用|
+|`\`|转义特殊字符，使其具有字面意义|`\.` 匹配字符 "."|
+|`\r`|匹配回车符|`\r` 在 `send` 命令中用于模拟回车键|
+|`\n`|匹配换行符|`\n` 用于模拟换行|
+|`eof`|表示进程输出结束|`expect eof` 用于等待进程结束|
 ### 8.3.4 expect 常用命令
+| 命令                 | 说明                              |
+| ------------------ | ------------------------------- |
+| **`spawn`**        | 启动一个新的进程（如 SSH、FTP、MySQL 等）。    |
+| **`expect`**       | 捕获进程的输出，根据匹配的模式执行操作（可以使用正则表达式）。 |
+| **`send`**         | 发送输入到启动的进程中，模拟用户输入。             |
+| **`timeout`**      | 设置等待输出的最大时间，如果超时会进行相应处理。        |
+| **`exp_continue`** | 继续匹配下一个 `expect`。               |
 
 ### 8.3.5 expect 基础用法
 ```bash
@@ -9740,3 +9759,155 @@ Connection to 192.168.121.132 closed.
 - `expect "password:"` 捕获密码提示，并用 `send` 发送密码。
 - 在登录后，脚本自动执行 `ls -l` 命令，并最终退出 SSH 会话。
 #### 8.3.6.2 自动化 FTP 登录与文件上传
+`expect` 可以用于自动化 FTP 登录、上传文件或执行其他交互命令。
+```bash
+[root rockylinux-1 ~] WORK 0 # cat demo03.sh
+#!/usr/bin/expect
+
+# 设置超时时间为 10 秒
+set timeout 10
+
+# FTP 登录信息
+set host "ftp_host"
+set user "your_username"
+set password "your_password"
+set file_path "/path/to/your/file"
+set remote_path "/remote/directory"
+
+# 使用 spawn 启动 FTP 会话
+spawn ftp $host
+
+# 捕获用户名提示并发送用户名
+expect "Name *:"
+send "$user\r"
+
+# 捕获密码提示并发送密码
+expect "Password:"
+send "$password\r"
+
+# 等待 FTP 提示符
+expect "ftp>"
+
+# 发送文件上传命令
+send "put $file_path $remote_path\r"
+
+# 等待文件上传完成
+expect "ftp>"
+
+# 退出 FTP 会话
+send "bye\r"
+
+# 等待 FTP 
+
+```
+说明：
+- `spawn ftp $host` 启动 FTP 会话。
+- `expect "Name *:"` 和 `expect "Password:"` 捕获用户名和密码提示。
+- `send "put ..."` 上传指定文件。
+#### 8.3.6.3 自动化数据库登录
+`expect` 还可以用于自动化数据库登录，例如自动登录 MySQL 数据库并执行查询。
+```bash
+#!/usr/bin/expect
+
+# 设置超时时间为 10 秒
+set timeout 10
+
+# MySQL 登录信息
+set user "root"
+set password "your_password"
+
+# 使用 spawn 启动 MySQL 客户端
+spawn mysql -u $user -p
+
+# 捕获密码提示并发送密码
+expect "Enter password:"
+send "$password\r"
+
+# 执行 SQL 查询
+expect "mysql>"
+send "SHOW DATABASES;\r"
+
+# 等待查询结果
+expect "mysql>"
+
+# 退出 MySQL
+send "exit\r"
+
+# 等待 MySQL 进程结束
+expect eof
+
+```
+说明：
+- `spawn mysql -u $user -p` 启动 MySQL 客户端。
+- `expect "Enter password:"` 捕获密码提示，并发送密码。
+- 执行 SQL 查询并退出 MySQL。
+### 8.3.7 `expect` 高级用法
+#### 8.3.7.1 使用 `expect` 自动处理不同的提示
+
+`expect` 可以根据不同的提示执行不同的操作，例如根据不同的错误码进行处理
+示例：自动处理错误提示
+```bash
+[root rockylinux-1 ~] WORK 0 # cat demo04.sh
+#!/usr/bin/expect
+
+set timeout 10
+spawn ssh user@remote_host
+
+expect {
+    "password:" {
+        send "your_password\r"
+    }
+    "yes/no" {
+        send "yes\r"
+        exp_continue
+    }
+    timeout {
+        send_user "连接超时\n"
+        exit 1
+    }
+}
+
+expect "$ "
+send "ls -l\r"
+expect "$ "
+send "exit\r"
+expect eof
+```
+说明：
+- `expect` 支持多种情况的处理，可以使用大括号 `expect {}` 来定义多个匹配条件。
+- `exp_continue` 允许在匹配后继续执行后续的 `expect`。
+#### 8.3.7.2 使用正则表达式匹配输出
+`expect` 支持使用正则表达式来匹配程序输出，这可以在处理复杂的交互式任务时非常有用。
+示例：使用正则表达式捕获输出
+```bash
+[root rockylinux-1 ~] WORK 0 # cat demo05.sh
+#!/usr/bin/expect
+
+set timeout 10
+spawn ssh user@remote_host
+
+expect {
+    "password:" {
+        send "your_password\r"
+    }
+    "yes/no" {
+        send "yes\r"
+        exp_continue
+    }
+    timeout {
+        send_user "连接超时\n"
+        exit 1
+    }
+}
+
+expect {
+    "Welcome" { send "echo Welcome\r" }
+    "Permission denied" { send "echo 权限拒绝\r" }
+}
+
+expect "$ "
+send "exit\r"
+expect eof
+```
+说明：
+- `expect` 可以通过正则表达式捕获不同的字符串（如 "Welcome" 或 "Permission denied"）。
