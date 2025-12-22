@@ -9598,3 +9598,57 @@ done
 说明：
 - 当 `Ctrl+C` 触发 `SIGINT` 信号时，`trap` 会捕获该信号，执行 `cleanup` 函数。
 - 在 `cleanup` 函数中，添加了 `exit` 命令，这会导致脚本在执行清理操作后退出。
+## 8.3 expect
+在 **Shell 编程** 中，`expect` 是一个非常有用的工具，通常用于自动化交互式任务的执行。`expect` 允许脚本自动处理那些需要用户交互的程序，模拟用户的输入并自动进行操作。它常用于 SSH 登录、FTP 操作、数据库管理、安装脚本等需要用户输入密码或选择的场景。
+### 8.3.1 什么是 expect
+`expect` 是一个自动化工具，提供了一种处理交互式会话的方式。在传统的 Shell 脚本中，我们通常会等待用户输入或交互，而 `expect` 允许我们模拟这些输入，自动执行一些交互任务。它的主要功能是：
+
+- 自动处理程序的提示信息。
+- 模拟用户输入。
+- 自动响应密码提示、确认提示等交互式问题。
+`expect` 本身并不是一个 Shell 内建命令，而是一个独立的程序。可以通过命令行或者在 Shell 脚本中调用它。
+### 8.3.2 expect 安装
+```bash
+# Centos
+[root rockylinux-1 ~] WORK 0 # yum install -y expect
+
+# Ubuntu
+17:33:25 root@redis02:~# apt install -y expect
+
+
+[root rockylinux-1 ~] WORK 0 # expect -v
+expect version 5.45.4
+17:35:27 root@redis02:~# expect -v
+expect version 5.45.4
+```
+### 8.3.3 expect 符号标识
+
+### 8.3.4 expect 常用命令
+
+### 8.3.5 expect 基础用法
+```bash
+#!/usr/bin/expect
+
+# 设置一个超时时间（可选）
+set timeout 20
+
+# 启动一个命令
+spawn command
+
+# 捕获期望的输出并进行响应
+expect "pattern1"
+send "response1\n"
+
+expect "pattern2"
+send "response2\n"
+
+# 退出 expect
+expect eof
+```
+语法说明：
+- `spawn command`：启动一个新进程（如 SSH 登录、FTP 上传等）。
+- `expect "pattern"`：等待特定的字符串或输出。
+- `send "response"`：向进程发送指定的响应。
+- `set timeout`：设置 `expect` 的超时时间，单位为秒，默认为 10 秒。
+- `expect eof`：表示处理完所有的交互后，脚本结束。
+### 8.3.6 `expect` 使用场景
