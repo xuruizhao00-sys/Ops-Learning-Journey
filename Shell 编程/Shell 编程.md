@@ -9407,5 +9407,194 @@ done
 - 捕获 `SIGINT`（Ctrl+C）和 `SIGTERM`（终止信号），并执行相同的操作：输出清理信息并退出。
 #### 示例 3：在脚本退出时执行清理操作
 ```bash
+17:16:19 root@redis02:~# cat demo03.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
 
+# 定义清理函数
+cleanup() {
+    echo "清理临时文件..."
+    rm -f /tmp/tempfile
+}
+
+# 捕获 SIGINT 和 SIGTERM 信号并执行清理
+trap cleanup SIGINT SIGTERM
+
+# 模拟脚本运行并创建临时文件
+echo "创建临时文件..."
+touch /tmp/tempfile
+echo "临时文件已创建"
+
+# 模拟脚本的长时间运行
+while true; do
+    sleep 1
+done
+
+
+17:16:20 root@redis02:~# bash demo03.sh
+创建临时文件...
+临时文件已创建
+^C清理临时文件...
 ```
+说明：
+- 通过 `trap` 捕获 `SIGINT` 和 `SIGTERM` 信号，调用 `cleanup` 函数清理临时文件 `/tmp/tempfile`。
+#### 示例 4：捕获 `EXIT` 信号
+`EXIT` 是一个特殊的信号，表示脚本退出时触发。它通常用于在脚本执行完毕时进行清理工作。
+```bash
+17:17:20 root@redis02:~# cat demo04.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo04.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 捕获 EXIT 信号，脚本结束时执行清理操作
+trap 'echo "脚本执行完毕，进行清理操作..."; rm -f /tmp/tempfile' EXIT
+
+# 模拟脚本运行并创建临时文件
+echo "创建临时文件..."
+touch /tmp/tempfile
+echo "临时文件已创建"
+
+# 模拟脚本执行
+echo "脚本正在执行，退出时会清理临时文件"
+
+17:17:21 root@redis02:~# bash demo04.sh
+创建临时文件...
+临时文件已创建
+脚本正在执行，退出时会清理临时文件
+脚本执行完毕，进行清理操作...
+17:17:23 root@redis02:~#
+```
+说明：
+- 当脚本执行完毕退出时，`EXIT` 信号被捕获并执行清理操作，删除临时文件。
+### 8.2.3 捕获信号并忽略
+有时我们希望在脚本运行时忽略某些信号。可以使用 `trap` 命令来捕获信号并什么都不做，这样就会忽略该信号。
+<mark style="background: #FF5582A6;">示例：忽略 SIGINT 信号（Ctrl+C）</mark>
+```bash
+17:20:20 root@redis02:~# cat demo05.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo05.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 忽略 SIGINT 信号（Ctrl+C）
+trap '' SIGINT
+
+# 模拟脚本长时间运行
+echo "脚本正在运行...按 Ctrl+C 也不会终止脚本"
+while true; do
+    sleep 1
+done
+
+
+17:21:01 root@redis02:~# bash demo05.sh
+脚本正在运行...按 Ctrl+C 也不会终止脚本
+^C
+^C^C^C^C^C^C
+```
+### 8.2.4 `trap` 命令中的信号操作
+|信号|说明|示例命令|操作类型|
+|---|---|---|---|
+|`SIGINT`|中断信号，通常由 `Ctrl+C` 触发|`trap 'commands' SIGINT`|捕获中断信号，执行自定义操作|
+|`SIGTERM`|终止信号，要求进程终止|`trap 'commands' SIGTERM`|捕获终止信号，执行清理或退出|
+|`SIGKILL`|强制终止信号，无法捕获或忽略|无法捕获，直接终止进程|强制退出进程（无法捕获或处理）|
+|`SIGQUIT`|退出信号，通常由 `Ctrl+\` 触发|`trap 'commands' SIGQUIT`|捕获退出信号，生成 core dump|
+|`SIGSTOP`|停止信号，暂停进程执行|`trap 'commands' SIGSTOP`|捕获停止信号，暂停进程执行|
+|`SIGCONT`|恢复信号，恢复被暂停的进程|`trap 'commands' SIGCONT`|捕获恢复信号，恢复进程执行|
+|`SIGPIPE`|管道破裂信号，当进程尝试向管道写入时|`trap 'commands' SIGPIPE`|捕获管道破裂信号，防止脚本退出|
+|`SIGALRM`|定时信号，通常用于定时器触发|`trap 'commands' SIGALRM`|捕获定时信号，执行定时任务|
+|`EXIT`|脚本退出时触发|`trap 'commands' EXIT`|捕获脚本退出时执行清理操作|
+### 8.2.5 `trap` 命令的高级用法
+#### 8.2.5.1 在函数内使用 `trap`
+我们可以在函数内部使用 `trap` 来捕获并处理信号，这样可以让函数在特定信号发生时执行自定义操作。
+```bash
+17:25:10 root@redis02:~# cat demo06.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo06.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 定义函数，捕获 SIGINT 信号
+my_function() {
+    trap 'echo "捕获到 SIGINT 信号"; exit' SIGINT
+    while true; do
+        echo "函数正在运行...按 Ctrl+C 终止"
+        sleep 1
+    done
+}
+
+# 调用函数
+my_function
+
+
+17:25:11 root@redis02:~# bash demo06.sh
+函数正在运行...按 Ctrl+C 终止
+^C捕获到 SIGINT 信号
+```
+### 8.2.6 `trap` 命令注意事项
+#### 8.2.6.1 `trap` 命令本身不具备推出脚本的能力
+==拿 8.2.2 小节中的示例3举例==
+- **`trap` 捕获信号并执行清理**：
+    - 当你按下 `Ctrl+C` 时，`SIGINT` 信号会被触发。
+    - `trap` 捕获到 `SIGINT` 后，调用 `cleanup` 函数，并执行清理操作（删除 `/tmp/tempfile`）。
+    - 但是 `trap` 只是捕获信号并执行 `cleanup`，然后脚本继续执行后面的代码。
+- **`trap` 不会自动退出脚本**：
+    - `trap` 仅仅是执行捕获信号时的操作，但它不会自动结束脚本。如果希望脚本在捕获信号后退出，必须显式调用 `exit` 命令。
+    - 在 `cleanup` 函数中添加 `exit` 语句来确保脚本终止。
+修改后的脚本如下：
+```bash
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo03.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+# 定义清理函数
+cleanup() {
+    echo "清理临时文件..."
+    rm -f /tmp/tempfile
+    exit
+}
+
+# 捕获 SIGINT 和 SIGTERM 信号并执行清理
+trap cleanup SIGINT SIGTERM
+
+# 模拟脚本运行并创建临时文件
+echo "创建临时文件..."
+touch /tmp/tempfile
+echo "临时文件已创建"
+
+# 模拟脚本的长时间运行
+while true; do
+    sleep 1
+done
+```
+说明：
+- 当 `Ctrl+C` 触发 `SIGINT` 信号时，`trap` 会捕获该信号，执行 `cleanup` 函数。
+- 在 `cleanup` 函数中，添加了 `exit` 命令，这会导致脚本在执行清理操作后退出。
