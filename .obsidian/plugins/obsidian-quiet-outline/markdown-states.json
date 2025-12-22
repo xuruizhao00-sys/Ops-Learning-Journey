@@ -3,12 +3,12 @@
     "scroll": 9639.575757575758,
     "cursor": {
       "from": {
-        "line": 9654,
-        "ch": 5
+        "line": 9657,
+        "ch": 0
       },
       "to": {
-        "line": 9654,
-        "ch": 5
+        "line": 9657,
+        "ch": 0
       }
     },
     "expandedKeys": [
@@ -39,7 +39,8 @@
       "item-3-622",
       "item-3-629",
       "item-3-631",
-      "item-2-633"
+      "item-2-633",
+      "item-3-639"
     ]
   },
   "Python/python.md": {
