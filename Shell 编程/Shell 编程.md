@@ -2896,7 +2896,6 @@ Shell 在执行命令时，顺序是这样的👇
 ```bash
 # 父 shell 中看到的是
 "echo $name"
-
 ```
 第二步：
 ```bash
