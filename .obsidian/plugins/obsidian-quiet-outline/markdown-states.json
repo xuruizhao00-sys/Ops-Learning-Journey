@@ -1,14 +1,14 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 9895.030303030304,
+    "scroll": 3668.3538692707734,
     "cursor": {
       "from": {
-        "line": 9879,
-        "ch": 43
+        "line": 3682,
+        "ch": 0
       },
       "to": {
-        "line": 9879,
-        "ch": 43
+        "line": 3682,
+        "ch": 0
       }
     },
     "expandedKeys": [
@@ -41,7 +41,19 @@
       "item-3-631",
       "item-2-633",
       "item-3-639",
-      "item-3-643"
+      "item-3-643",
+      "item-1-124",
+      "item-3-229",
+      "item-5-235",
+      "item-4-232",
+      "item-3-242",
+      "item-1-246",
+      "item-3-248",
+      "item-2-247",
+      "item-4-250",
+      "item-1-277",
+      "item-3-272",
+      "item-2-260"
     ]
   },
   "Python/python.md": {
@@ -218,7 +230,7 @@
     "expandedKeys": []
   },
   "MySQL/mysql_manager.md": {
-    "scroll": 1460.3896276595744,
+    "scroll": 1459.8484848484848,
     "cursor": {
       "from": {
         "line": 1486,
