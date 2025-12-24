@@ -2891,7 +2891,30 @@ Shell 在执行命令时，顺序是这样的👇
 1️⃣ **父 shell 先解析命令行**  
 2️⃣ **做变量展开（`$var`、`$$`、`$?` 等）**  
 3️⃣ **再执行命令**
+`bash -c "echo $name"`
+第一步：
+```bash
+# 父 shell 中看到的是
+"echo $name"
 
+```
+第二步：
+```bash
+# 父 shell 中进行展开
+"echo $name"  ----->  $name -----> tom
+
+# 于是父 shell 实际执行的是：
+bash -c "echo tom"
+```
+⚠️ **这一步已经把 name 替换完了**
+第三步：
+```bash
+# 启动子 shell
+# 子 shell 实际拿到的命令是
+echo tom
+
+# 👉 子 shell 根本没见过 `$name`
+```
 #### 2.2.3.2 嵌套实践
 ##### 2.2.3.2.1 验证本地变量无法传递给子 shell
 ```bash
