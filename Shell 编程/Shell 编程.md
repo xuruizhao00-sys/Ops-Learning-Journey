@@ -2886,6 +2886,12 @@ echo "USER_BIN = $USER_BIN"  # 输出：/home/user/bin
 └── 环境表：var2=456（复制父的环境表）
     → 子Shell修改var2=789 → 仅修改自身环境表，父的var2仍为456
 ```
+##### 2.2.3.1.2 shell 执行顺序
+Shell 在执行命令时，顺序是这样的👇
+1️⃣ **父 shell 先解析命令行**  
+2️⃣ **做变量展开（`$var`、`$$`、`$?` 等）**  
+3️⃣ **再执行命令**
+
 #### 2.2.3.2 嵌套实践
 ##### 2.2.3.2.1 验证本地变量无法传递给子 shell
 ```bash
@@ -3536,10 +3542,11 @@ echo "父 shell BASHPID: $BASHPID"
 ###### 📌 如果在交互式 shell 执行呢？
 在 interactive shell（命令行直接输入）中 `$$` **会随着 subshell 改变**：
 ```bash
-$ echo $$
-1000
-$ (echo $$)
-1001
+23:05:24 root@redis02:~# echo $$
+20652
+23:05:41 root@redis02:~# bash -c 'echo $$'
+20792
+23:05:49 root@redis02:~#
 ```
 
 ##### 2.2.3.4.3 export 数组问题
