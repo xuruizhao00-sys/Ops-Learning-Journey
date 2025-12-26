@@ -137,7 +137,7 @@ Google的四个黄金指标
 
 ### 1.3.1 系统命令
 
-![image-20250915113204776](../image-20250915113204776.png)
+![image-20250915113204776](Prometheus.assets/image-20250915113204776.png)
 
 ### 1.3.2 开源软件
 
@@ -149,7 +149,7 @@ Google的四个黄金指标
 
 一些云服务商提供了监控平台可以实现监控功能
 
-![image-20250915132917020](../image-20250915132917020.png)
+![image-20250915132917020](Prometheus.assets/image-20250915132917020.png)
 
 ## 1.4 时序数据库
 
@@ -157,7 +157,7 @@ Google的四个黄金指标
 
 https://db-engines.com/en/ranking/time+series+dbms
 
-![image-20250915133025831](../image-20250915133025831.png)
+![image-20250915133025831](Prometheus.assets/image-20250915133025831.png)
 
 时间序列数据(TimeSeries Data) : 按照时间顺序记录系统、设备状态变化的数据被称为时序数据。
 
@@ -193,7 +193,7 @@ TSDB是一个分布式时间序列数据库，具备多副本高可用能力。�
 
 ### 1.5.1 Prometheus 简介
 
-![image-20250915133212306](../image-20250915133212306.png)
+![image-20250915133212306](Prometheus.assets/image-20250915133212306.png)
 
 Prometheus 是一款时序(time series）数据库TSDB，也是一款设计用于实现基于目标(Target)的监控系统的关键组件，结合其它组件，例如Pushgateway、Altermanager和Grafana等，可构成一个完整的监控系统
 
@@ -221,7 +221,7 @@ github：https://github.com/prometheus
 - 支持静态配置和服务发现两种方式发现目标
 - 多种可视化和仪表盘,支持第三方 Dashboard,比如:Graf
 
-![image-20250915133401767](../image-20250915133401767.png)
+![image-20250915133401767](Prometheus.assets/image-20250915133401767.png)
 
 数据特点
 
@@ -257,13 +257,13 @@ Prometheus 同其它TSDB相比有一个非常典型的特性：它主动从各 T
 
 两个方式各有优劣，其中，Pull模型的优势在于：集中控制：有利于将配置集在 Prometheus Server上完成，包括指标及采取速率等,Prometheus的根本目标在于收集在Target上预先完成聚合的聚合型数据，而非一款由事件驱动的存储系统
 
-![image-20250915133612747](../image-20250915133612747.png)
+![image-20250915133612747](Prometheus.assets/image-20250915133612747.png)
 
 #### 1.5.2.2 Prometheus 架构
 
 https://github.com/prometheus/prometheus
 
-![image-20250915133720376](../image-20250915133720376.png)
+![image-20250915133720376](Prometheus.assets/image-20250915133720376.png)
 
 Prometheus 的主要模块包括：
 
@@ -293,15 +293,15 @@ Prometheus 的主要模块包括：
 
 Prometheus 由几个主要的软件组件组成，其职责概述如下
 
-| 组件                 | 解析                                                                                                                                        |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Prometheus server  | 彼此独立运行，仅依靠其本地存储来实现其核心功能：抓取时序数据，规则处理和报警                                                                                                    |
-| Client Library     | 客户端库，为需要监控的服务生成相应的 metrics 并暴露给 Prometheus server。当 Prometheus server 来 pull 时，直接返回实时状态的 metrics。                                         |
+| 组件               | 解析                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| Prometheus server  | 彼此独立运行，仅依靠其本地存储来实现其核心功能：抓取时序数据，规则处理和报警 |
+| Client Library     | 客户端库，为需要监控的服务生成相应的 metrics 并暴露给 Prometheus server。当 Prometheus server 来 pull 时，直接返回实时状态的 metrics。 |
 | Push Gateway       | exporter 采集类型已经很丰富，但是依然需要很多自定义的监控数据,用 pushgateway 可以实现自定义的监控数据,任意灵活想做什么都可以做到 exporter 的开发需要使用真正的编程语言，不支持shell这种快速脚本,而pushgateway 开发就容易的多。 |
-| exporters          | 部署到第三方软件主机上，用于暴露已有的第三方服务的 metrics 给 Prometheus。                                                                                           |
-| Alertmanager       | 从 Prometheus server 端接收到 alerts 后，会进行去除重复数据，分组，并路由到对应的接受方式，以高效向用户完成告警信息发送。常见的接收方式有：电子邮件，pagerduty，OpsGenie, webhook 等,一些其他的工具。            |
-| Data Visualization | Prometheus Web UI （Prometheus Server内建），及Grafana等                                                                                         |
-| Service Discovery  | 动态发现待监控的 Target，从而完成监控配置的重要组件，在容器化环境中尤为有用；该组件目前由 Prometheus Server 内建支持；                                                                  |
+| exporters          | 部署到第三方软件主机上，用于暴露已有的第三方服务的 metrics 给 Prometheus。 |
+| Alertmanager       | 从 Prometheus server 端接收到 alerts 后，会进行去除重复数据，分组，并路由到对应的接受方式，以高效向用户完成告警信息发送。常见的接收方式有：电子邮件，pagerduty，OpsGenie, webhook 等,一些其他的工具。 |
+| Data Visualization | Prometheus Web UI （Prometheus Server内建），及Grafana等     |
+| Service Discovery  | 动态发现待监控的 Target，从而完成监控配置的重要组件，在容器化环境中尤为有用；该组件目前由 Prometheus Server 内建支持； |
 
 在上述的组件中，大多数都是用Go编写的，因此易于构建和部署为静态二进制文件。
 
@@ -322,7 +322,7 @@ Prometheus 只负责时序型指标数据的采集及存储
 
 https://prometheus.io/docs/instrumenting/exporters/
 
-![image-20250915134649713](../image-20250915134649713.png)
+![image-20250915134649713](Prometheus.assets/image-20250915134649713.png)
 
 ### 1.5.3 Prometheus 数据模型
 
@@ -340,7 +340,7 @@ metric 名字由 ASCII 字符，数字，下划线，以及冒号组成，且必
 
 注意：冒号是为用户定义的记录规则保留的。
 
-![image-20250915135120527](../image-20250915135120527.png)
+![image-20250915135120527](Prometheus.assets/image-20250915135120527.png)
 
 #### 1.5.3.2 标签
 
@@ -363,7 +363,7 @@ metric 名字由 ASCII 字符，数字，下划线，以及冒号组成，且必
 
 查询语言允许基于这些维度进行过滤和聚合。更改任何标签值，包括添加或删除标签，都会创建一个新  的时间序列
 
-![image-20250915135628790](../image-20250915135628790.png)
+![image-20250915135628790](Prometheus.assets/image-20250915135628790.png)
 
 #### 1.5.3.3 数据格式
 
@@ -385,7 +385,7 @@ Exporter 收集的数据转化的文本内容以行 (\n) 为单位，空行将�
 
 一组同种类型的 instances 集合称为一个 job，主要用于保证可扩展性和可靠性。
 
-![image-20250915171028247](../image-20250915171028247.png)
+![image-20250915171028247](Prometheus.assets/image-20250915171028247.png)
 
 例如：一个 API 服务 job 包含四个 instances
 
@@ -432,7 +432,7 @@ Prometheus 的 Metric 指标都必须以 http 的方式暴露出来，因此 pro
 
 prometheus 默认支持通过三种类型的途径从目标上"抓取（Scrape）"指标数据
 
-![image-20250915171306596](../image-20250915171306596.png)
+![image-20250915171306596](Prometheus.assets/image-20250915171306596.png)
 
 | 方式            | 解析                                                         |
 | --------------- | ------------------------------------------------------------ |
@@ -497,7 +497,7 @@ PromQL 支持处理两种向量，并内置提供了一组用于数据处理的�
 - 告警指示由Prometheus Server基于用户提供的告警规则周期性计算生成
 - Alertmanager接收到Prometheus Server 发来的告警指示后，基于用户定义的告警路由(route)向告警接收人发送告警信息；
 
-![image-20250915171623408](../image-20250915171623408.png)
+![image-20250915171623408](Prometheus.assets/image-20250915171623408.png)
 
 # 二、Prometheus 部署和监控
 
@@ -632,7 +632,7 @@ root@prometheus-221:~ 17:27:35 #
 http://<prometheus服务器IP>:9090
 ~~~
 
-![image-20250915172814990](../image-20250915172814990.png)
+![image-20250915172814990](Prometheus.assets/image-20250915172814990.png)
 
 #### 2.1.2.2 RedHat/Rocky/Centos
 
@@ -787,16 +787,16 @@ root@prometheus-221:~ 11:04:37 # systemctl reload prometheus
 http://192.168.121.221:9090/
 ~~~
 
-![image-20250916110638909](../image-20250916110638909.png)
+![image-20250916110638909](Prometheus.assets/image-20250916110638909.png)
 
-![image-20250916110649434](../image-20250916110649434.png)
+![image-20250916110649434](Prometheus.assets/image-20250916110649434.png)
 
 ~~~shell
 #浏览器访问:
 http://192.168.121.221:9090/metrics
 ~~~
 
-![image-20250916110720075](../image-20250916110720075.png)
+![image-20250916110720075](Prometheus.assets/image-20250916110720075.png)
 
 ~~~shell
 root@prometheus-221:~ 11:05:58 # curl http://localhost:9090/metrics
@@ -907,7 +907,7 @@ root@prometheus-221:~ 13:03:25 # /usr/local/prometheus/bin/prometheus --help
 
 查看配置
 
-![image-20250916130627524](../image-20250916130627524.png)
+![image-20250916130627524](Prometheus.assets/image-20250916130627524.png)
 
 ### 2.1.4 容器化启动
 
@@ -1243,9 +1243,9 @@ start_node_exporter
 
 http://192.168.121.111:9100/
 
-![image-20250917181810400](../image-20250917181810400.png)
+![image-20250917181810400](Prometheus.assets/image-20250917181810400.png)
 
-![image-20250917181830228](../image-20250917181830228.png)
+![image-20250917181830228](Prometheus.assets/image-20250917181830228.png)
 
 ## 2.3 Prometheus 采集 Node Exporter 数据
 
@@ -1322,17 +1322,17 @@ http://192.168.121.221:9090/targets
 
 ~~~
 
-![image-20250917182847023](../image-20250917182847023.png)
+![image-20250917182847023](Prometheus.assets/image-20250917182847023.png)
 
 ### 2.3.3 Prometheus 验证 Node 节点监控数据
 
 点上面页面的主机链接,可以直接跳转至对应节点的页面
 
-![image-20250917182943382](../image-20250917182943382.png)
+![image-20250917182943382](Prometheus.assets/image-20250917182943382.png)
 
-![image-20250917183043242](../image-20250917183043242.png)
+![image-20250917183043242](Prometheus.assets/image-20250917183043242.png)
 
-![image-20250917183351576](../image-20250917183351576.png)
+![image-20250917183351576](Prometheus.assets/image-20250917183351576.png)
 
 ## 2.4 Grafana 展示 Prometheus 数据
 
@@ -1419,7 +1419,7 @@ docker run -d --name=grafana -p 3000:3000 grafana/grafana
 #输入用户名和密码：admin/admin，就会进入到更改密码的页面，查看效果
 ~~~
 
-![image-20250917205100426](../image-20250917205100426.png)
+![image-20250917205100426](Prometheus.assets/image-20250917205100426.png)
 
 输入更改后的密码后，此处为了方便密码使用 123456, 点击"Submit"后，就会进入到首页，查看效果
 
@@ -1427,35 +1427,35 @@ docker run -d --name=grafana -p 3000:3000 grafana/grafana
 
 添加数据源: 点击 "Add your first data source" 
 
-![image-20250917205207439](../image-20250917205207439.png)
+![image-20250917205207439](Prometheus.assets/image-20250917205207439.png)
 
 选择 "Prometheus" 出现添加界面
 
-![image-20250917205232584](../image-20250917205232584.png)
+![image-20250917205232584](Prometheus.assets/image-20250917205232584.png)
 
 按照如下配置信息，在 Settings 界面对 Prometheus 进行配置 ，效果如下
 
 输入 Prometheus 的地址(192.168.121.221:9090或者localhost:9090)，其它没有做任何变动。
 
-![image-20250917205318214](../image-20250917205318214.png)
+![image-20250917205318214](Prometheus.assets/image-20250917205318214.png)
 
 其它信息不用设置，点击最下面的 "Save & Test" 查看效果
 
-![image-20250917205405528](../image-20250917205405528.png)
+![image-20250917205405528](Prometheus.assets/image-20250917205405528.png)
 
 #### 2.4.3.3 使用数据源中内置的 Dashboard
 
 点 Dashboards 页签内的 import,导入内置的三个模板
 
-![image-20250917205515900](../image-20250917205515900.png)
+![image-20250917205515900](Prometheus.assets/image-20250917205515900.png)
 
 查看默认的三个模板
 
-![image-20250917205537335](../image-20250917205537335.png)
+![image-20250917205537335](Prometheus.assets/image-20250917205537335.png)
 
 注意: 由于没有将 grafana 纳入到 prometheus 监控的 target,所以以下没有数据
 
-![image-20250917205615866](../image-20250917205615866.png)
+![image-20250917205615866](Prometheus.assets/image-20250917205615866.png)
 
 ### 2.4.4 导入指定模板展示 Node Exporter 数据
 
@@ -1465,9 +1465,9 @@ docker run -d --name=grafana -p 3000:3000 grafana/grafana
 
 https://grafana.com/grafana/dashboards/
 
-![image-20250917205819427](../image-20250917205819427.png)
+![image-20250917205819427](Prometheus.assets/image-20250917205819427.png)
 
-![image-20250917205929742](../image-20250917205929742.png)
+![image-20250917205929742](Prometheus.assets/image-20250917205929742.png)
 
 #### 2.4.4.2 导入指定模板
 
@@ -1475,13 +1475,13 @@ https://grafana.com/grafana/dashboards/
 
 点击"import",将"https://grafana.com/dashboards/8919或1860或11074"添加到如下位置，点Load 后效果如下
 
-![image-20250917210038587](../image-20250917210038587.png)
+![image-20250917210038587](Prometheus.assets/image-20250917210038587.png)
 
-![image-20250917210120775](../image-20250917210120775.png)
+![image-20250917210120775](Prometheus.assets/image-20250917210120775.png)
 
 在Prometheus Data Source右侧选择刚才配置的Prometheus数据源即可，然后点击"Import",查看效果
 
-![image-20250917210147253](../image-20250917210147253.png)
+![image-20250917210147253](Prometheus.assets/image-20250917210147253.png)
 
 结果显示：node_exporter部署完毕后，节点的信息立刻就展示出来了。
 
@@ -1517,7 +1517,7 @@ root@prometheus-221:~ 21:05:24 #
 
 在 Grafana 的数据源 Prometheus 中内置模板 Grafana metrics 中即可展示 Grafana 的状态
 
-![image-20250917210713325](../image-20250917210713325.png)
+![image-20250917210713325](Prometheus.assets/image-20250917210713325.png)
 
 ## 2.6 监控 zookeeper
 
@@ -1561,7 +1561,7 @@ root@prometheus-221:~ 21:09:42 # systemctl restart prometheus.service
 
 ### 2.6.3 查看 Prometheus 监控数据
 
-![image-20250917211046070](../image-20250917211046070.png)
+![image-20250917211046070](Prometheus.assets/image-20250917211046070.png)
 
 ### 2.6.4 配置 Grafana
 
@@ -1569,7 +1569,7 @@ root@prometheus-221:~ 21:09:42 # systemctl restart prometheus.service
 
 点击 import ，注意：选择正确的 Cluster 名称才能正常显示
 
-![image-20250917211229176](../image-20250917211229176.png)
+![image-20250917211229176](Prometheus.assets/image-20250917211229176.png)
 
 ## 2.7 Pushgateway 采集自定义数据
 
@@ -1579,7 +1579,7 @@ root@prometheus-221:~ 21:09:42 # systemctl restart prometheus.service
 
 https://prometheus.io/docs/practices/pushing/
 
-![image-20250918120858556](../image-20250918120858556.png)
+![image-20250918120858556](Prometheus.assets/image-20250918120858556.png)
 
 Pushgateway 是一项中介服务，允许您从无法抓取的作业中推送指标
 
@@ -1669,9 +1669,9 @@ root@prometheus-221:~ 14:11:43 #
 
 ~~~
 
-![image-20250918141159300](../image-20250918141159300.png)
+![image-20250918141159300](Prometheus.assets/image-20250918141159300.png)
 
-![image-20250918141214148](../image-20250918141214148.png)
+![image-20250918141214148](Prometheus.assets/image-20250918141214148.png)
 
 ### 2.7.3 配置 Prometheus 收集 Pushgateway 数据
 
@@ -1777,9 +1777,9 @@ pushgateway   #指定 jobname,会自动添加一个新标签名称为 exported_
 
 ~~~
 
-![image-20250918142342451](../image-20250918142342451.png)
+![image-20250918142342451](Prometheus.assets/image-20250918142342451.png)
 
-![image-20250918142421136](../image-20250918142421136.png)
+![image-20250918142421136](Prometheus.assets/image-20250918142421136.png)
 
 范例: 通用脚本
 
@@ -1835,7 +1835,7 @@ push_metric
 - 数据采集以特定的时间周期进行，随着时间将这些样本数据记录下来，将生成一个离散的样本数据序列,该序列也称为向量（Vector）
 - 将多个序列放在同一个坐标系内（以时间为横轴，以序列为纵轴），将形成一个由数据点组成的矩阵
 
-![image-20250918160032492](../image-20250918160032492.png)
+![image-20250918160032492](Prometheus.assets/image-20250918160032492.png)
 
 Prometheus基于指标名称（metrics name）以及附属的标签集（labelset）唯一定义一条时间序列
 
@@ -1853,7 +1853,7 @@ Metric Name的表示方式有下面两种
 {__name__="metric name",<label name>=<label value>, …} #通常用于Prometheus内部
 ~~~
 
-![image-20250918160354388](../image-20250918160354388.png)
+![image-20250918160354388](Prometheus.assets/image-20250918160354388.png)
 
 - 指标名称：
 
@@ -1885,7 +1885,7 @@ Prometheus的每个数据样本由两部分组成
 - key: 包括三部分Metric 名称,Label, Timestamp(毫秒精度的时间戳)
 - value: float64格式的数据
 
-![image-20250918160521460](../image-20250918160521460.png)
+![image-20250918160521460](Prometheus.assets/image-20250918160521460.png)
 
 PromQL支持基于定义的指标维度进行过滤，统计和聚合
 
@@ -1936,7 +1936,7 @@ https://prometheus.io/docs/prometheus/latest/querying/basics/
 
 日常图形展示中用到的数据就是基于上面四种样式组合而成的综合表达式,效果如下
 
-![image-20250918160917704](../image-20250918160917704.png)
+![image-20250918160917704](Prometheus.assets/image-20250918160917704.png)
 
 PromQL的查询操需要针对有限个时间序列上的样本数据进行，挑选出目标时间序列是构建表达式时最为关键的一步,然后根据挑选出给定指标名称下的所有时间序列或部分时间序列的即时（当前）样本值或至过去某个时间范围内的样本值。
 
@@ -2585,7 +2585,7 @@ irate函数求出来的就是瞬时变化率
 
 irate函数=时间区间内最后两个样本点的差 / 最后两个样本点的时间差
 
-![image-20250919161756140](../image-20250919161756140.png)
+![image-20250919161756140](Prometheus.assets/image-20250919161756140.png)
 
 一般情况下，irate函数的图像峰值变化大，rate函数变化较为平缓
 
@@ -2836,21 +2836,21 @@ root@prometheus-221:~ 12:58:29 # systemctl restart prometheus.service
 
 浏览器访问 prometheus 的 target 界面
 
-![image-20250920125924442](../image-20250920125924442.png)
+![image-20250920125924442](Prometheus.assets/image-20250920125924442.png)
 
 进入到graph界面查看数据效果
 
-![image-20250920125954008](../image-20250920125954008.png)
+![image-20250920125954008](Prometheus.assets/image-20250920125954008.png)
 
 结果显示：在prometheus上面可以看到正常的数据收集
 
 rate(request_count_total{instance="127.0.0.1:8000", job="my_metric"}[5m])
 
-![image-20250920130155545](../image-20250920130155545.png)
+![image-20250920130155545](Prometheus.assets/image-20250920130155545.png)
 
 irate(request_count_total{instance="127.0.0.1:8000", job="my_metric"}[5m])
 
-![image-20250920130222723](../image-20250920130222723.png)
+![image-20250920130222723](Prometheus.assets/image-20250920130222723.png)
 
 ## 3.5 基于 PromQL 实现 Grafana 展示
 
@@ -2878,23 +2878,23 @@ Grafana是一个可视化的集成套件，可以借助于现成的dashboard模�
 
 默认的可视化方式，我们可以点击左侧边栏的"+"，然后选择"Dashboard",再选择"Choose virtualization"就可以看到默认的可视化样式，效果如下：
 
-![image-20250920130449606](../image-20250920130449606.png)
+![image-20250920130449606](Prometheus.assets/image-20250920130449606.png)
 
 可视化插件
 
 对于可视化插件来说，我们就需要借助于grafana-cli plugins命令从https://grafana.com/plugins/页面下载我们想要的可视化插件，每种插件中都集成了一些特定的可视化样式，我们可以点击左侧变量的"齿 轮"，点击"Plugins"，就可以看到我们所安装的插件样式集，效果如下
 
-![image-20250920130555391](../image-20250920130555391.png)
+![image-20250920130555391](Prometheus.assets/image-20250920130555391.png)
 
 **图形展示**
 
 接下来我们通过现有的模板页面来学习一下Grafana中图形的展示方式以及制作流程。点击我们之前加载好的prometheus的模板页面，效果如下
 
-![image-20250920130825683](../image-20250920130825683.png)
+![image-20250920130825683](Prometheus.assets/image-20250920130825683.png)
 
 以折线图为例，当把鼠标放在图形的标题位置右侧三个点的位置，就会出现图形的操作信息，效果如下
 
-![image-20250920130935496](../image-20250920130935496.png)
+![image-20250920130935496](Prometheus.assets/image-20250920130935496.png)
 
 ~~~shell
 View     #当前Graph的综合展示
@@ -2906,15 +2906,15 @@ More     #这部分包含了对当前图形的一些扩展信息，比如切�
 
 点击View或者键盘输入缩写"x",进入到图形综合展示界面，效果如下
 
-![image-20250920131026918](../image-20250920131026918.png)
+![image-20250920131026918](Prometheus.assets/image-20250920131026918.png)
 
 点击Explore进入到图形详情展示界面
 
-![image-20250920131134159](../image-20250920131134159.png)
+![image-20250920131134159](Prometheus.assets/image-20250920131134159.png)
 
 点击Edit或者键盘输入缩写"e",进入到图形编辑界面
 
-![image-20250920131207309](../image-20250920131207309.png)
+![image-20250920131207309](Prometheus.assets/image-20250920131207309.png)
 
 **配置解析**
 
@@ -2929,7 +2929,7 @@ Alert          #触发器、告警配置
 
 数据查询语句界面
 
-![image-20250920132450399](../image-20250920132450399.png)
+![image-20250920132450399](Prometheus.assets/image-20250920132450399.png)
 
 **实践流程**
 
@@ -2980,11 +2980,11 @@ request_processing_seconds_count{instance="10.0.0.101:8000",job="my_metric"}
 
 接下来开始配置查询语句，按照我们之前定制好的PromQL，然后复制到Metrics右侧的输入框中，配置好图例名称，然后点击右侧的"小眼睛"，就可以看具体的效果，我们以"绘制每分钟请求数量的曲线QPS"为例，效果如下，
 
-![image-20250920135213504](../image-20250920135213504.png)
+![image-20250920135213504](Prometheus.assets/image-20250920135213504.png)
 
-![image-20250920135737467](../image-20250920135737467.png)
+![image-20250920135737467](Prometheus.assets/image-20250920135737467.png)
 
-![image-20250920141727976](../image-20250920141727976.png)
+![image-20250920141727976](Prometheus.assets/image-20250920141727976.png)
 
 # 四、Prometheus 标签管理
 
@@ -3014,11 +3014,11 @@ request_processing_seconds_count{instance="10.0.0.101:8000",job="my_metric"}
 
 范例: 添加主机节点查看默认标签
 
-![image-20250920141929424](../image-20250920141929424.png)
+![image-20250920141929424](Prometheus.assets/image-20250920141929424.png)
 
 应用默认的标签如下形式
 
-![image-20250920142005129](../image-20250920142005129.png)
+![image-20250920142005129](Prometheus.assets/image-20250920142005129.png)
 
 添加主机标签
 
@@ -3044,7 +3044,7 @@ Checking /usr/local/prometheus/conf/prometheus.yml
 root@prometheus-221:~ 18:10:18 # systemctl restart prometheus.service 
 ~~~
 
-![image-20250920181243542](../image-20250920181243542.png)
+![image-20250920181243542](Prometheus.assets/image-20250920181243542.png)
 
 ## 4.2 指标的生命周期
 
@@ -3066,7 +3066,7 @@ root@prometheus-221:~ 18:10:18 # systemctl restart prometheus.service
 
 **Prometheus 对数据的处理流程：**
 
-![image-20250920181705385](../image-20250920181705385.png)
+![image-20250920181705385](Prometheus.assets/image-20250920181705385.png)
 
 在每个scrape_interval期间，Prometheus都会检查执行的作业 Job
 
@@ -3266,9 +3266,9 @@ metric_relabel_configs:
 
 ~~~
 
-![image-20250920184404333](../image-20250920184404333.png)
+![image-20250920184404333](Prometheus.assets/image-20250920184404333.png)
 
-![image-20250920185247951](../image-20250920185247951.png)
+![image-20250920185247951](Prometheus.assets/image-20250920185247951.png)
 
 用于在相应的job上，删除发现的各target之上面以"go"为前名称前缀的指标
 
@@ -3308,11 +3308,11 @@ metric_relabel_configs:
 # 再访问以go开头的指标，不会再生成新的采集数据
 ~~~
 
-![image-20250920185640815](../image-20250920185640815.png)
+![image-20250920185640815](Prometheus.assets/image-20250920185640815.png)
 
 # 五、记录和告警规则
 
-![image-20250920190337081](../image-20250920190337081.png)
+![image-20250920190337081](Prometheus.assets/image-20250920190337081.png)
 
 ## 5.1 记录规则
 
@@ -3462,17 +3462,17 @@ root@prometheus-221:~ 22:15:48 # systemctl restart prometheus.service
 
 ```
 
-![image-20250920221759730](../image-20250920221759730.png)
+![image-20250920221759730](Prometheus.assets/image-20250920221759730.png)
 
-![image-20250920221824005](../image-20250920221824005.png)
+![image-20250920221824005](Prometheus.assets/image-20250920221824005.png)
 
 点击Status下面的Rules，查看效果
 
-![image-20250920221852619](../image-20250920221852619.png)
+![image-20250920221852619](Prometheus.assets/image-20250920221852619.png)
 
 在 Grafana 图形使用记录规则
 
-![image-20250920224000495](../image-20250920224000495.png)
+![image-20250920224000495](Prometheus.assets/image-20250920224000495.png)
 
 范例：系统相关指标的记录规则
 
@@ -3640,9 +3640,9 @@ root@prometheus-221:~ 23:06:11 # curl 192.168.121.221:9093/metrics
 # 可以通过访问 http://192.168.121.221:9093/ 来看 alertmanager 提供的 Web 界面
 ~~~
 
-![image-20250920230645566](../image-20250920230645566.png)
+![image-20250920230645566](Prometheus.assets/image-20250920230645566.png)
 
-![image-20250920230658587](../image-20250920230658587.png)
+![image-20250920230658587](Prometheus.assets/image-20250920230658587.png)
 
 #### 5.2.4.2 shell 脚本一键部署
 
@@ -3859,7 +3859,7 @@ https://prometheus.io/docs/alerting/latest/configuration/#email_config
 
 **网易邮箱开启邮件通知功能**
 
-![image-20250921201740627](../image-20250921201740627.png)
+![image-20250921201740627](Prometheus.assets/image-20250921201740627.png)
 
 ##### 5.6.2.2.2 Alertmanager 实现邮件告警
 
@@ -3906,7 +3906,7 @@ amtool check-config /usr/local/alertmanager/conf/alertmanager.yml
 systemctl restart alertmanager.service
 ~~~
 
-![image-20250921202819811](../image-20250921202819811.png)
+![image-20250921202819811](Prometheus.assets/image-20250921202819811.png)
 
 ## 5.3 告警规则
 
@@ -3995,7 +3995,7 @@ promtool check rules prometheus_alert_rules.yml
 systemctl reload prometheus.service
 ~~~
 
-![image-20250921205333048](../image-20250921205333048.png)
+![image-20250921205333048](Prometheus.assets/image-20250921205333048.png)
 
 告警状态
 
@@ -4007,19 +4007,19 @@ systemctl reload prometheus.service
 
 停止自定义的 flask 服务，稍等1分钟后，查看告警效果
 
-![image-20250921212627242](../image-20250921212627242.png)
+![image-20250921212627242](Prometheus.assets/image-20250921212627242.png)
 
 查看 Alertmanager 界面
 
-![image-20250921212654762](../image-20250921212654762.png)
+![image-20250921212654762](Prometheus.assets/image-20250921212654762.png)
 
 邮件告警效果
 
-![image-20250921213903056](../image-20250921213903056.png)
+![image-20250921213903056](Prometheus.assets/image-20250921213903056.png)
 
 恢复正常后，也会收到恢复通知邮件，如下界面
 
-![image-20250921213936876](../image-20250921213936876.png)
+![image-20250921213936876](Prometheus.assets/image-20250921213936876.png)
 
 ## 5.4 告警模板
 
@@ -4156,7 +4156,7 @@ root@prometheus-221:~ 16:09:16 # systemctl status  alertmanager.service
 
 #### 5.4.2.3 测试结果
 
-![image-20250923163351585](../image-20250923163351585.png)
+![image-20250923163351585](Prometheus.assets/image-20250923163351585.png)
 
 ## 5.5 告警路由
 
@@ -4167,7 +4167,7 @@ Alertmanager 的 route 配置段支持定义"树"状路由表，入口位置称�
 - 所有告警都将进入路由根节点，而后进行子节点遍历
 - 若路由上的 continue 字段的值为 false，则遇到第一个匹配的路由分支后即终止；否则，将继续匹配后续的子节点
 
-![image-20250923163537255](../image-20250923163537255.png)
+![image-20250923163537255](Prometheus.assets/image-20250923163537255.png)
 
 上图所示：Alertmanager中的第一个Route是根节点，每一个match 都是子节点。
 
@@ -4270,9 +4270,9 @@ root@prometheus-221:~ 16:46:00 #
 # 查看prometheus上的路由规则效果
 ~~~
 
-![image-20250923164658410](../image-20250923164658410.png)
+![image-20250923164658410](Prometheus.assets/image-20250923164658410.png)
 
-![image-20250923164708989](../image-20250923164708989.png)
+![image-20250923164708989](Prometheus.assets/image-20250923164708989.png)
 
 #### 5.5.2.2 定制路由分组
 
@@ -4337,9 +4337,9 @@ root@prometheus-221:~ 16:53:08 # systemctl restart alertmanager.service
 
 #### 5.5.2.3 测试效果
 
-![image-20250923170148901](../image-20250923170148901.png)
+![image-20250923170148901](Prometheus.assets/image-20250923170148901.png)
 
-![image-20250923170738276](../image-20250923170738276.png)
+![image-20250923170738276](Prometheus.assets/image-20250923170738276.png)
 
 ## 5.6 告警抑制
 
@@ -4347,7 +4347,7 @@ root@prometheus-221:~ 16:53:08 # systemctl restart alertmanager.service
 
 对于一种业务场景，有相互依赖的两种服务：A服务和B服务，一旦A服务异常，依赖A服务的B服务也会异常,从而导致本来没有问题的B服务也不断的发出告警。
 
-![image-20250923183659653](../image-20250923183659653.png)
+![image-20250923183659653](Prometheus.assets/image-20250923183659653.png)
 
 Alertmanager的抑制机制可以避免当某种问题告警产生之后用户接收到大量由此问题导致的一系列的其它告警通知。例如当集群不可用时，用户可能只希望接收到一条告警，告知用户这时候集群出现了问题，而不是大量的如集群中的应用异常、中间件服务异常的告警通知。
 
@@ -4535,7 +4535,7 @@ https://work.weixin.qq.com/
 
 注意：注册一个企业，没有任何限制，无需认证
 
-![image-20250926161024423](../image-20250926161024423.png)
+![image-20250926161024423](Prometheus.assets/image-20250926161024423.png)
 
 注册好之后需要查看自己的企业 id
 
@@ -4559,7 +4559,7 @@ graph LR;
 
 上传Logo和指定应用名称,并选择范围
 
-![image-20250926161608580](../image-20250926161608580.png)
+![image-20250926161608580](Prometheus.assets/image-20250926161608580.png)
 
 注意记下以下信息：
 
@@ -4840,21 +4840,21 @@ Prometheus--->Alertmanager--->prometheus-webhook-dingtalk--->|Webhook|钉钉
 
 点击右上角的内容，点击"创建企业/组织/团队"
 
-![image-20250926165634907](../image-20250926165634907.png)
+![image-20250926165634907](Prometheus.assets/image-20250926165634907.png)
 
 #### 5.8.1.2 创建钉钉的告警群
 
-![image-20250926165926820](../image-20250926165926820.png)
+![image-20250926165926820](Prometheus.assets/image-20250926165926820.png)
 
 #### 5.8.1.3 告警群中添加配置机器人
 
 群设置 --- 智能群助手 --- 添加机器人 --- 自定义通过webhook接入自定义服务
 
-![image-20250926170048794](../image-20250926170048794.png)
+![image-20250926170048794](Prometheus.assets/image-20250926170048794.png)
 
-![image-20250926170145453](../image-20250926170145453.png)
+![image-20250926170145453](Prometheus.assets/image-20250926170145453.png)
 
-![image-20250926170215566](../image-20250926170215566.png)
+![image-20250926170215566](Prometheus.assets/image-20250926170215566.png)
 
 
 
@@ -4881,13 +4881,13 @@ root@prometheus-221:~ 17:07:51 # curl -H "Content-Type: application/json" -d '{"
 
 可以看到钉钉收到如下信息
 
-![image-20250926170900411](../image-20250926170900411.png)
+![image-20250926170900411](Prometheus.assets/image-20250926170900411.png)
 
 ##### 5.8.1.4.2 采用关键字和加签的测试效果
 
 在机器人的安全设置,选择"加签",复制加签信息
 
-![image-20250926171022792](../image-20250926171022792.png)
+![image-20250926171022792](Prometheus.assets/image-20250926171022792.png)
 
 ~~~shell
 加签信息： SECf180eaf0546d7464334179287f116aac3af58c00b42e733e0b2e32d1d5a2114b
@@ -4943,7 +4943,7 @@ root@prometheus-221:~ 17:16:34 # curl -H "Content-Type: application/json" -d '{"
 {"errcode":0,"errmsg":"ok"}
 ~~~
 
-![image-20250926171717722](../image-20250926171717722-17588782385391.png)
+![image-20250926171717722](Prometheus.assets/image-20250926171717722-17588782385391.png)
 
 ### 5.8.2 钉钉告警实现
 
@@ -5136,7 +5136,7 @@ default_message:
 
 ### 5.9.1 负载均衡
 
-![image-20250926180104785](../image-20250926180104785.png)
+![image-20250926180104785](Prometheus.assets/image-20250926180104785.png)
 
 ### 5.9.2 Gossip 实现
 
@@ -5144,7 +5144,7 @@ https://yunlzheng.gitbook.io/prometheus-book/part-ii-prometheus-jinjie/readmd/al
 
 Alertmanager引入了Gossip机制。Gossip机制为多个Alertmanager之间提供了信息传递的机制。确保及时在多个Alertmanager分别接收到相同告警信息的情况下，也只有一个告警通知被发送给Receiver。
 
-![image-20250926180141946](../image-20250926180141946.png)
+![image-20250926180141946](Prometheus.assets/image-20250926180141946.png)
 
 Gossip是分布式系统中被广泛使用的协议，用于实现分布式节点之间的信息交换和状态同步。Gossip协议同步状态类似于流言或者病毒的传播。
 
@@ -5184,7 +5184,7 @@ alertmanager  --web.listen-address=":9094" --cluster.listen-address="127.0.0.1:
 
 https://github.com/feiyu563/PrometheusAlert
 
-![image-20250926182849865](../image-20250926182849865.png)
+![image-20250926182849865](Prometheus.assets/image-20250926182849865.png)
 
 范例: Docker 部署 prometheus alert
 
@@ -5221,7 +5221,7 @@ Prometheus Server 的数据抓取工作于Pull模型，因而，它必需要事�
 
 对于中大型的系统环境或具有较强动态性的云计算环境来说，由于场景体量的因素，静态配置显然难以适用。
 
-![image-20250928203033677](../image-20250928203033677.png)
+![image-20250928203033677](Prometheus.assets/image-20250928203033677.png)
 
 因此，Prometheus 为此专门设计了一组服务发现机制，以便于能够基于服务注册中心自动发现、检测、分类可被监控的各 Target，以及更新发生了变动的 Target
 
@@ -5248,7 +5248,7 @@ https://prometheus.io/docs/prometheus/latest/configuration/configuration/
 
 发现原理
 
-![image-20250928223847293](../image-20250928223847293.png)
+![image-20250928223847293](Prometheus.assets/image-20250928223847293.png)
 
 Prometheus服务发现机制大致涉及到三个部分：
 
@@ -5332,7 +5332,7 @@ root@prometheus-221:~ 09:39:16 # systemctl restart prometheus.service
 # 结果显示：所有的节点都添加完毕了，而且每个节点都有自己的标签信息
 ~~~
 
-![image-20250930094045606](../image-20250930094045606.png)
+![image-20250930094045606](Prometheus.assets/image-20250930094045606.png)
 
 ~~~shell
 # 后续可以自由的编辑文件，无需重启 Prometheus 服务，就可以做到自动发现的效果
@@ -5407,7 +5407,7 @@ Checking /usr/local/prometheus/conf/prometheus.yml
 root@prometheus-221:~ 09:52:59 # systemctl restart prometheus.service
 ~~~
 
-![image-20250930095347837](../image-20250930095347837.png)
+![image-20250930095347837](Prometheus.assets/image-20250930095347837.png)
 
 ## 6.3 DNS 服务发现
 
@@ -5415,7 +5415,7 @@ root@prometheus-221:~ 09:52:59 # systemctl restart prometheus.service
 
 https://prometheus.io/docs/prometheus/latest/configuration/configuration/#dns_sd_config
 
-![image-20250930095738992](../image-20250930095738992.png)
+![image-20250930095738992](Prometheus.assets/image-20250930095738992.png)
 
 基于DNS的服务发现针对一组DNS域名进行定期查询，以发现待监控的目标
 
@@ -5650,13 +5650,13 @@ _prometheus._tcp.wang.org has SRV record 10 10 9100 node4.lnxguru.org.
 
 ### 6.4.1 Cousul 服务介绍
 
-![image-20251004233139685](../image-20251004233139685.png)
+![image-20251004233139685](Prometheus.assets/image-20251004233139685.png)
 
 单体架构逐渐被微服务架构所替代，原本不同功能模被拆分成了多个不同的服务。
 
 原本模块间的通信只需要函数调用就能够实现，现在却做不到了，因为它们不在同一个进程中，甚至服务都可能部署到不同的机房。
 
-![image-20251004233232159](../image-20251004233232159.png)
+![image-20251004233232159](Prometheus.assets/image-20251004233232159.png)
 
 服务间的通信成为了迈向微服务大门的第一道难关：
 
@@ -5699,7 +5699,7 @@ https://developer.hashicorp.com/consul/docs
 
 **Consul 的工作原理：**
 
-![image-20251004233731337](../image-20251004233731337.png)
+![image-20251004233731337](Prometheus.assets/image-20251004233731337.png)
 
 - Agent 是一直运行在 Consul 集群中每个成员上的守护进程。通过运行 consul agent 来启动。
 
@@ -6105,7 +6105,7 @@ Oct 05 16:18:32 ubuntu2204 systemd[1]: Started "HashiCorp Consul - A service mes
 # 浏览器访问测试
 ~~~
 
-![image-20251005174220594](../image-20251005174220594.png)
+![image-20251005174220594](Prometheus.assets/image-20251005174220594.png)
 
 范例: 一键安装脚本
 
@@ -6277,7 +6277,7 @@ https://developer.hashicorp.com/consul/docs/install/glossary
 
 **Consul 集群架构**
 
-![image-20251009194836860](../image-20251009194836860.png)
+![image-20251009194836860](Prometheus.assets/image-20251009194836860.png)
 
 Server 是 consul 服务端高可用集群，Client 是 consul 客户端。
 
@@ -6334,7 +6334,7 @@ node 3
 consul agent -bind=192.168.121.113 -client=0.0.0.0 -data-dir=/data/consul -node=node3 -retry-join=192.168.121.111 -ui -server -bootstrap-expect 2
 ~~~
 
-![image-20251010114305400](../image-20251010114305400.png)
+![image-20251010114305400](Prometheus.assets/image-20251010114305400.png)
 
 ###### 6.4.2.2.2.2 基于 Docker-compose 部署 Consul 集群
 
@@ -6483,11 +6483,11 @@ root@prometheus-221:~ 11:53:20 # curl -X PUT -d '{"id": "myservice-id","name": "
 # 集群中每一台 consul 都会有信息
 ~~~
 
-![image-20251010115620867](../image-20251010115620867.png)
+![image-20251010115620867](Prometheus.assets/image-20251010115620867.png)
 
-![image-20251010115636172](../image-20251010115636172.png)
+![image-20251010115636172](Prometheus.assets/image-20251010115636172.png)
 
-![image-20251010115652564](../image-20251010115652564.png)
+![image-20251010115652564](Prometheus.assets/image-20251010115652564.png)
 
 ###### 6.4.2.2.4.2 测试停止一台 consul 其他 consul 服务器可以正常访问
 
@@ -6496,7 +6496,7 @@ root@prometheus-221:~ 11:53:20 # curl -X PUT -d '{"id": "myservice-id","name": "
 # 集群会重新选举 leader
 ~~~
 
-![image-20251010115847997](../image-20251010115847997.png)
+![image-20251010115847997](Prometheus.assets/image-20251010115847997.png)
 
 ###### 6.4.2.2.4.3 Prometheus 对接 consul cluster
 
@@ -6526,7 +6526,7 @@ Checking /usr/local/prometheus/conf/prometheus.yml
 root@prometheus-221:~ 12:01:18 #
 ~~~
 
-![image-20251010120245152](../image-20251010120245152.png)
+![image-20251010120245152](Prometheus.assets/image-20251010120245152.png)
 
 ### 6.4.3 Consul 自动注册和删除服务
 
@@ -6750,9 +6750,9 @@ root@prometheus-221:~ 17:57:20 #
 
 ~~~
 
-![image-20251008175753275](../image-20251008175753275.png)
+![image-20251008175753275](Prometheus.assets/image-20251008175753275.png)
 
-![image-20251008175803993](../image-20251008175803993.png)
+![image-20251008175803993](Prometheus.assets/image-20251008175803993.png)
 
 由于 192.168.121.220:8500/metrics api 不存在，因此收集时，将其排除
 
@@ -6776,7 +6776,7 @@ root@prometheus-221:~ 21:08:34 # cat /usr/local/prometheus/conf/prometheus.yml
 
 ~~~
 
-![image-20251008211014135](../image-20251008211014135.png)
+![image-20251008211014135](Prometheus.assets/image-20251008211014135.png)
 
 ### 6.4.5 验证采集结果
 
@@ -6836,7 +6836,7 @@ Registered service: myservice-2
 
 查看 Prometheus 监控情况
 
-![image-20251008194928873](../image-20251008194928873.png)
+![image-20251008194928873](Prometheus.assets/image-20251008194928873.png)
 
 # 七、各种 Exporter
 
@@ -7179,14 +7179,14 @@ root@prometheus-221:~ 11:45:37 # systemctl restart prometheus.service
 只有已安装的服务才会在这里显示，否则不显示
 ~~~
 
-![image-20251011115551276](../image-20251011115551276.png)
+![image-20251011115551276](Prometheus.assets/image-20251011115551276.png)
 
 ~~~shell
 #在node1节点安装nginx服务后,再次观察可以看到下面结果
 [root@node1 ~]#apt -y install nginx
 ~~~
 
-![image-20251011120017300](../image-20251011120017300.png)
+![image-20251011120017300](Prometheus.assets/image-20251011120017300.png)
 
 ## 7.2 MySQL 监控
 
@@ -7320,7 +7320,7 @@ tcp   LISTEN 0      70         127.0.0.1:33060      0.0.0.0:*    users:(("mysqld
 root@node1-111:~ 14:50:23 #
 ~~~
 
-![image-20251011145105492](../image-20251011145105492.png)
+![image-20251011145105492](Prometheus.assets/image-20251011145105492.png)
 
 #### 7.2.2.3 配置 Prometheus
 
@@ -7339,13 +7339,13 @@ Checking /usr/local/prometheus/conf/prometheus.yml
 root@prometheus-221:~ 14:52:44 # systemctl restart prometheus.service
 ~~~
 
-![image-20251011145311022](../image-20251011145311022.png)
+![image-20251011145311022](Prometheus.assets/image-20251011145311022.png)
 
 #### 7.2.2.4 Grafana 图形展示
 
 17320 14057 7362  
 
-![image-20251011145452160](../image-20251011145452160.png)
+![image-20251011145452160](Prometheus.assets/image-20251011145452160.png)
 
 ### 7.2.3 docker-compose 实现
 
@@ -7485,11 +7485,11 @@ tcp   LISTEN 0      4096         0.0.0.0:9999       0.0.0.0:*    users:(("haprox
 root@node1-111:~ 15:08:31 # 
 ~~~
 
-![image-20251011150927258](../image-20251011150927258.png)
+![image-20251011150927258](Prometheus.assets/image-20251011150927258.png)
 
 csv 格式显示
 
-![image-20251011150953986](../image-20251011150953986.png)
+![image-20251011150953986](Prometheus.assets/image-20251011150953986.png)
 
 ##### 7.3.1.2.2 安装 Haproxy exporter 
 
@@ -7576,13 +7576,13 @@ root@prometheus-221:~ 15:17:58 # systemctl restart prometheus.service
 root@prometheus-221:~ 15:18:00 # 
 ~~~
 
-![image-20251011151830235](../image-20251011151830235.png)
+![image-20251011151830235](Prometheus.assets/image-20251011151830235.png)
 
 ##### 7.3.1.2.4 Grafana 展示
 
 364
 
-![image-20251011152222304](../image-20251011152222304.png)
+![image-20251011152222304](Prometheus.assets/image-20251011152222304.png)
 
 ### 7.3.2 Haproxy 内置功能实现监控
 
@@ -7714,7 +7714,7 @@ tcp   LISTEN 0      4096           0.0.0.0:9999      0.0.0.0:*    users:(("hapro
 root@node2-112:~ 15:31:09 # 
 ~~~
 
-![image-20251011153238481](../image-20251011153238481.png)
+![image-20251011153238481](Prometheus.assets/image-20251011153238481.png)
 
 #### 7.3.2.3 修改 Prometheus 配置
 
@@ -7733,7 +7733,7 @@ Checking /usr/local/prometheus/conf/prometheus.yml
 root@prometheus-221:~ 15:33:53 # systemctl restart prometheus.service 
 ~~~
 
-![image-20251011153418924](../image-20251011153418924.png)
+![image-20251011153418924](Prometheus.assets/image-20251011153418924.png)
 
 ## 7.4 Redis 监控
 
@@ -7779,7 +7779,7 @@ root@prometheus-221:~ 15:46:20 # tail -6 /usr/local/prometheus/conf/prometheus.y
 root@prometheus-221:~ 15:46:22 # systemctl restart prometheus.service 
 ~~~
 
-![image-20251011154653754](../image-20251011154653754.png)
+![image-20251011154653754](Prometheus.assets/image-20251011154653754.png)
 
 ## 7.5 nginx 监控
 
@@ -7801,7 +7801,7 @@ Nginx 默认自身没有提供 Json 格式的指标数据,可以通过下两种�
 
 https://hub.docker.com/r/nginx/nginx-prometheus-exporter
 
-![image-20251011154829341](../image-20251011154829341.png)
+![image-20251011154829341](Prometheus.assets/image-20251011154829341.png)
 
 范例：基于 docker 实现
 
@@ -7965,7 +7965,7 @@ root@node1-111:~ 19:20:59 # systemctl status consul_exporter.service
 
 ~~~
 
-![image-20251011192410948](../image-20251011192410948.png)
+![image-20251011192410948](Prometheus.assets/image-20251011192410948.png)
 
 ### 7.6.3 Prometheus 监控 consul
 
@@ -7983,7 +7983,7 @@ systemctl reload prometheus.service
 
 ### 7.7.1 黑盒监控说明
 
-![image-20251011192533594](../image-20251011192533594.png)
+![image-20251011192533594](Prometheus.assets/image-20251011192533594.png)
 
 黑盒监视也称远端探测，监测应用程序的外部，可以查询应用程序的外部特征
 
@@ -8143,11 +8143,11 @@ tcp   LISTEN 0      4096                                  *:9115            *:* 
 root@prometheus-221:~ 12:02:14 #
 ~~~
 
-![image-20251012120505834](../image-20251012120505834.png)
+![image-20251012120505834](Prometheus.assets/image-20251012120505834.png)
 
 > 同时其自身也暴露了 /metrics 接口
 
-![image-20251012120546250](../image-20251012120546250.png)
+![image-20251012120546250](Prometheus.assets/image-20251012120546250.png)
 
 #### 7.7.2.2 Docker 启动
 
@@ -8186,7 +8186,7 @@ Checking /usr/local/prometheus/conf/prometheus.yml
 root@prometheus-221:~ 13:41:34 # systemctl restart prometheus.service 
 ~~~
 
-![image-20251012134343841](../image-20251012134343841.png)
+![image-20251012134343841](Prometheus.assets/image-20251012134343841.png)
 
 #### 7.7.3.2 TCP 端口连通性监控
 
@@ -8216,9 +8216,9 @@ root@prometheus-221:~ 13:45:16 # systemctl restart prometheus.service
 
 ~~~
 
-![image-20251012134551513](../image-20251012134551513.png)
+![image-20251012134551513](Prometheus.assets/image-20251012134551513.png)
 
-![image-20251012134606754](../image-20251012134606754.png)
+![image-20251012134606754](Prometheus.assets/image-20251012134606754.png)
 
 #### 7.7.3.3 http/https 网站监控
 
@@ -8244,21 +8244,21 @@ root@prometheus-221:~ 13:50:03 # tail -18 /usr/local/prometheus/conf/prometheus.
 
 ~~~
 
-![image-20251012135042104](../image-20251012135042104.png)
+![image-20251012135042104](Prometheus.assets/image-20251012135042104.png)
 
-![image-20251012134946433](../image-20251012134946433.png)
+![image-20251012134946433](Prometheus.assets/image-20251012134946433.png)
 
 ### 7.7.4 Grafana 展示
 
 **Grafana** **导入模板** **9965 13587**
 
-![image-20251012135358338](../image-20251012135358338.png)
+![image-20251012135358338](Prometheus.assets/image-20251012135358338.png)
 
 # 八、Prometheus 实现容器监控
 
 ## 8.1 cAdvisor 介绍
 
-![image-20251012135502698](../image-20251012135502698.png)
+![image-20251012135502698](Prometheus.assets/image-20251012135502698.png)
 
 对于物理主机可以在其上安装Node Exporter实现监控，但是对于容器的监控并不适用
 
@@ -8286,7 +8286,7 @@ https://github.com/google/cadvisor/archive/refs/tags/v0.39.3.tar.gz
 
 **cAdvisor** **工作原理**
 
-![image-20251012135853975](../image-20251012135853975.png)
+![image-20251012135853975](Prometheus.assets/image-20251012135853975.png)
 
 ## 8.2 cAdvisor
 
@@ -8404,9 +8404,9 @@ root@node3-113:/usr/local/cadvisor 14:18:05 # ./cadvisor ?-port=8080 &>>/var/log
 root@node3-113:/usr/local/cadvisor 14:18:36 # 
 ~~~
 
-![image-20251012141859894](../image-20251012141859894.png)
+![image-20251012141859894](Prometheus.assets/image-20251012141859894.png)
 
-![image-20251012141935469](../image-20251012141935469.png)
+![image-20251012141935469](Prometheus.assets/image-20251012141935469.png)
 
 ### 8.2.2 Docker 方式安装 cAdvisor
 
@@ -8415,6 +8415,7 @@ root@node3-113:/usr/local/cadvisor 14:18:36 #
 https://github.com/google/cadvisor/
 
 cAdvisor 版本
+
 https://github.com/google/cadvisor/releases
 
 ~~~shell
@@ -8434,7 +8435,7 @@ docker pull gcr.dockerproxy.com/cadvisor/cadvisor:v0.49.1
 https://hub.docker.com/r/zcube/cadvisor/tags
 ~~~
 
-~~~bash
+~~~shell
 # 运行容器
 root@node3-113:~ 18:16:39 # docker image ls
 REPOSITORY                        TAG       IMAGE ID       CREATED        SIZE
@@ -8484,7 +8485,7 @@ root@prometheus-221:~ 18:20:47 # systemctl restart prometheus.service
 root@prometheus-221:~ 18:20:52 # 
 ```
 
-![image-20251012182112045](../image-20251012182112045.png)
+![image-20251012182112045](Prometheus.assets/image-20251012182112045.png)
 
 ## 8.4 cAdvisor 常见指标
 
@@ -8644,11 +8645,11 @@ https://prometheus.io/docs/prometheus/latest/federation/
 
 中心Prometheus用于连接所有的级联 Prometheus，实现最终的数据聚合、全局视图和告警。为提高可靠性，中心Prometheus使用双活架构，也就是在不同可用区布置两个Prometheus中心节点，都连接相同的下一级Prometheus。
 
-![image-20251012183551624](../image-20251012183551624.png)
+![image-20251012183551624](Prometheus.assets/image-20251012183551624.png)
 
 ## 9.2 实战案例：Prometheus Federation 部署
 
-![image-20251012184029454](../image-20251012184029454.png)
+![image-20251012184029454](Prometheus.assets/image-20251012184029454.png)
 
 | 地址            | 角色                                   |
 | --------------- | -------------------------------------- |
@@ -8767,11 +8768,11 @@ root@prometheus-221:~ 18:59:49 #
 
 ### 9.2.6 Prometheus Federation 验证
 
-![image-20251012190308064](../image-20251012190308064.png)
+![image-20251012190308064](Prometheus.assets/image-20251012190308064.png)
 
 查看指定指标node_os_info,可以看到Node节点上的数据如下
 
-![image-20251012190624743](../image-20251012190624743.png)
+![image-20251012190624743](Prometheus.assets/image-20251012190624743.png)
 
 Grafana导入**8919**模板
 
@@ -8790,7 +8791,7 @@ root@node1-111:~ 19:07:24 # systemctl restart prometheus.service
 
 ```
 
-![image-20251012190820090](../image-20251012190820090.png)
+![image-20251012190820090](Prometheus.assets/image-20251012190820090.png)
 
 # 十、Prometheus 存储
 
@@ -8814,7 +8815,7 @@ Prometheus的存储结构 TSDB是参考了Facebook的Gorilla之后自行实现�
 
 参考文章《Gorilla: A Fast, Scalable, In-Memory Time Series Database》可以对Prometheus为何采用这样的存储结构有着更为清晰的理解
 
-![image-20251013164931859](../image-20251013164931859.png)
+![image-20251013164931859](Prometheus.assets/image-20251013164931859.png)
 
 - 最新的数据是保存在内存中的，并同时写入至预写日志（WAL）
 - 以每2小时为一个时间窗口，将内存中的数据存储为一个单独的 Block
@@ -8824,7 +8825,7 @@ Prometheus的存储结构 TSDB是参考了Facebook的Gorilla之后自行实现�
 
 ### 10.1.3 Prometheus 数据目录结构
 
-![image-20251013165028224](../image-20251013165028224.png)
+![image-20251013165028224](Prometheus.assets/image-20251013165028224.png)
 
 PTSDB本地存储使用自定义的文件结构。
 
@@ -8914,7 +8915,7 @@ WAL日志的数量及截断的位置则保存于checkpoint文件中，该文件�
 
 ### 10.1.5 Prometheus 压缩机制
 
-![image-20251013165256214](../image-20251013165256214.png)
+![image-20251013165256214](Prometheus.assets/image-20251013165256214.png)
 
 Prometheus将最近的数据保存在内存中，这样查询最近的数据会变得非常快，然后通过一个compactor定时将数据打包到磁盘。
 
@@ -9094,9 +9095,9 @@ data  flock.lock  indexdb  metadata  snapshots  tmp
 root@node1-111:~ 17:32:17 #
 ~~~
 
-![image-20251013173248665](../image-20251013173248665.png)
+![image-20251013173248665](Prometheus.assets/image-20251013173248665.png)
 
-![image-20251013173302218](../image-20251013173302218.png)
+![image-20251013173302218](Prometheus.assets/image-20251013173302218.png)
 
 ##### 10.2.2.1.2 修改 Prometheus 使用 Victoriametrics 远程存储
 
@@ -9121,7 +9122,7 @@ root@prometheus-221:~ 17:35:01 #
 
 ##### 10.2.2.1.3 访问 Victoriametrics Web UI 查看数据
 
-![image-20251013173637565](../image-20251013173637565.png)
+![image-20251013173637565](Prometheus.assets/image-20251013173637565.png)
 
 ##### 10.2.2.1.4 Grafana 展示
 
@@ -9147,11 +9148,11 @@ VictoriaMetrics 集群可以解决单机的单点可用性和性能瓶颈问题
 
 https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html
 
-![image-20251013173954607](../image-20251013173954607.png)
+![image-20251013173954607](Prometheus.assets/image-20251013173954607.png)
 
 集群版的victoriametrics有下面主要服务组成：
 
-![image-20251013174028377](../image-20251013174028377.png)
+![image-20251013174028377](Prometheus.assets/image-20251013174028377.png)
 
 - vmstorage
 
@@ -9226,7 +9227,7 @@ https://docs.victoriametrics.com/Cluster-VictoriaMetrics.html
 
 以下实现部署一个三节点的 VictoriaMetrics 集群，且三节点同时都提供vmstorage，vminsert和vmselect角色
 
-![image-20251013174341072](../image-20251013174341072.png)
+![image-20251013174341072](Prometheus.assets/image-20251013174341072.png)
 
 ##### 10.2.3.2.1 下载集群二进制程序文件
 
