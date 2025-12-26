@@ -1,14 +1,14 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 2927.792865791706,
+    "scroll": 2909.242424242424,
     "cursor": {
       "from": {
-        "line": 2950,
-        "ch": 30
+        "line": 2923,
+        "ch": 21
       },
       "to": {
-        "line": 2929,
-        "ch": 0
+        "line": 2923,
+        "ch": 21
       }
     },
     "expandedKeys": [
@@ -56,9 +56,7 @@
       "item-4-316",
       "item-3-314",
       "item-2-308",
-      "item-4-216",
       "item-5-217",
-      "item-4-204",
       "item-5-222",
       "item-4-197"
     ]
@@ -82,14 +80,14 @@
     ]
   },
   "Prometheus/Prometheus.md": {
-    "scroll": 130.91865079365078,
+    "scroll": 126.97083333333333,
     "cursor": {
       "from": {
-        "line": 139,
-        "ch": 73
+        "line": 136,
+        "ch": 0
       },
       "to": {
-        "line": 139,
+        "line": 136,
         "ch": 0
       }
     },
