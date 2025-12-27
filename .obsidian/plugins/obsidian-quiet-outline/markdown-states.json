@@ -80,7 +80,7 @@
     ]
   },
   "Prometheus/Prometheus.md": {
-    "scroll": 121.55284552845528,
+    "scroll": 119.55555555555556,
     "cursor": {
       "from": {
         "line": 139,
@@ -162,11 +162,11 @@
     "scroll": 0,
     "cursor": {
       "from": {
-        "line": 7,
-        "ch": 0
+        "line": 6,
+        "ch": 73
       },
       "to": {
-        "line": 7,
+        "line": 6,
         "ch": 0
       }
     },
@@ -262,6 +262,22 @@
       "item-3-99",
       "item-1-101",
       "item-2-103"
+    ]
+  },
+  "Linux 基础/Linux 基础使用/用户管理和权限管理.md": {
+    "scroll": 0,
+    "cursor": {
+      "from": {
+        "line": 0,
+        "ch": 0
+      },
+      "to": {
+        "line": 0,
+        "ch": 0
+      }
+    },
+    "expandedKeys": [
+      "item-1-0"
     ]
   }
 }
