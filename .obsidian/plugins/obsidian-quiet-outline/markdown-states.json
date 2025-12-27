@@ -100,7 +100,7 @@
     ]
   },
   "README.md": {
-    "scroll": 51.46666666666667,
+    "scroll": 61.8989048020219,
     "cursor": {
       "from": {
         "line": 15,
@@ -111,7 +111,22 @@
         "ch": 7
       }
     },
-    "expandedKeys": []
+    "expandedKeys": [
+      "item-1-0",
+      "item-3-92",
+      "item-2-90",
+      "item-1-75",
+      "item-3-80",
+      "item-2-78",
+      "item-2-62",
+      "item-1-33",
+      "item-4-69",
+      "item-3-64",
+      "item-2-49",
+      "item-2-42",
+      "item-3-6",
+      "item-2-4"
+    ]
   },
   "redis/redis.md": {
     "scroll": 7011.641414141414,
@@ -299,6 +314,35 @@
     },
     "expandedKeys": [
       "item-1-0"
+    ]
+  },
+  "Nginx/Nginx.md": {
+    "scroll": 0,
+    "cursor": {
+      "from": {
+        "line": 6534,
+        "ch": 0
+      },
+      "to": {
+        "line": 6534,
+        "ch": 0
+      }
+    },
+    "expandedKeys": [
+      "item-1-0",
+      "item-3-92",
+      "item-2-90",
+      "item-1-75",
+      "item-3-80",
+      "item-2-78",
+      "item-2-62",
+      "item-1-33",
+      "item-4-69",
+      "item-3-64",
+      "item-2-49",
+      "item-2-42",
+      "item-3-6",
+      "item-2-4"
     ]
   }
 }
