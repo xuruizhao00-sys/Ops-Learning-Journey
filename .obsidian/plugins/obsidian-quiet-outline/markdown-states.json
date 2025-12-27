@@ -114,7 +114,7 @@
     "expandedKeys": []
   },
   "redis/redis.md": {
-    "scroll": 0,
+    "scroll": 7011.641414141414,
     "cursor": {
       "from": {
         "line": 6,
@@ -141,7 +141,28 @@
       "item-4-374",
       "item-3-373",
       "item-4-379",
-      "item-1-383"
+      "item-1-383",
+      "item-5-43",
+      "item-4-39",
+      "item-2-60",
+      "item-3-63",
+      "item-3-89",
+      "item-2-77",
+      "item-3-79",
+      "item-4-97",
+      "item-3-96",
+      "item-2-95",
+      "item-3-256",
+      "item-2-255",
+      "item-5-310",
+      "item-4-308",
+      "item-3-307",
+      "item-2-305",
+      "item-3-319",
+      "item-4-331",
+      "item-3-342",
+      "item-4-354",
+      "item-3-352"
     ]
   },
   "2025-12-14.md": {
