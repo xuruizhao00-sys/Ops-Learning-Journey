@@ -10091,3 +10091,32 @@ tom_2
 tom_3
 11:26:54 root@redis02:~# 
 ```
+#### 8.4.5.2 动态读取变量名（通过索引取值）
+```bash
+17:21:04 root@redis02:~# cat demo16.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo16.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+user_1="alice"
+user_2="bob"
+user_3="cindy"
+
+idx=2
+var="user_$idx"
+
+eval echo \$$var   # bob
+
+17:21:05 root@redis02:~# bash demo16.sh
+bob
+17:21:06 root@redis02:~# 
+```
+#### 8.4.5.3 写一个通用函数：传入变量名，返回变量值
+```bash
+
+```
