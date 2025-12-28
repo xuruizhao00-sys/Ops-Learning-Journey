@@ -9291,7 +9291,7 @@ check_params "Alice" 30
 参数个数正确，继续执行...
 20:58:28 root@redis02:~# 
 ```
-# 八、脚本自动化
+# 八、Shell 脚本高阶部分
 ## 8.1 信号
 ### 8.1.1 信号基础知识
 当我们在构建一些更高级的脚本的时候，就会涉及到如何在 linux 系统上来更好的运行和控制它们，到目前为止，我们运行脚本的方式都是以实时的模式，在命令行来运行它。但是这并不是脚本唯一的运行方式，我们可以在 linux 系统中以更丰富的方式来运行它们，甚至在脚本遇到不可查的异常中止时候，以关闭 linux 终端界面的方式终止脚本。
@@ -9940,8 +9940,8 @@ expect eof
 ```
 说明：
 - `expect` 可以通过正则表达式捕获不同的字符串（如 "Welcome" 或 "Permission denied"）。
-## 8.4 间接变量（变量的变量/嵌套变量）
-### 8.4.1 什么是间接变量
+## 8.4 嵌套变量（变量的变量/间接变量）
+### 8.4.1 什么是嵌套变量
 - **普通变量**：`name="tom"` → `$name` 得到 `tom`
 - **嵌套变量 / 间接引用**：`a="name"`，你希望通过 `$a` 找到变量 `name`，再取出 `name` 的值。
 也就是：
@@ -10118,5 +10118,250 @@ bob
 ```
 #### 8.4.5.3 写一个通用函数：传入变量名，返回变量值
 ```bash
+17:24:23 root@redis02:~# cat demo17.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo17.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
 
+get_var() {
+  local varname="$1"
+  eval echo \$$varname
+}
+
+name="tom"
+echo "$(get_var name)"   # tom
+
+
+17:24:24 root@redis02:~# bash demo17.sh
+tom
 ```
+#### 8.4.5.4 `eval` + `case`：动态执行运维命令
+```bash
+17:25:30 root@redis02:~# cat demo18.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo18.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+action="$1"
+
+cmd_start="systemctl start nginx"
+cmd_stop="systemctl stop nginx"
+cmd_restart="systemctl restart nginx"
+
+case "$action" in
+  start)   eval "$cmd_start" ;;
+  stop)    eval "$cmd_stop" ;;
+  restart) eval "$cmd_restart" ;;
+  *) echo "Usage: $0 {start|stop|restart}" ;;
+esac
+```
+### 8.4.6 注意事项
+#### 8.4.6.1 `eval` 的风险：命令注入
+如果 `eval` 的内容来自用户输入或不可信数据，容易被注入恶意命令。
+
+❌ 危险示例：
+```bash
+user_input='name; rm -rf /'
+eval "echo $user_input"
+```
+#### 8.4.6.2 安全建议
+|建议|说明|
+|---|---|
+|不对不可信输入使用 eval|用户输入、外部文件内容要谨慎|
+|变量名做白名单校验|只允许 `[a-zA-Z_][a-zA-Z0-9_]*`|
+|优先用 `${!var}`（bash 特性）替代 eval|更安全、更清晰（如果你的环境允许）|
+>这部分我们是在讲 `eval` 命令，但在真实生产中能不用 eval 就尽量不用。
+
+## 8.5 嵌套变量进阶
+<mark style="background: #ADCCFFA6;">不使用 `eval` 的实现方式（强烈推荐）</mark>
+
+> 在 Bash 中，**嵌套变量 ≈ 间接引用（Indirect Expansion）**
+### 8.5.1 为什么要“避免 eval”
+虽然 `eval` 能实现嵌套变量，但它有 **三大问题**：
+
+|问题|说明|
+|---|---|
+|❌ 安全风险|极易命令注入（生产事故重灾区）|
+|❌ 可读性差|调试困难，逻辑不直观|
+|❌ 维护成本高|稍复杂就很难看懂|
+
+👉 **Bash 已经提供了“官方安全方案”**
+### 8.5.2 方式一：`${!var}` —— Bash 间接展开（最常用）
+#### 8.5.2.1 什么是 `${!var}`
+```bash
+${!var}  ===  “把 var 的值当成变量名，再取它的值”
+```
+#### 8.5.2.2 基础示例（一层嵌套）
+```bash
+17:25:31 root@redis02:~# name="jerry"
+17:31:43 root@redis02:~# b="name"
+17:31:50 root@redis02:~# echo ${!b}
+jerry
+17:32:01 root@redis02:~#
+
+#### 执行过程
+17:32:49 root@redis02:~# cat demo19.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo19.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+name="jack"
+c="name"
+echo ${!c}
+
+17:32:51 root@redis02:~# bash -x demo19.sh
++ name=jack
++ c=name
++ echo jack
+jack
+
+
+#######
+a="name"
+${!a}
+→ ${name}
+→ jack
+```
+#### 8.5.2.3 对比 eval 的写法
+|方式|写法|
+|---|---|
+|eval|`eval echo \$$a`|
+|推荐|`echo ${!a}`|
+
+✔️ 更安全  
+✔️ 更直观  
+✔️ Bash 原生支持
+#### 8.5.2.4 多层嵌套（循环解析）
+```bash
+17:34:24 root@redis02:~# cat demo20.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo20.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+v1="v2"
+v2="v3"
+v3="final"
+
+cur="v1"
+for i in {1..3}; do
+  cur="${!cur}"
+done
+
+echo "$cur"
+
+
+17:34:25 root@redis02:~# bash demo20.sh
+final
+```
+### 8.5.3 方式二：`declare -n`（命名引用，最优雅）
+**Bash 4.3+** 支持  
+类似“指针 / 引用变量”
+#### 8.5.3.1 什么是 `declare -n`
+```bash
+declare -n ref=var
+```
+含义：
+
+> `ref` 不再是普通变量  
+> 👉 它“指向”变量 `var`
+
+#### 8.5.3.2 基础示例
+```bash
+17:34:27 root@redis02:~# name="lucy"
+17:36:49 root@redis02:~# declare -n ref=name
+17:36:58 root@redis02:~# echo $ref
+lucy
+17:37:03 root@redis02:~#
+```
+#### 8.5.3.3 修改引用变量（双向）
+```bash
+17:34:27 root@redis02:~# name="lucy"
+17:36:49 root@redis02:~# declare -n ref=name
+17:36:58 root@redis02:~# echo $ref
+lucy
+17:37:03 root@redis02:~# ref="zhangsan"
+17:37:36 root@redis02:~# echo $name
+zhangsan
+17:37:39 root@redis02:~# 
+```
+👉 **ref 就像 name 的别名**
+#### 8.5.3.4 动态变量名（非常适合函数）
+```bash
+17:38:32 root@redis02:~# cat demo21.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo21.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+get_value() {
+  local varname="$1"
+  declare -n ref="$varname"
+  echo "$ref"
+}
+
+user="alice"
+get_value user
+```
+### 8.5.4 `${!prefix*}`：批量嵌套变量（高级）
+#### 8.5.4.1 用途
+根据变量名前缀，批量取变量名
+#### 8.5.4.2 示例
+```bash
+cfg_db_host="127.0.0.1"
+cfg_db_port="3306"
+cfg_db_user="root"
+
+echo ${!cfg_db_*}
+
+
+# 输出
+cfg_db_host cfg_db_port cfg_db_user
+```
+#### 8.5.4.3 配合循环读取值
+```bash
+for var in ${!cfg_db_*}; do
+  echo "$var = ${!var}"
+done
+
+# 输出
+cfg_db_host = 127.0.0.1
+cfg_db_port = 3306
+cfg_db_user = root
+```
+### 8.5.5 对比
+|方式|是否推荐|安全性|可读性|适用场景|
+|---|---|---|---|---|
+|`eval`|❌ 不推荐|❌ 低|❌ 差|老脚本、被迫兼容|
+|`${!var}`|✅ 推荐|✅ 高|✅ 好|变量的变量|
+|`declare -n`|⭐ 强烈推荐|⭐⭐⭐|⭐⭐⭐|函数 / 复杂逻辑|
+### 8.5.6 生产环境最佳实践
+- 能用 `${!var}` 就不用 `eval`
+	- 90% 的嵌套变量都能解决
+- 函数里优先用 `declare -n`
+- eval 只在“你 100% 控制输入”时使用
+- 永远不要 eval 用户输入
