@@ -8483,6 +8483,57 @@ done
 - 使用 `mysqldump` 命令备份数据库。
 - 如果备份成功，记录到日志文件。如果失败，发送邮件通知管理员。
 - 每 24 小时执行一次备份任务
+#### 6.2.2.4 while read line
+在 **Shell 脚本** 中，使用 **`while read line`** 是读取文件内容的常见方式。它可以逐行读取文件的内容并对每一行进行处理。
+##### 6.2.2.4.1 `while read line` 的语法
+```bash
+while read line; do
+    # 对每一行进行处理
+    echo "$line"
+done < filename
+```
+- **`read line`**：`read` 命令读取一行输入并将其赋值给变量 `line`。
+- **`while ...; do ... done`**：`while` 循环将持续执行，直到文件中的所有行都被读取完。
+- **`< filename`**：将文件内容传递给 `while` 循环进行处理。这里 `filename` 是你要读取的文件。
+##### 6.2.2.4.2 示例
+```bash
+18:34:04 root@redis02:~# cat demo22.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo22.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 逐行读取文件 example.txt
+while read line; do
+    # 输出每一行的内容
+    echo "读取到的行：$line"
+done < example.txt
+18:34:05 root@redis02:~# cat example.txt 
+apple
+banana
+cherry
+date
+18:34:09 root@redis02:~# bash demo22.sh 
+读取到的行：apple
+读取到的行：banana
+读取到的行：cherry
+读取到的行：date
+18:34:12 root@redis02:~# 
+```
+##### 6.2.2.4.3 处理空行
+```bash
+while read line; do
+    # 忽略空行
+    if [ -z "$line" ]; then
+        continue
+    fi
+    echo "读取到的行：$line"
+done < example.txt
+```
 ### 6.2.3 until 循环
 `until` 循环是另一种用于循环执行命令的控制结构，它与 `while` 循环类似，但有一个关键的区别：`until` 循环会在条件为 **假** 时继续执行，直到条件变为 **真** 为止。
 #### 6.2.3.1 语法结构
