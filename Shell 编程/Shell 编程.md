@@ -8534,6 +8534,45 @@ while read line; do
     echo "读取到的行：$line"
 done < example.txt
 ```
+##### 6.2.2.4.4 处理每行的字段
+在很多情况下，我们读取的文件中的每一行不仅包含一个完整的字符串，而是由多个 **字段（field）** 组成的。例如，CSV 文件、制表符分隔的文件，甚至是空格分隔的文件，每一行都有多个字段。为了从每一行中提取出不同的字段，Shell 提供了 `IFS`（Internal Field Separator） 来作为字段分隔符。
+示例：读取 CSV 文件（以逗号分隔的文件）
+假设你有一个 CSV 文件，内容如下：
+```csv
+apple,10,1.2
+banana,20,0.8
+cherry,30,2.5
+```
+可以使用 `while read line` 逐行读取文件，并根据逗号分隔每一行的数据。
+```bash
+18:39:55 root@redis02:~# cat demo23.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo23.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+# 设置 IFS 为逗号（CSV 文件）,默认 IFS 是空格
+IFS=','
+
+while read fruit quantity price; do
+    echo "水果：$fruit, 数量：$quantity, 价格：$price"
+done < text.csv
+18:39:57 root@redis02:~# cat text.csv 
+apple,10,1.2
+banana,20,0.8
+cherry,30,2.5
+
+18:40:00 root@redis02:~# bash demo23.sh 
+水果：apple, 数量：10, 价格：1.2
+水果：banana, 数量：20, 价格：0.8
+水果：cherry, 数量：30, 价格：2.5
+水果：, 数量：, 价格：
+18:40:14 root@redis02:~#
+```
 ### 6.2.3 until 循环
 `until` 循环是另一种用于循环执行命令的控制结构，它与 `while` 循环类似，但有一个关键的区别：`until` 循环会在条件为 **假** 时继续执行，直到条件变为 **真** 为止。
 #### 6.2.3.1 语法结构
@@ -9342,6 +9381,8 @@ check_params "Alice" 30
 参数个数正确，继续执行...
 20:58:28 root@redis02:~# 
 ```
+## 7.4 函数递归调用
+
 # 八、Shell 脚本高阶部分
 ## 8.1 信号
 ### 8.1.1 信号基础知识
