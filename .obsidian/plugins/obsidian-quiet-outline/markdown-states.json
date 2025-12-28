@@ -1,14 +1,14 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 10756.075126262625,
+    "scroll": 10761.050505050505,
     "cursor": {
       "from": {
-        "line": 10771,
-        "ch": 73
+        "line": 10770,
+        "ch": 55
       },
       "to": {
-        "line": 10771,
-        "ch": 73
+        "line": 10770,
+        "ch": 55
       }
     },
     "expandedKeys": [
@@ -427,15 +427,15 @@
     "expandedKeys": []
   },
   "MySQL/mysql_manager.md": {
-    "scroll": 1466.5125,
+    "scroll": 1473.203914141414,
     "cursor": {
       "from": {
-        "line": 1434,
-        "ch": 61
+        "line": 1488,
+        "ch": 0
       },
       "to": {
-        "line": 1434,
-        "ch": 61
+        "line": 1488,
+        "ch": 0
       }
     },
     "expandedKeys": [
@@ -453,7 +453,8 @@
       "item-2-98",
       "item-3-99",
       "item-1-101",
-      "item-2-103"
+      "item-2-103",
+      "item-2-63"
     ]
   },
   "Linux 基础/Linux 基础使用/用户管理和权限管理.md": {
