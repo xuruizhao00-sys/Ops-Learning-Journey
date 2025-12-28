@@ -9950,5 +9950,144 @@ expect eof
 ### 8.4.2 嵌套变量的使用方式
 #### 8.4.2.1 一层嵌套
 ```bash
+name="tom"
+a="name"
 
+# 想得到 tom（即 $name 的值）
+```
+你会发现：
+- `$a` 得到的是 `"name"`
+- 但你想要的是 `$name` 的值 `"tom"`
+#### 8.4.2.2 多层嵌套
+```bash
+v1="v2"
+v2="v3"
+v3="final"
+
+# 希望从 v1 一路解析到 final
+```
+### 8.4.3 `eval` 命令详解
+#### 8.4.3.1 `eval` 是什么
+`eval` 会把它的参数拼成一条命令字符串，然后**让当前 shell 再解析执行一次**。
+```bash
+11:21:38 root@redis02:~# echo hello
+hello
+11:23:25 root@redis02:~# eval "echo hello"
+hello
+11:23:31 root@redis02:~# 
+```
+#### 8.4.3.2 基本语法
+```bash
+eval COMMAND_STRING
+```
+#### 8.4.3.3 `eval` 常见用法总结表
+|用法|目的|示例|
+|---|---|---|
+|执行拼接命令|动态执行字符串命令|`cmd="ls -l"; eval "$cmd"`|
+|间接引用变量|变量的变量|`eval echo \$$var`|
+|动态赋值|把拼出来的变量名赋值|`eval "x_$i=100"`|
+|动态导出环境变量|变量名动态生成|`eval "export $k=$v"`|
+### 8.4.4 如何实现嵌套变量
+`eval` 的作用：**把“拼出来的一段命令字符串”，再当成命令执行一遍。**
+#### 8.4.4.1 使用 `eval` 实现一层嵌套变量
+示例：从 `a="name"` 取到 `$name`
+```bash
+11:18:26 root@redis02:~# cat demo12.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo12.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+name="tom"
+a="name"
+eval echo \$$a
+
+11:18:27 root@redis02:~# bash demo12.sh
+tom
+11:18:30 root@redis02:~# 
+```
+解释：
+- `\$$a`：先得到字面上的 `$name`
+- `eval echo $name`：再执行一次，输出 `tom`
+#### 8.4.4.2 把结果赋值出来
+```bash
+11:20:11 root@redis02:~# cat demo13.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo13.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+name="tom"
+a="name"
+
+eval value=\$$a
+echo $value
+
+11:20:13 root@redis02:~# bash demo13.sh
+tom
+```
+#### 8.4.4.3 多层嵌套解析（循环 + eval)
+```bash
+11:21:35 root@redis02:~# cat demo14.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo14.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+#!/bin/bash
+v1="v2"
+v2="v3"
+v3="final"
+
+cur="v1"
+for i in {1..3}; do
+  eval cur=\$$cur
+done
+
+echo "$cur"   # final
+
+
+11:21:36 root@redis02:~# bash demo14.sh
+final
+```
+### 8.4.5 `eval` 实践案例
+#### 8.4.5.1 动态变量名赋值（批量生成）
+```bash
+11:26:50 root@redis02:~# cat demo15.sh
+#!/bin/bash
+# ==============================================================================
+# 脚本基础信息
+# filename: demo15.sh
+# name: xuruizhao
+# email: xuruizhao00@163.com
+# v: LnxGuru
+# GitHub: xuruizhao00-sys
+# ==============================================================================
+
+for i in {1..3}; do
+  eval "user_$i=tom_$i"
+done
+
+echo "$user_1"
+echo "$user_2"
+echo "$user_3"
+
+
+11:26:52 root@redis02:~# bash demo15.sh
+tom_1
+tom_2
+tom_3
+11:26:54 root@redis02:~# 
 ```
