@@ -3756,6 +3756,7 @@ text  l i n u x _ s h e l l
 
 ${text:2:4}
 
+0
 l i n u x _ s h e l l
     |-------|
        ↑  ↑
