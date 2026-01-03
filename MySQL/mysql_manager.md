@@ -516,7 +516,76 @@ Jan 03 16:38:33 redis02 systemd[1]: Started mysqld.service - LSB: start and stop
 ```
 ```shell
 方式二
+16:42:36 root@redis02:~# cat /lib/systemd/system/mysqld.service
+[Unit]
+Description=MySQL Server 8.4.0
+Documentation=https://dev.mysql.com/doc/
+After=network.target
+Wants=network.target
 
+[Service]
+User=mysql
+Group=mysql
+
+# mysqld 本体直接前台运行（推荐）
+Type=simple
+
+# 启动命令
+ExecStart=/usr/local/mysql/bin/mysqld \
+  --defaults-file=/etc/my.cnf \
+  --basedir=/usr/local/mysql \
+  --datadir=/lnxguru/apps/mysql/3306/data \
+  --user=mysql
+
+# 停止命令
+ExecStop=/usr/local/mysql/bin/mysqladmin \
+  --defaults-file=/usr/local/mysql/etc/my.cnf shutdown
+
+# 资源限制（企业必配）
+LimitNOFILE=65535
+LimitNPROC=65535
+
+# 异常退出自动拉起
+Restart=on-failure
+RestartSec=5s
+
+# 超时设置
+TimeoutStartSec=300
+TimeoutStopSec=300
+
+[Install]
+WantedBy=multi-user.target
+
+# 完善配置文件
+16:42:57 root@redis02:~# cat /etc/my.cnf 
+[mysqld]
+basedir=/usr/local/mysql
+datadir=/lnxguru/apps/mysql/3306/data
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock
+pid-file=/lnxguru/apps/mysql/3306/data/mysqld.pid
+log-error=/lnxguru/apps/mysql/3306/error.log
+# 配置权限
+16:42:57 root@redis02:~# chown -R mysql:mysql /usr/local/mysql /lnxguru/apps/mysql/3306
+16:42:37 root@redis02:~# systemctl daemon-reload 
+16:42:41 root@redis02:~# systemctl start mysqld.service 
+16:42:47 root@redis02:~# systemctl status  mysqld.service 
+● mysqld.service - MySQL Server 8.4.0
+     Loaded: loaded (/usr/lib/systemd/system/mysqld.service; disabled; preset: enabled)
+     Active: active (running) since Sat 2026-01-03 16:42:43 CST; 7s ago
+       Docs: https://dev.mysql.com/doc/
+   Main PID: 4852 (mysqld)
+      Tasks: 36 (limit: 2210)
+     Memory: 430.1M (peak: 443.5M)
+        CPU: 2.784s
+     CGroup: /system.slice/mysqld.service
+             └─4852 /usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf --basedir=/usr/local/mysql --datadir=/lnxguru/apps/mysql/3306/data --user=mysql
+
+Jan 03 16:42:43 redis02 systemd[1]: mysqld.service: Scheduled restart job, restart counter is at 10.
+Jan 03 16:42:43 redis02 systemd[1]: Started mysqld.service - MySQL Server 8.4.0.
+16:42:50 root@redis02:~# ss -tunlp  |grep 3306
+tcp   LISTEN 0      70                 *:33060            *:*    users:(("mysqld",pid=4852,fd=18))                      
+tcp   LISTEN 0      151                *:3306             *:*    users:(("mysqld",pid=4852,fd=20))                      
+16:42:57 root@redis02:~#
 ```
 ###### 1.5.1.2.2.10 MySQL 连接测试
 ```bash
@@ -754,6 +823,36 @@ mysql>
 ##### 1.5.2.5.5 备份策略
 - 定期使用 `mysqldump`、`mysqlpump` 或 **Percona XtraBackup** 进行全量或增量备份。
 - 配置合理的备份保留策略，确保数据的恢复和灾难恢复能力。
+#### 1.5.2.6 MySQL 错误日志管理
+错误日志路径 ==/lnxguru/apps/mysql/3306/data/`hostname`.err==
+在数据库启动中出现的问题，我们是可以通过错误日志查找问题，因为在命令行界面，可能很多错误都是相同的提示，我们无法准确定性错误
+
+##### 1.5.2.6.1.模拟配置文件错误
+配置文件虽然有错，但是可以启动数据库服务，但是不能连接数据库服务，例如：修改了 socket 文件位置，这一类错误，不需要去查看 `hostname.err`文件
+```bash
+1、修改配置文件中的 socket 文件位置
+# MySQL 是可以正常启动的
+16:46:16 root@redis02:~# cat /etc/my.cnf
+[mysqld]
+basedir=/usr/local/mysql
+datadir=/lnxguru/apps/mysql/3306/data
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock.asd
+pid-file=/lnxguru/apps/mysql/3306/data/mysqld.pid
+log-error=/lnxguru/apps/mysql/3306/error.log
+16:46:17 root@redis02:~# systemctl restart mysqld
+16:46:25 root@redis02:~# echo $?
+0
+16:46:28 root@redis02:~#
+# 但是无法连接
+16:46:28 root@redis02:~# mysql
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' (2)
+16:46:43 root@redis02:~#
+```
+配置文件错误，无法启动数据库服务，这一类错误，需要去查看 `hostname.err`文件
+```bash
+
+
+```
 ## 1.6 数据库启动方式
 ### 1.6.1 利用脚本启动
 

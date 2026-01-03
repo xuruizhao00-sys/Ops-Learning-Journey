@@ -250,14 +250,14 @@
     "expandedKeys": []
   },
   "MySQL/mysql_manager.md": {
-    "scroll": 502.82323232323233,
+    "scroll": 825.5818661971831,
     "cursor": {
       "from": {
-        "line": 518,
+        "line": 852,
         "ch": 0
       },
       "to": {
-        "line": 518,
+        "line": 852,
         "ch": 0
       }
     },
@@ -265,24 +265,28 @@
       "item-1-0",
       "item-2-4",
       "item-2-17",
-      "item-2-56",
-      "item-2-60",
-      "item-2-69",
-      "item-3-71",
-      "item-4-73",
-      "item-1-95",
-      "item-2-97",
-      "item-2-98",
+      "item-2-58",
+      "item-2-62",
+      "item-2-71",
+      "item-3-73",
+      "item-4-75",
+      "item-1-97",
       "item-2-99",
-      "item-3-100",
-      "item-1-102",
-      "item-2-104",
-      "item-2-64",
+      "item-2-100",
+      "item-2-101",
+      "item-3-102",
+      "item-1-104",
+      "item-2-106",
+      "item-2-66",
       "item-3-43",
       "item-3-18",
       "item-4-19",
       "item-4-22",
-      "item-5-24"
+      "item-5-24",
+      "item-4-36",
+      "item-4-47",
+      "item-4-50",
+      "item-4-56"
     ]
   },
   "Linux 基础/Linux 基础使用/用户管理和权限管理.md": {
