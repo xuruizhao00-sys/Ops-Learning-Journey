@@ -1774,7 +1774,51 @@ mysql>
 2、采用安全模式启动数据库
 --skip-grant-tables 启动数据库不会加载授权表 
 --skip-networking 启动数据库只会创建进程信息，不会生成网络端口信息 （可选）
+17:31:14 root@redis02:~# /usr/local/mysql/bin/mysqld   --defaults-file=/etc/my.cnf   --skip-grant-tables   --skip-networking   --user=mysql
 
+# 在另一个终端中进行连接
+18:03:21 root@redis02:~# mysql
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.4.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+# 刷新授权表，重置密码
+mysql> flush privileges;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> alter user root@'localhost' identified by '123';
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> exit
+Bye
+
+# 终止安全模式数据库，重新启动数据库
+18:04:12 root@redis02:~# pkill mysqld
+
+18:04:18 root@redis02:~# systemctl restart mysqld 
+18:04:28 root@redis02:~# mysql -p123 
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 8.4.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
 ```
 # 二、SQL 基本概念
 ## 2.1 SQL 介绍
