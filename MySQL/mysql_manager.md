@@ -1461,7 +1461,8 @@ mysql> show charset;
 | utf8mb4  | UTF-8 Unicode                   | utf8mb4_0900_ai_ci  |      4 |  
 ...
 ```
-utf8mb3 等价于早期的 utf8 字符编码 可以识别中文信息 每个字符占用3字节 utf8mb4 支持emoji 每个字符占用4字节
+utf8mb3 等价于早期的 utf8 字符编码 可以识别中文信息 每个字符占用3字节 
+utf8mb4 支持emoji 每个字符占用4字节
 ## 3.2 设置字符集
 ### 3.2.1 查看数据库使用的字符集
 默认使用的是 utf8mb4
@@ -1484,5 +1485,11 @@ mysql> select @@character_set_server;
 mysql> 
 ```
 ### 3.2.2 修改数据库使用的字符集
-
+mysqld 配置项有一个参数 character-set-server ，该值默认是 utf8mb4
+```bash
+13:58:53 root@redis02:~# mysqld --help --verbose | grep character-set-server
+  -C, --character-set-server=name 
+character-set-server                                         utf8mb4
+13:59:05 root@redis02:~# 
+```
 # 四、MySQL 校对规则/排序规则
