@@ -294,7 +294,7 @@ Disabled
 Ubuntu 默认没有启动 SELinux，Ubuntu 使用的是 AppArmor 不是 SELinux
 
 ```
-###### 1.5.1.2.2.1 安装必要依赖
+###### 1.5.1.2.2.2 安装必要依赖
 ```bash
 # Rocky系统：
 
@@ -302,7 +302,7 @@ Ubuntu 默认没有启动 SELinux，Ubuntu 使用的是 AppArmor 不是 SELinux
 
 # Ubuntu系统：
 
-root@ubuntu24:~# apt install libaio-dev numactl libnuma-dev libncurses-dev
+root@ubuntu24:~# apt install libaio-dev numactl libnuma-dev libncurses-dev -y
 ```
 注意：ubuntu24 系统没有 libaio1 的包，需要单独去下载安装
 ```bash
@@ -320,7 +320,7 @@ Unpacking libaio1:amd64 (0.3.113-4) ...
 Setting up libaio1:amd64 (0.3.113-4) ...
 Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
 ```
-###### 1.5.1.2.2.2 用户管理
+###### 1.5.1.2.2.3 用户管理
 创建用户组和用户
 ```bash
 15:20:49 root@redis03:~# groupadd -r mysql
@@ -329,7 +329,7 @@ Processing triggers for libc-bin (2.39-0ubuntu8.6) ...
 mysql:x:999:988::/home/mysql:/sbin/nologin
 15:21:42 root@redis03:~# 
 ```
-###### 1.5.1.2.2.3 MySQL 目录配置
+###### 1.5.1.2.2.4 MySQL 目录配置
 ```bash
 15:23:03 root@redis02:~# mkdir /xuruizhao/apps/mysql -pv
 mkdir: created directory '/xuruizhao'
