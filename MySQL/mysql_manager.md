@@ -1924,6 +1924,41 @@ mysqld 配置项有一个参数 character-set-server ，该值默认是 utf8mb4
   -C, --character-set-server=name 
 character-set-server                                         utf8mb4
 13:59:05 root@redis02:~# 
+
+8:27:55 root@redis02:~# cat /etc/my.cnf
+[mysqld]
+basedir=/usr/local/mysql
+datadir=/lnxguru/apps/mysql/3306/data
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock
+pid-file=/lnxguru/apps/mysql/3306/data/mysqld.pid
+log-error=/lnxguru/apps/mysql/3306/error.log
+character-set-server=utf8mb3
+[client]
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock
+18:27:56 root@redis02:~# systemctl restart mysqld
+18:28:04 root@redis02:~# mysql -p123
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 8.4.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> select @@character-set-server;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'character-set-server' at line 1
+mysql> select @@character_set_server;
++------------------------+
+| @@character_set_server |
++------------------------+
+| utf8mb3                |
++------------------------+
+1 row in set (0.00 sec)
 ```
 # 四、MySQL 校对规则/排序规则
 
