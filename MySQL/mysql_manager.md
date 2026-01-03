@@ -2321,7 +2321,7 @@ mysql>
 | TIMESTAMP | 4   | 1970~2038 | ✅     |
 | TIME      | 3   | 时间        | ❌     |
 | YEAR      | 1   | 年         | ❌     |
-### DATETIME vs TIMESTAMP（必会）
+DATETIME vs TIMESTAMP（必会）
 
 |项目|DATETIME|TIMESTAMP|
 |---|---|---|
@@ -2350,3 +2350,43 @@ mysql> select * from t8;
 
 mysql>
 ```
+## 5.6 枚举类型
+ENUM 枚举类型（插入单个合理数据） -- SET 集合类型（插入多个合理数据）
+
+1.enum 类型测试
+```sql
+mysql> create table t9 (gender enum("女","男"));
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> insert into t9 values ("女");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from t9;
++--------+
+| gender |
++--------+
+| 女     |
++--------+
+1 row in set (0.00 sec)
+
+mysql> insert into t9 values ("sad");
+ERROR 1265 (01000): Data truncated for column 'gender' at row 1
+mysql>
+```
+2.set 类型测试输入
+```sql
+mysql> create table t10 (hobby set("乒乓球","游泳","篮球"));
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> insert into t10 values ("乒乓球,游泳");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from t10;
++------------------+
+| hobby            |
++------------------+
+| 乒乓球,游泳      |
++------------------+
+1 row in set (0.00 sec)
+```
+# 六、数据库的约束和属性
