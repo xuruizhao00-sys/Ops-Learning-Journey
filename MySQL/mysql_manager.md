@@ -291,6 +291,7 @@ Disabled
 [root rockylinux-1 ~] WORK 0 # 
 
 # Ubuntu system
+Ubuntu 默认没有启动 SELinux，Ubuntu 使用的是 AppArmor 不是 SELinux
 
 ```
 ###### 1.5.1.2.2.1 安装必要依赖
