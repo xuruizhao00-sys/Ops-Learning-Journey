@@ -253,15 +253,15 @@
     "expandedKeys": []
   },
   "MySQL/mysql_manager.md": {
-    "scroll": 1929.6186868686868,
+    "scroll": 1944.4873737373737,
     "cursor": {
       "from": {
-        "line": 1937,
-        "ch": 49
+        "line": 1967,
+        "ch": 0
       },
       "to": {
-        "line": 1937,
-        "ch": 49
+        "line": 1967,
+        "ch": 0
       }
     },
     "expandedKeys": [
@@ -293,7 +293,8 @@
       "item-4-57",
       "item-5-59",
       "item-5-62",
-      "item-2-106"
+      "item-2-106",
+      "item-1-121"
     ]
   },
   "Linux 基础/Linux 基础使用/用户管理和权限管理.md": {

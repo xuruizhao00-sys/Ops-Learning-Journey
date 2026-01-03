@@ -1961,5 +1961,10 @@ mysql> select @@character_set_server;
 1 row in set (0.00 sec)
 ```
 # 四、MySQL 校对规则/排序规则
+## 4.1 MySQL 校对规则
+可以实现区分大小写查询数据  test TEST  select ... where name='test'
+可以影响数据显示的默认排序  abc abd abe ABC ABD ABE   abc ABC abd ABD abe ABE  abc abd abe ABC ABD ABE 
+```bash
 
-[^1]: 
+```
+# 五、MySQL 数据类型
