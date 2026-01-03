@@ -331,12 +331,13 @@ mysql:x:999:988::/home/mysql:/sbin/nologin
 ```
 ###### 1.5.1.2.2.4 MySQL 目录配置
 ```bash
-15:23:03 root@redis02:~# mkdir /xuruizhao/apps/mysql -pv
-mkdir: created directory '/xuruizhao'
-mkdir: created directory '/xuruizhao/apps'
-mkdir: created directory '/xuruizhao/apps/mysql'
+14:25:25 root@redis02:~# mkdir -pv /lnxguru/apps/mysql/3306
+mkdir: created directory '/lnxguru'
+mkdir: created directory '/lnxguru/apps'
+mkdir: created directory '/lnxguru/apps/mysql'
+mkdir: created directory '/lnxguru/apps/mysql/3306'
 ```
-###### 1.5.1.2.2.4 MySQL 安装
+###### 1.5.1.2.2.5 MySQL 安装
 ```bash
 15:37:10 root@redis02:/xuruizhao/apps/mysql# tar xf mysql-8.4.0-linux-glibc2.28-x86_64.tar.xz 
 15:38:33 root@redis02:/xuruizhao/apps/mysql# ls
