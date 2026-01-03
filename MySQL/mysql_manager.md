@@ -174,6 +174,13 @@ MySQL 服务器与客户端之间的通信通过 **MySQL 网络协议** 进行�
 ## 1.5 MySQL 安装与配置
 ### 1.5.1 MySQL 安装
 MySQL 可以通过多种方式进行安装，具体的安装方式取决于操作系统和用户的需求。常见的安装方式包括 **包管理器安装**、**二进制安装**、以及 **源码编译安装**
+在安装时一般选择偶数版本，偶数版本一般是上一个奇数版本的稳定版
+
+==确定内核版本==
+```bash
+[root rockylinux-1 ~] WORK 0 # uname -a
+Linux rockylinux-1 5.14.0-362.8.1.el9_3.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Nov 8 17:36:32 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+```
 #### 1.5.1.1 包管理安装（适用于 Linux）
 ##### 1.5.1.1.1 在 Ubuntu/Debian 上安装 MySQL
 使用包管理工具 `apt` 来安装 MySQL。
@@ -258,6 +265,34 @@ https://downloads.mysql.com/archives/community/
 ![](assets/mysql_manager/file-20251219150929263.png)
 ![](assets/mysql_manager/file-20251219150952447.png)
 ##### 1.5.1.2.2 在 Ubuntu 中安装 MySQL8.4.0
+###### 1.5.1.2.2.1 操作系统环境准备
+```bash
+1、关闭防火墙
+# Ubuntu system
+14:06:44 root@redis02:~# systemctl disable --now ufw
+Synchronizing state of ufw.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install disable ufw
+14:06:55 root@redis02:~# 
+# rocky system
+[root rockylinux-1 ~] WORK 3 # systemctl disable --now firewalld
+[root rockylinux-1 ~] WORK 0 # systemctl status firewalld
+○ firewalld.service - firewalld - dynamic firewall daemon
+     Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; preset: enabled)
+     Active: inactive (dead)
+       Docs: man:firewalld(1)
+[root rockylinux-1 ~] WORK 3 # 
+
+2、关闭 SELinux
+# rocky system
+[root rockylinux-1 ~] WORK 0 # sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
+    
+[root rockylinux-1 ~] WORK 0 # getenforce 
+Disabled
+[root rockylinux-1 ~] WORK 0 # 
+
+# Ubuntu system
+
+```
 ###### 1.5.1.2.2.1 安装必要依赖
 ```bash
 # Rocky系统：
