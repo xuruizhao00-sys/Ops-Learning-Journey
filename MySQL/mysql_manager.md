@@ -2413,8 +2413,112 @@ mysql> select * from t10;
 |FOREIGN KEY|外键|
 |CHECK|检查约束（8.0+）|
 ### 6.2.1 PRIMARY KEY（主键约束）
+主键约束（PK primary key）： 限制列信息非空 且唯一 主键索引
+作用
+- 唯一标识一行数据
+- 不能为 NULL
+- 一个表只能有一个
+```sql
+CREATE TABLE users (
+  id BIGINT PRIMARY KEY
+);
 
+-- 复合主键
+PRIMARY KEY (user_id, role_id)
+```
+- 自动创建唯一索引
+- InnoDB 使用主键作为聚簇索引
+### 6.2.2 UNIQUE（唯一约束）
+- 保证字段或字段组合唯一
+- 允许多个 NULL（MySQL 特性）
+唯一约束（UQ Unique）：限制列的信息不能重复，但可以输入空值 唯一索引
+```sql
+email VARCHAR(100) UNIQUE
+```
+📌 **常见场景**
+- 用户名
+- 邮箱
+- 订单号
+### 6.2.3 NOT NULL（非空约束）
+禁止 NULL 值
+```sql
+username VARCHAR(50) NOT NULL
+
+ALTER TABLE `x`.`test01` 
+ADD COLUMN `gender` ENUM('男', '女') NOT NULL AFTER `name`;
+```
+📌 **生产建议**
+> 能 NOT NULL 就 NOT NULL，配默认值
+
+### 6.2.4 FOREIGN KEY（外键约束）
+外键约束：当业务功能需要操作多张数据表时，需要控制操作表的顺序
+
+当多张表插入数据和删除数据都会有合理顺序 
+```sql
+mysql> create table class(
+       id int primary key auto_increment, 
+       name varchar(10) not null comment "班级名字，不能为空",
+       room varchar(10) comment '教室：允许为空',    
+       ) charset utf8;
+Query OK, 0 rows affected, 1 warning (0.03 sec)
+
+mysql> create table student(
+       id int primary key auto_increment,
+       number char(10) not null unique comment "学号：不能重复",
+       name varchar(10) not null comment "姓名", 
+       c_id int, 
+       foreign key(c_id) references class(id) 
+       ) charset utf8;
+Query OK, 0 rows affected, 1 warning (0.04 sec)
+
+mysql> show tables;
++------------------+
+| Tables_in_test02 |
++------------------+
+| class            |
+| student          |
++------------------+
+2 rows in set (0.00 sec)
+
+mysql> 
+
+mysql> insert into class values (01,'class01','03');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into student values (01,'20252213','李四',01);
+Query OK, 1 row affected (0.01 sec)
+mysql> select * from class;
++----+---------+------+
+| id | name    | room |
++----+---------+------+
+|  1 | class01 | 03   |
++----+---------+------+
+1 row in set (0.00 sec)
+
+mysql> select * from student;
++----+----------+--------+------+
+| id | number   | name   | c_id |
++----+----------+--------+------+
+|  1 | 20252213 | 李四   |    1 |
++----+----------+--------+------+
+1 row in set (0.00 sec)
+
+mysql> delete from student where id=1;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> delete from class  where id=01;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+```
+
+当设置外键约束，插入数据信息时，需要先在主表中插入数据，然后才能在子表中插入对应数据;
+
+当设置外键约束，删除数据信息时，需要先在子表中删除数据，然后才能在主表中删除对应数据;
+
+🎟以上4种约束信息，其中 PK UQ NN 约束需要创建表时进行设置，FK约束可以创建表后进行设置
 ## 6.3 字段属性（Column Attributes）
+
 
 ## 6.4 约束 vs 属性：对比总结
 |项目|约束|属性|
