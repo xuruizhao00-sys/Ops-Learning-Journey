@@ -824,11 +824,9 @@ mysql>
 - 定期使用 `mysqldump`、`mysqlpump` 或 **Percona XtraBackup** 进行全量或增量备份。
 - 配置合理的备份保留策略，确保数据的恢复和灾难恢复能力。
 #### 1.5.2.6 MySQL 错误日志管理
-错误日志路径 ==/lnxguru/apps/mysql/3306/data/`hostname`.err==
 在数据库启动中出现的问题，我们是可以通过错误日志查找问题，因为在命令行界面，可能很多错误都是相同的提示，我们无法准确定性错误
 
-##### 1.5.2.6.1.模拟配置文件错误
-配置文件虽然有错，但是可以启动数据库服务，但是不能连接数据库服务，例如：修改了 socket 文件位置，这一类错误，不需要去查看 `hostname.err`文件
+配置文件虽然有错，但是可以启动数据库服务，但是不能连接数据库服务，例如：修改了 socket 文件位置，这一类错误，不需要去错误日志文件
 ```bash
 1、修改配置文件中的 socket 文件位置
 # MySQL 是可以正常启动的
@@ -848,11 +846,154 @@ log-error=/lnxguru/apps/mysql/3306/error.log
 ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' (2)
 16:46:43 root@redis02:~#
 ```
-配置文件错误，无法启动数据库服务，这一类错误，需要去查看 `hostname.err`文件
+配置文件错误，无法启动数据库服务，这一类错误，需要去查看错误日志文件
 ```bash
-
-
+17:04:43 root@redis02:~# cat /etc/my.cnf 
+[mysqld]
+aaabasedir=/usr/local/mysql
+datadir=/lnxguru/apps/mysql/3306/data
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock
+pid-file=/lnxguru/apps/mysql/3306/data/mysqld.pid
+log-error=/lnxguru/apps/mysql/3306/error.log
+[mysql]
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock
+17:02:57 root@redis02:~# systemctl restart mysqld 
+17:03:02 root@redis02:~# systemctl status mysqld 
+● mysqld.service - MySQL Server 8.4.0
+     Loaded: loaded (/usr/lib/systemd/system/mysqld.service; disabled; preset: enabled)
+     Active: activating (auto-restart) (Result: exit-code) since Sat 2026-01-03 17:03:06 CST; 4s ago
+       Docs: https://dev.mysql.com/doc/
+    Process: 6291 ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf --basedir=/usr/local/mysql --datadir=/lnxguru/apps/mysql/3306/data --user=mysql (code=exited, status=1/FAILURE)
+   Main PID: 6291 (code=exited, status=1/FAILURE)
+        CPU: 2.945s
+# 查看错误日志
+17:04:03 root@redis02:~# tail -f /lnxguru/apps/mysql/3306/error.log 
+2026-01-03T09:03:57.089813Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-01-03T09:03:57.089924Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-01-03T09:03:57.121628Z 0 [ERROR] [MY-000067] [Server] unknown variable 'aaabasedir=/usr/local/mysql'.
+2026-01-03T09:03:57.123864Z 0 [ERROR] [MY-010119] [Server] Aborting
 ```
+#### 1.5.2.7 socket 文件配置注意事项
+##### 1.5.2.7.1 什么是 socket 文件
+socket 文件的本质：  
+是“本机 MySQL 客户端与 mysqld 之间最高效、最安全、最可靠的通信通道”。
+MySQL 客户端连接服务端，只有两条路：
+
+| 方式          | 是否走网络  | 是否需要端口 |
+| ----------- | ------ | ------ |
+| Unix Socket | ❌ 不走网络 | ❌ 不需要  |
+| TCP/IP      | ✅ 走网络栈 | ✅ 需要   |
+```ini
+本地连接的默认优先级
+socket  >  tcp
+```
+👉 **在连接时只要没写 `-h`，就会尝试 socket**
+##### 1.5.2.7.2 为什么要设置 socket 文件
+###### 1.5.2.7.2.1 性能原因
+Unix Socket：
+```ini
+进程《----》内核《-----》进程
+```
+Tcp
+```ini
+进程 ↔ TCP/IP 协议栈 ↔ 网卡 ↔ 回环接口 ↔ TCP/IP ↔ 进程
+```
+📌 **socket 少了整套 TCP/IP 协议栈**
+
+| 项目  | Socket | TCP |
+| --- | ------ | --- |
+| 延迟  | ⭐ 极低   | 较高  |
+| CPU | ⭐ 少    | 多   |
+| QPS | ⭐ 更高   | 低一些 |
+👉 **DBA 本机运维、备份、监控，100% 走 socket**
+###### 1.5.2.7.2.2 安全原因
+Unix Socket：
+- 只能本机访问
+- 受 **Linux 文件权限** 控制
+- 不能被远程扫描
+
+TCP：
+- 端口暴露
+- 可能被扫描、爆破
+- 依赖防火墙
+👉 **socket = 天然“内网+最小暴露”**
+##### 1.5.2.7.3 如何设置 socket 文件
+
+> [!NOTE] 结论
+> **`[mysqld]` 里的 socket 是“服务端监听用的”，  
+`[client] / [mysql]` 里的 socket 是“客户端去找服务端用的”。**
+**两边必须一致，但作用完全不同，谁也不能省。**
+###### 1.5.2.7.3.1 先看“socket 到底是谁用谁的”
+1️⃣ mysqld（服务端）视角
+```bash
+[mysqld]
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock
+```
+- mysqld **创建** 并 **监听** 这个 socket 文件
+- 本地客户端通过这个 socket 才能连进来
+- **没有这个配置，mysqld 可能：**
+    - 用默认 socket（如 `/tmp/mysql.sock`）
+    - 或者根本不创建 socket（只监听 TCP）
+📌 **这是“服务端出口”**
+2️⃣ mysql（客户端）视角
+```bash
+[client]
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock
+```
+👉 含义是：
+- mysql 客户端 **主动去这个路径找 socket**
+- 找不到就报你看到的错误
+- 如果没配置：
+    - 回退到编译时默认 `/tmp/mysql.sock`
+📌 **这是“客户端入口”**
+###### 1.5.2.7.3.2 为什么不能“只配一边”
+❌ 只在 `[client]` 配 socket（错误）
+```ini
+[client]
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock
+```
+**后果：**
+- 客户端会去这个路径找
+- 但 mysqld 可能：
+    - 根本没在这监听
+    - 或监听在别的地方
+- ❌ 连接失败
+
+❌ 只在 `[mysqld]` 配 socket
+```ini
+[mysqld]
+socket=/lnxguru/apps/mysql/3306/data/mysql.sock
+```
+**后果：**
+- mysqld 正常创建 socket
+- 客户端不知道
+- 客户端回退 `/tmp/mysql.sock`
+- ❌ 连接失败
+###### 1.5.2.7.3.3 一个非常形象的类比
+把 socket 想成：
+
+> 🏢 **服务端（mysqld）开了一扇“后门”**  
+> 🚶 **客户端（mysql）要知道这扇门在哪里**
+
+|配置位置|相当于|
+|---|---|
+|`[mysqld] socket`|“我在这里开门”|
+|`[client] socket`|“我从这里进门”|
+
+**门没开 or 人走错门 → 永远进不去**
+
+##### 1.5.2.7.4 为什么 socket 不能放 /tmp
+/tmp 的问题
+
+|问题|说明|
+|---|---|
+|tmpfs|重启可能清空|
+|权限|被误删|
+|多实例|冲突|
+|安全|公共目录|
+
+👉 **生产环境严禁 /tmp/mysql.sock**
+
 ## 1.6 数据库启动方式
 ### 1.6.1 利用脚本启动
 
@@ -1574,7 +1715,67 @@ Open tables: 31
 Queries per second avg: 0.072
 这表示平均每秒执行的查询数为0.072。这个数值较低，可能表明数据库当前的负载很低，或者服务器的性能没有被充分利用。
 ```
+## 1.11 数据库用户密码管理
+### 1.11.1 设置/修改密码
+1、Linux 命令修改
+格式 `mysqladmin -u用户 -p原密码(如果没有，不用写 -p 参数) password '新密码'`
+2、SQL 语句修改
+格式：alter user 用户名@'主机域' identified by '新密码'
+```bash
+17:23:02 root@redis02:~# mysqladmin -uroot password 123
+mysqladmin: [Warning] Using a password on the command line interface can be insecure.
+Warning: Since password will be sent to server in plain text, use ssl connection to ensure password safety.
+17:23:20 root@redis02:~# mysql -p123
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 10
+Server version: 8.4.0 MySQL Community Server - GPL
 
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+
+
+######################################################################
+mysql> alter user  root@'localhost' identified by "321";
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> exit
+Bye
+17:24:08 root@redis02:~# mysql -p321
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 11
+Server version: 8.4.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+```
+### 1.11.2 重置密码
+![](assets/mysql_manager/file-20260103172452222.png)
+
+```bash
+1、关闭数据库服务
+17:25:41 root@redis02:~# systemctl stop mysqld
+
+2、采用安全模式启动数据库
+--skip-grant-tables 启动数据库不会加载授权表 
+--skip-networking 启动数据库只会创建进程信息，不会生成网络端口信息 （可选）
+
+```
 # 二、SQL 基本概念
 ## 2.1 SQL 介绍
 SQL（Structured Query Language）是结构化查询语言，是一种用于管理关系型数据库的标准语言。SQL 用于与数据库进行交互，执行数据库的创建、查询、更新和删除等操作。SQL 使得开发人员、数据库管理员和数据分析师能够与数据库系统（如 MySQL、PostgreSQL、SQL Server、Oracle 等）进行通信。

@@ -1,6 +1,6 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 3789.1666666666665,
+    "scroll": 3749.5454545454545,
     "cursor": {
       "from": {
         "line": 3815,
@@ -37,7 +37,10 @@
       "item-3-239",
       "item-5-236",
       "item-4-233",
-      "item-3-243"
+      "item-3-243",
+      "item-3-249",
+      "item-2-248",
+      "item-1-247"
     ]
   },
   "Python/python.md": {
@@ -250,34 +253,34 @@
     "expandedKeys": []
   },
   "MySQL/mysql_manager.md": {
-    "scroll": 825.5818661971831,
+    "scroll": 1766.9146825396826,
     "cursor": {
       "from": {
-        "line": 852,
-        "ch": 0
+        "line": 1770,
+        "ch": 6
       },
       "to": {
-        "line": 852,
-        "ch": 0
+        "line": 1770,
+        "ch": 6
       }
     },
     "expandedKeys": [
       "item-1-0",
       "item-2-4",
       "item-2-17",
-      "item-2-58",
-      "item-2-62",
+      "item-2-67",
       "item-2-71",
-      "item-3-73",
-      "item-4-75",
-      "item-1-97",
-      "item-2-99",
-      "item-2-100",
-      "item-2-101",
-      "item-3-102",
-      "item-1-104",
-      "item-2-106",
-      "item-2-66",
+      "item-2-80",
+      "item-3-82",
+      "item-4-84",
+      "item-1-109",
+      "item-2-111",
+      "item-2-112",
+      "item-2-113",
+      "item-3-114",
+      "item-1-116",
+      "item-2-118",
+      "item-2-75",
       "item-3-43",
       "item-3-18",
       "item-4-19",
@@ -286,7 +289,11 @@
       "item-4-36",
       "item-4-47",
       "item-4-50",
-      "item-4-56"
+      "item-4-56",
+      "item-4-57",
+      "item-5-59",
+      "item-5-62",
+      "item-2-106"
     ]
   },
   "Linux 基础/Linux 基础使用/用户管理和权限管理.md": {
