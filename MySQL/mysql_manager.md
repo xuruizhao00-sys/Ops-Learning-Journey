@@ -2273,5 +2273,80 @@ mysql> select * from decimal01;
 - CHAR 会自动填充空格
 - VARCHAR 最大 65535（受字符集影响）
 ```sql
+mysql> create table t7 (name01 char(3),name02 varchar(10));
+Query OK, 0 rows affected (0.04 sec)
 
+mysql> insert into t7 values ("李五","王九");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into t7 values ("李五六七","王九");
+ERROR 1406 (22001): Data too long for column 'name01' at row 1
+mysql> select * from t7;
++--------+--------+
+| name01 | name02 |
++--------+--------+
+| 李五   | 王九   |
++--------+--------+
+1 row in set (0.00 sec)
+
+mysql>
+```
+### 5.4.2 TEXT 系列（大文本）
+|类型|最大长度|
+|---|---|
+|TINYTEXT|255|
+|TEXT|64K|
+|MEDIUMTEXT|16M|
+|LONGTEXT|4G|
+企业建议
+- ❌ 能不用 TEXT 就不用
+- ❌ TEXT 列不适合做索引
+- ✅ 大文本单独拆表
+### 5.4.3 BINARY / VARBINARY（二进制）
+
+|类型|场景|
+|---|---|
+|BINARY|固定二进制|
+|VARBINARY|变长二进制|
+
+常见用途：
+- 哈希值
+- token
+- 加密数据
+## 5.5 日期和时间类型（Time & Date）
+| 类型        | 字节  | 范围        | 是否带时区 |
+| --------- | --- | --------- | ----- |
+| DATE      | 3   | 日期        | ❌     |
+| DATETIME  | 8   | 日期+时间     | ❌     |
+| TIMESTAMP | 4   | 1970~2038 | ✅     |
+| TIME      | 3   | 时间        | ❌     |
+| YEAR      | 1   | 年         | ❌     |
+### DATETIME vs TIMESTAMP（必会）
+
+|项目|DATETIME|TIMESTAMP|
+|---|---|---|
+|是否存时区|❌ 不存|❌（但会转换）|
+|是否受时区影响|❌|✅|
+|存储方式|原值存储|UTC 存储|
+|读取时|原样返回|按会话时区转换|
+|自动维护|❌|✅（CURRENT_TIMESTAMP）|
+📌 **生产建议**
+- 业务时间：`DATETIME`
+- 创建/更新时间：`TIMESTAMP`
+```sql
+mysql> create table t8 (d1 date,d2 time,d3 datetime,d4 timestamp);
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> insert into t8 values (20200203,121212,20231212032536,19770203123223);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from t8;
++------------+----------+---------------------+---------------------+
+| d1         | d2       | d3                  | d4                  |
++------------+----------+---------------------+---------------------+
+| 2020-02-03 | 12:12:12 | 2023-12-12 03:25:36 | 1977-02-03 12:32:23 |
++------------+----------+---------------------+---------------------+
+1 row in set (0.00 sec)
+
+mysql>
 ```
