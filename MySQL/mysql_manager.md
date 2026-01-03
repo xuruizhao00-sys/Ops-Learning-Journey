@@ -474,6 +474,48 @@ mysql       2960    2820 42 15:06 ?        00:00:03 /usr/local/mysql/bin/mysqld 
 > 2、编写 mysql.service
 > 
 ```bash
+方式1
+15:09:12 root@redis02:~# systemctl enable mysqld
+mysqld.service is not a native service, redirecting to systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable mysqld
+16:38:05 root@redis02:~# systemctl status mysqld
+○ mysqld.service - LSB: start and stop MySQL
+     Loaded: loaded (/etc/init.d/mysqld; generated)
+     Active: inactive (dead)
+       Docs: man:systemd-sysv-generator(8)
+
+Jan 03 15:06:32 redis02 systemd[1]: Starting mysqld.service - LSB: start and stop MySQL...
+Jan 03 15:06:32 redis02 mysqld[2806]: Starting MySQL
+Jan 03 15:06:37 redis02 mysqld[2806]: .... *
+Jan 03 15:06:37 redis02 systemd[1]: Started mysqld.service - LSB: start and stop MySQL.
+Jan 03 15:08:31 redis02 systemd[1]: Stopping mysqld.service - LSB: start and stop MySQL...
+Jan 03 15:08:31 redis02 mysqld[3020]: Shutting down MySQL
+Jan 03 15:08:32 redis02 mysqld[3020]: . *
+Jan 03 15:08:32 redis02 systemd[1]: mysqld.service: Deactivated successfully.
+Jan 03 15:08:32 redis02 systemd[1]: Stopped mysqld.service - LSB: start and stop MySQL.
+Jan 03 15:08:32 redis02 systemd[1]: mysqld.service: Consumed 6.088s CPU time, 444.2M memory peak, 0B memory swap peak.
+16:38:11 root@redis02:~# systemctl start mysqld
+16:38:34 root@redis02:~# systemctl status mysqld
+● mysqld.service - LSB: start and stop MySQL
+     Loaded: loaded (/etc/init.d/mysqld; generated)
+     Active: active (running) since Sat 2026-01-03 16:38:33 CST; 2s ago
+       Docs: man:systemd-sysv-generator(8)
+    Process: 3849 ExecStart=/etc/init.d/mysqld start (code=exited, status=0/SUCCESS)
+      Tasks: 37 (limit: 2210)
+     Memory: 429.9M (peak: 444.1M)
+        CPU: 4.246s
+     CGroup: /system.slice/mysqld.service
+             ├─3863 /bin/sh /usr/local/mysql/bin/mysqld_safe --datadir=/lnxguru/apps/mysql/3306/data --pid-file=/lnxguru/apps/mysql/3306/data/redis02.pid
+             └─4003 /usr/local/mysql/bin/mysqld --basedir=/usr/local/mysql --datadir=/lnxguru/apps/mysql/3306/data --plugin-dir=/usr/local/mysql/lib/plugin --user=mysql --log-error=redis02.err --pid-file=/ln>
+
+Jan 03 16:38:29 redis02 systemd[1]: Starting mysqld.service - LSB: start and stop MySQL...
+Jan 03 16:38:29 redis02 mysqld[3849]: Starting MySQL
+Jan 03 16:38:33 redis02 mysqld[3849]: .... *
+Jan 03 16:38:33 redis02 systemd[1]: Started mysqld.service - LSB: start and stop MySQL.
+16:38:38 root@redis02:~# 
+```
+```shell
+方式二
 
 ```
 ###### 1.5.1.2.2.10 MySQL 连接测试
