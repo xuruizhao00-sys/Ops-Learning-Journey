@@ -1964,7 +1964,314 @@ mysql> select @@character_set_server;
 ## 4.1 MySQL 校对规则
 可以实现区分大小写查询数据  test TEST  select ... where name='test'
 可以影响数据显示的默认排序  abc abd abe ABC ABD ABE   abc ABC abd ABD abe ABE  abc abd abe ABC ABD ABE 
-```bash
+```sql
+1、查看所有的校对规则
+mysql> show collation;
+...
+utf8mb4_0900_ai_ci          | utf8mb4  | 255 | Yes     | Yes      |       0 | NO PAD        |
+...
+```
+ai 不区分重音
+as 区分重音
+ci 不区分大小写，Case-insensitive的缩写 utf8mb4_0900_ai_ci 
+cs 区分大小写，Case-sensitive的缩写 utf8mb4_0900_as_cs 
+\_bin 采用二进制方式存储，影响数据排序
+## 4.2 测试校对规则
+```sql
+1、创建三个测试数据表，并设置不同校对规则
+mysql> create database test01;
+Query OK, 1 row affected (0.01 sec)
 
+mysql> use test01;
+Database changed
+mysql> create table t1(info char(3)) charset utf8mb4 collate utf8mb4_0900_ai_ci;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> create table t2(info char(3)) charset utf8mb4 collate utf8mb4_0900_as_cs;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> create table t3(info char(3)) charset utf8mb4 collate utf8mb4_bin;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> show tables;
++------------------+
+| Tables_in_test01 |
++------------------+
+| t1               |
+| t2               |
+| t3               |
++------------------+
+3 rows in set (0.00 sec)
+
+mysql> 
+
+
+2、在三张表中插入相同数据
+mysql> insert into t1 values('a'),('A'),('b'),('B'),('c'),('C');
+Query OK, 6 rows affected (0.03 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> insert into t2 values('a'),('A'),('b'),('B'),('c'),('C');
+Query OK, 6 rows affected (0.00 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> insert into t3 values('a'),('A'),('b'),('B'),('c'),('C');
+Query OK, 6 rows affected (0.01 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> 
+
+3、测试不同校对规则的区分字母大小写功能
+-- ci 不具备区分大小功能；cs 和 bin 具备区分大小写功能
+mysql> select * from t1 where info="A";
++------+
+| info |
++------+
+| a    |
+| A    |
++------+
+2 rows in set (0.00 sec)
+
+mysql> select * from t2 where info="A";
++------+
+| info |
++------+
+| A    |
++------+
+1 row in set (0.01 sec)
+
+mysql> select * from t3 where info="A";
++------+
+| info |
++------+
+| A    |
++------+
+1 row in set (0.00 sec)
+
+4、测试数据信息排序规则
+-- ci 和 cs 在排序时不具备区分大小写功能；bin 在排序时具备区分大小写功能
+mysql> select * from t1 order by info;
++------+
+| info |
++------+
+| a    |
+| A    |
+| b    |
+| B    |
+| c    |
+| C    |
++------+
+6 rows in set (0.00 sec)
+
+mysql> select * from t2 order by info;
++------+
+| info |
++------+
+| a    |
+| A    |
+| b    |
+| B    |
+| c    |
+| C    |
++------+
+6 rows in set (0.01 sec)
+
+mysql> select * from t3 order by info;
++------+
+| info |
++------+
+| A    |
+| B    |
+| C    |
+| a    |
+| b    |
+| c    |
++------+
+6 rows in set (0.00 sec)
 ```
 # 五、MySQL 数据类型
+## 5.1 数据类型作用
+在 MySQL 中，**数据类型决定了：**
+- 占用多少磁盘空间
+- 能不能用索引、索引效率
+- 比较、排序规则
+- 是否容易出 BUG
+- 将来扩展是否痛苦
+> **类型选错，后期几乎必然返工。**
+
+## 5.2 数据类型总览
+MySQL 数据类型主要分为 5 大类：
+
+|大类|说明|
+|---|---|
+|数值类型|整数、小数|
+|字符串类型|文本、二进制|
+|日期时间类型|时间、日期|
+|JSON 类型|半结构化数据|
+|空间类型|GIS（了解即可）|
+## 5.3 数值类型（Numeric Types）
+### 5.3.1 整数类型
+|类型|字节|有符号范围|无符号范围|
+|---|---|---|---|
+|TINYINT|1|-128 ~ 127|0 ~ 255|
+|SMALLINT|2|-32K ~ 32K|0 ~ 65K|
+|MEDIUMINT|3|-8M ~ 8M|0 ~ 16M|
+|INT|4|-21亿 ~ 21亿|0 ~ 42亿|
+|BIGINT|8|±9e18|0 ~ 18e18|
+常见用法
+
+|场景|推荐|
+|---|---|
+|状态位（0/1/2）|TINYINT|
+|数量、小 ID|INT UNSIGNED|
+|分布式 ID|BIGINT|
+|是否字段|TINYINT(1)（本质仍是 TINYINT）|
+ ❗ 常见误区
+- ❌ `INT(11)` 不是长度（只是显示宽度，已废弃）
+- ❌ 所有 ID 都用 BIGINT（浪费）
+```sql
+mysql> create table t4 (id tinyint);
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> insert into t4 values (-127),(126);
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from t4;
++------+
+| id   |
++------+
+| -127 |
+|  126 |
++------+
+2 rows in set (0.00 sec)
+
+mysql> insert into t4 values (128);
+ERROR 1264 (22003): Out of range value for column 'id' at row 1
+mysql> 
+```
+
+### 5.3.2 浮点类型
+| 类型          | 名称      | 含义                        |
+| ----------- | ------- | ------------------------- |
+| float(m,d)  | 单精度浮点类型 | 可以保留的小数位最多 6 m 总个数 d 小数位  |
+| double(m,d) | 双精度浮点类型 | 可以保留的小数位最多 17 m 总个数 d 小数位 |
+| decimal     | 定点数类型   | 可以自定义                     |
+DECIMAL 从 [MySQL](https://cloud.tencent.com/product/cdb?from_column=20065&from=20065) 5.1引入，列的声明语法是 DECIMAL(M,D)
+对于声明语法 DECIMAL(M,D)，自变量的值范围如下：
+- M是最大位数（精度），范围是1到65。可不指定，默认值是10。
+- D是小数点右边的位数（小数位）。范围是0到30，并且不能大于M，可不指定，默认值是0。
+
+|类型|是否精确|场景|
+|---|---|---|
+|FLOAT / DOUBLE|❌|统计、计算|
+|DECIMAL|✅|金额、财务|
+📌 **金额字段永远不要用 FLOAT / DOUBLE**
+
+float 存储小数情况，最多保留6位小数，多出的部分截断，double 也一样
+```sql
+mysql> create table t5 (id float);
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> insert into t5 values (1.123456),(2.1234567);
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from t5;
++---------+
+| id      |
++---------+
+| 1.12346 |
+| 2.12346 |
++---------+
+2 rows in set (0.00 sec)
+```
+float(m,d) 测试，如果小数位不够3位，会自动补全；总位数不能超过6位，小数点不算位数。
+```sql
+mysql> create table t6 (id float(6,3));
+Query OK, 0 rows affected, 1 warning (0.04 sec)
+
+mysql> insert into t6 values (1.123456),(2.123);
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from t6;
++-------+
+| id    |
++-------+
+| 1.123 |
+| 2.123 |
++-------+
+2 rows in set (0.01 sec)
+
+mysql> insert into t6 values (1234567.123);
+ERROR 1264 (22003): Out of range value for column 'id' at row 1
+mysql> insert into t6 values (1234567);
+ERROR 1264 (22003): Out of range value for column 'id' at row 1
+mysql> insert into t6 values (123456);
+ERROR 1264 (22003): Out of range value for column 'id' at row 1
+mysql> insert into t6 values (123);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from t6;
++---------+
+| id      |
++---------+
+|   1.123 |
+|   2.123 |
+| 123.000 |
++---------+
+3 rows in set (0.00 sec)
+
+mysql>
+```
+decimal 存储情况
+```sql
+mysql> create table decimal01 (num decimal(20,19));
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> insert into decimal01 values (0.1234567812345678123);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from decimal01;
++-----------------------+
+| num                   |
++-----------------------+
+| 0.1234567812345678123 |
++-----------------------+
+1 row in set (0.00 sec)
+
+mysql> insert into decimal01 values (0.12345678123456781234);
+Query OK, 1 row affected, 1 warning (0.00 sec)
+
+mysql> select * from decimal01;
++-----------------------+
+| num                   |
++-----------------------+
+| 0.1234567812345678123 |
+| 0.1234567812345678123 |
++-----------------------+
+2 rows in set (0.00 sec)
+```
+## 5.4 字符串类型（String Types）
+### 5.4.1 CHAR vs VARCHAR
+张三 char(10) 2个字符 --> 磁盘 10个字符 利用空格符补全剩余字符 "张三 空格 空格 ... " 10个字符，本身没有那么多字符，浪费磁盘使用率。
+李四 varchar(10) 2个字符 --> 磁盘 "李四+结束字符" 3个字符
+
+| 类型         | 特性                 | 含义                |
+| ---------- | ------------------ | ----------------- |
+| char(n)    | 固定长度字符类型（提高数据检索效率） | 存储字符范围 最多255个字符   |
+| varchar(n) | 可变长度字符类型（提高磁盘利用率）  | 存储字符范围 最多65535个字符 |
+使用建议
+
+|场景|推荐|
+|---|---|
+|性别、国家码|CHAR|
+|用户名、标题|VARCHAR|
+|变长字段|VARCHAR|
+❗ 坑点
+- CHAR 会自动填充空格
+- VARCHAR 最大 65535（受字符集影响）
+```sql
+
+```
