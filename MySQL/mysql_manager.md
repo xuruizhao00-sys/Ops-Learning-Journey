@@ -331,23 +331,22 @@ mysql:x:999:988::/home/mysql:/sbin/nologin
 ```
 ###### 1.5.1.2.2.4 MySQL 目录配置
 ```bash
-14:25:25 root@redis02:~# mkdir -pv /lnxguru/apps/mysql/3306
+14:25:25 root@redis02:~# mkdir -pv /lnxguru/apps/mysql/3306/data/
 mkdir: created directory '/lnxguru'
 mkdir: created directory '/lnxguru/apps'
 mkdir: created directory '/lnxguru/apps/mysql'
 mkdir: created directory '/lnxguru/apps/mysql/3306'
+mkdir: created directory '/lnxguru/apps/mysql/3306/data'
 ```
 ###### 1.5.1.2.2.5 MySQL 安装
 ```bash
-15:37:10 root@redis02:/xuruizhao/apps/mysql# tar xf mysql-8.4.0-linux-glibc2.28-x86_64.tar.xz 
-15:38:33 root@redis02:/xuruizhao/apps/mysql# ls
-mysql-8.4.0-linux-glibc2.28-x86_64  mysql-8.4.0-linux-glibc2.28-x86_64.tar.xz
-15:38:49 root@redis02:/xuruizhao/apps/mysql# ls -l 
-total 469892
-drwxr-xr-x 9 root root      4096 Dec 19 15:38 mysql-8.4.0-linux-glibc2.28-x86_64
--rw-r--r-- 1 root root 481157440 Dec 19 15:24 mysql-8.4.0-linux-glibc2.28-x86_64.tar.xz
-15:38:52 root@redis02:/xuruizhao/apps/mysql# mv mysql-8.4.0-linux-glibc2.28-x86_64 /usr/local/mysql
-15:39:13 root@redis02:/xuruizhao/apps/mysql# ls -l /usr/local/mysql
+14:49:52 root@redis02:~# tar xf mysql-8.4.0-linux-glibc2.28-x86_64.tar.xz -C /usr/local/
+14:50:54 root@redis02:~# cd /usr/local/
+14:50:58 root@redis02:/usr/local# ln -sv mysql-8.4.0-linux-glibc2.28-x86_64 mysql 
+'mysql' -> 'mysql-8.4.0-linux-glibc2.28-x86_64'
+14:51:06 root@redis02:/usr/local# ls -l mysql
+lrwxrwxrwx 1 root root 34 Jan  3 14:51 mysql -> mysql-8.4.0-linux-glibc2.28-x86_64
+14:51:10 root@redis02:/usr/local# ls -l mysql/
 total 308
 drwxr-xr-x  2 7161 31415   4096 Apr 10  2024 bin
 drwxr-xr-x  2 7161 31415   4096 Apr 10  2024 docs
@@ -358,11 +357,11 @@ drwxr-xr-x  4 7161 31415   4096 Apr 10  2024 man
 -rw-r--r--  1 7161 31415    666 Apr 10  2024 README
 drwxr-xr-x 28 7161 31415   4096 Apr 10  2024 share
 drwxr-xr-x  2 7161 31415   4096 Apr 10  2024 support-files
+14:51:12 root@redis02:/usr/local#
 ```
-###### 1.5.1.2.2.5 配置 MySQL 环境变量
+###### 1.5.1.2.2.6 配置 MySQL 环境变量
 ```bash
-15:40:25 root@redis02:~# vim /etc/profile.d/mysql.sh
-15:41:04 root@redis02:~# cat /etc/profile.d/mysql.sh
+14:52:49 root@redis02:/usr/local# cat /etc/profile.d/mysql.sh
 #!/bin/bash
 # ==============================================================================
 # 脚本基础信息
@@ -373,38 +372,37 @@ drwxr-xr-x  2 7161 31415   4096 Apr 10  2024 support-files
 # GitHub: xuruizhao00-sys
 # ==============================================================================
 MYSQL_HOME=/usr/local/mysql
-PATH=$PATH:$MYSQL_HOME/bin
+PATH=$MYSQL_HOME/bin:$PATH
 
-15:41:05 root@redis02:~# source /etc/profile.d/mysql.sh
-15:41:09 root@redis02:~# mysql --version
+14:52:50 root@redis02:/usr/local# source /etc/profile.d/mysql.sh
+14:53:10 root@redis02:/usr/local# mysql --version
 mysql  Ver 8.4.0 for Linux on x86_64 (MySQL Community Server - GPL)
-15:41:18 root@redis02:~#
+14:53:41 root@redis02:/usr/local# 
 ```
-###### 1.5.1.2.2.6 配置 MySQL 环境
+###### 1.5.1.2.2.7 配置 MySQL 环境
 创建主配置文件
 注意：配置文件中涉及到的配置目录，必须存在，否则无法运行
 ```bash
-15:43:16 root@redis02:~# cat /usr/local/mysql/etc/my.cnf
-[mysql]
-port=3306
-socket=/usr/local/mysql/data/mysql.sock
+14:58:23 root@redis02:~# cat /etc/my.cnf
 [mysqld]
-port = 3306
-mysqlx_port = 33060
-mysqlx_socket = /usr/local/mysql/data/mysqlx.sock
-basedir = /usr/local/mysql
-datadir = /usr/local/mysql/data
-socket = /usr/local/mysql/data/mysql.sock
-pid-file = /usr/local/mysql/data/mysqld.pid
-log-error = /usr/local/mysql/log/error.log
-15:43:18 root@redis02:~# 
+user=mysql
+basedir=/usr/local/mysql
+datadir=/lnxguru/apps/mysql/3306/data
+socket=/tmp/mysql.sock
+```
+```java
+[mysqld]     --配置标签信息（标明 是服务端配置标签 客户端配置标签） 
+user=mysql   --数据库进程用户信息
+basedir=/usr/local/mysql   -- 加载程序目录  Linux 系统 mysql5.6  mysql5.7 mysql8.0 （多实例）   
+datadir=/data/3306/data    -- 加载数据目录
+socket=/tmp/mysql.sock     -- 配置连接数据库的 socket（客户端命令可以连接访问服务端）
 ```
 创建数据、日志目录
 ```bash
 15:43:18 root@redis02:~# mkdir /usr/local/mysql/{data,log}
 15:44:26 root@redis02:~# chown -R mysql:mysql /usr/local/mysql
 ```
-###### 1.5.1.2.2.7 MySQL 环境初始化
+###### 1.5.1.2.2.8 MySQL 环境初始化
 需要保证 MySQL 的数据目录是空的
 > [!NOTE] MySQL 安全初始化
 > 如果使用 --initialize 选项会生成随机密码，要去 /data/mysql/mysql.log中查看
@@ -424,49 +422,61 @@ log-error = /usr/local/mysql/log/error.log
 > 如果使用 --initialize-insecure -选项会生成空密码
 ```bash
 15:48:39 root@redis02:~# rm -rf /usr/local/mysql/data/*
-15:50:13 root@redis02:~# mysqld --initialize-insecure  --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data
+14:55:59 root@redis02:/usr/local# mysqld --initialize-insecure --user=mysql --datadir=/lnxguru/apps/mysql/3306/data/  --basedir=/usr/local/mysql
+14:56:30 root@redis02:/usr/local# echo $?
+0
 ```
-###### 1.5.1.2.2.8 MySQL 服务脚本
+###### 1.5.1.2.2.9 MySQL 服务启动
+
+> [!NOTE] MySQL 自带的脚本启动
+> /usr/local/mysql/support-files/mysql.server 
 ```bash
-# 该脚本不是 systemd 风格的脚本，但是可以被 systemd 兼容
-15:50:40 root@redis02:~# cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
-15:52:28 root@redis02:~# systemctl daemon-reload 
-15:52:39 root@redis02:~# /etc/init.d/mysqld start 
-Starting mysqld (via systemctl): mysqld.service.
+1、MySQL 数据库程序为我们提供了一个启动 MySQL 的脚本
+14:58:25 root@redis02:~# file /usr/local/mysql/support-files/mysql.server 
+/usr/local/mysql/support-files/mysql.server: POSIX shell script, ASCII text executable
 
+2、将该脚本移动到 /etc/init.d/ 目录下
+15:03:05 root@redis02:~# mv /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+15:03:42 root@redis02:~# ls -l /etc/init.d/mysqld
+-rwxr-xr-x 1 7161 31415 10576 Apr 10  2024 /etc/init.d/mysqld
 
-# 查看自动生成的服务管理文件
-15:52:57 root@redis02:~# systemctl cat mysqld
-# /run/systemd/generator.late/mysqld.service
-# Automatically generated by systemd-sysv-generator
-
-[Unit]
-Documentation=man:systemd-sysv-generator(8)
-SourcePath=/etc/init.d/mysqld
-Description=LSB: start and stop MySQL
-After=network-online.target
-After=remote-fs.target
-After=ypbind.service
-After=nscd.service
-After=ldap.service
-After=ntpd.service
-After=xntpd.service
-Wants=network-online.target
-
-[Service]
-Type=forking
-Restart=no
-TimeoutSec=5min
-IgnoreSIGPIPE=no
-KillMode=process
-GuessMainPID=no
-RemainAfterExit=yes
-SuccessExitStatus=5 6
-ExecStart=/etc/init.d/mysqld start
-ExecStop=/etc/init.d/mysqld stop
-ExecReload=/etc/init.d/mysqld reload
+3、利用该脚本启停 MySQL
+15:04:17 root@redis02:~# /etc/init.d/mysqld start 
+Starting mysqld (via systemctl): mysqld.service.                     
+15:04:45 root@redis02:~# ss -tunlp | grep 3306
+tcp   LISTEN 0      70                 *:33060            *:*    users:(("mysqld",pid=2689,fd=18))                      
+tcp   LISTEN 0      151                *:3306             *:*    users:(("mysqld",pid=2689,fd=30))                      
+15:04:49 root@redis02:~# 
+# 数据库进程查看，对于数据库进程来说，也是有 master 进程和 worker 进程的
+15:05:09 root@redis02:~# ps -ef | grep mysql | grep -v grep 
+root        2551       1  0 15:04 ?        00:00:00 /bin/sh /usr/local/mysql/bin/mysqld_safe --datadir=/lnxguru/apps/mysql/3306/data --pid-file=/lnxguru/apps/mysql/3306/data/redis02.pid
+mysql       2689    2551  9 15:04 ?        00:00:04 /usr/local/mysql/bin/mysqld --basedir=/usr/local/mysql --datadir=/lnxguru/apps/mysql/3306/data --plugin-dir=/usr/local/mysql/lib/plugin --user=mysql --log-error=redis02.err --pid-file=/lnxguru/apps/mysql/3306/data/redis02.pid --socket=/tmp/mysql.sock
+15:05:14 root@redis02:~
+15:05:14 root@redis02:~# /etc/init.d/mysqld stop
+Stopping mysqld (via systemctl): mysqld.service.
+15:05:48 root@redis02:~# ps -ef | grep mysql | grep -v grep 
+15:05:49 root@redis02:~#
 ```
-###### 1.5.1.2.2.9 MySQL 连接测试
+
+> [!NOTE] service 方式启动
+>要想使用 service 方式启动，必须要保证 /etc/init.d/mysqld 存在 
+```bash
+15:05:49 root@redis02:~# service mysqld start
+15:06:37 root@redis02:~# ps -ef | grep mysql | grep -v grep 
+root        2820       1  0 15:06 ?        00:00:00 /bin/sh /usr/local/mysql/bin/mysqld_safe --datadir=/lnxguru/apps/mysql/3306/data --pid-file=/lnxguru/apps/mysql/3306/data/redis02.pid
+mysql       2960    2820 42 15:06 ?        00:00:03 /usr/local/mysql/bin/mysqld --basedir=/usr/local/mysql --datadir=/lnxguru/apps/mysql/3306/data --plugin-dir=/usr/local/mysql/lib/plugin --user=mysql --log-error=redis02.err --pid-file=/lnxguru/apps/mysql/3306/data/redis02.pid --socket=/tmp/mysql.sock
+15:06:40 root@redis02:~#
+```
+
+> [!NOTE] systemctl 启动数据库服务
+> 默认的我们是没有 mysql.service 文件，有两种解决方式
+> 1、先通过 `systemctl enable mysqld`，默认指定从 `/etc/rc.d/init.d/mysqld` 启动
+> 2、编写 mysql.service
+> 
+```bash
+
+```
+###### 1.5.1.2.2.10 MySQL 连接测试
 ```bash
 15:53:12 root@redis02:~# mysql
 Welcome to the MySQL monitor.  Commands end with ; or \g.
@@ -1530,3 +1540,5 @@ character-set-server                                         utf8mb4
 13:59:05 root@redis02:~# 
 ```
 # 四、MySQL 校对规则/排序规则
+
+[^1]: 
