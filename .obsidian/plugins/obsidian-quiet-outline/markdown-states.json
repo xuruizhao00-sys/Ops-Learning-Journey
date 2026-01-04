@@ -1,13 +1,13 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 3749.5454545454545,
+    "scroll": 4066.151515151515,
     "cursor": {
       "from": {
-        "line": 3815,
+        "line": 4083,
         "ch": 0
       },
       "to": {
-        "line": 3815,
+        "line": 4083,
         "ch": 0
       }
     },
@@ -40,7 +40,29 @@
       "item-3-243",
       "item-3-249",
       "item-2-248",
-      "item-1-247"
+      "item-1-247",
+      "item-4-257",
+      "item-3-424",
+      "item-2-402",
+      "item-1-278",
+      "item-2-261",
+      "item-3-262",
+      "item-4-251",
+      "item-4-270",
+      "item-3-280",
+      "item-2-279",
+      "item-3-284",
+      "item-4-291",
+      "item-3-290",
+      "item-4-297",
+      "item-3-303",
+      "item-3-309",
+      "item-2-308",
+      "item-3-314",
+      "item-5-325",
+      "item-4-322",
+      "item-4-336",
+      "item-5-258"
     ]
   },
   "Python/python.md": {
@@ -111,7 +133,7 @@
     ]
   },
   "redis/redis.md": {
-    "scroll": 7011.641414141414,
+    "scroll": 5762.580808080808,
     "cursor": {
       "from": {
         "line": 6,
@@ -159,7 +181,12 @@
       "item-4-331",
       "item-3-342",
       "item-4-354",
-      "item-3-352"
+      "item-3-352",
+      "item-4-338",
+      "item-3-336",
+      "item-4-323",
+      "item-4-287",
+      "item-3-286"
     ]
   },
   "2025-12-14.md": {
@@ -348,5 +375,19 @@
       "item-3-6",
       "item-2-4"
     ]
+  },
+  "redis/redis.service.md": {
+    "scroll": 0,
+    "cursor": {
+      "from": {
+        "line": 0,
+        "ch": 0
+      },
+      "to": {
+        "line": 0,
+        "ch": 0
+      }
+    },
+    "expandedKeys": []
   }
 }

@@ -3839,12 +3839,8 @@ Shell（以 Bash 为例）常见的配置文件如下：
 - 设置提示符：`PS1`
 - 加载函数、脚本等
 📌 **小提示**：多数 Linux 默认在 `~/.bash_profile` 中再加载 `~/.bashrc`，确保登录/非登录行为一致。
-🗂️ **常见 Shell 配置文件结构示意图**
-![](assets/Shell%20编程/file-20251208221944908.png)
-
 #### 3.1.1.2 shell 登录方式
 ##### 3.1.1.2.1 🔐 登录 shell（Login Shell）
-![](assets/Shell%20编程/file-20251208222001111.png)
 触发方式：
 
 - SSH 登录
