@@ -2999,6 +2999,216 @@ mysql> show create table t12;
 ```sql
 alter table table_name add column new_column_name enum("男","女","未知") not null default "未知";
 
+mysql> alter table t12 add column sex enum("男","女","未知") not null default "未知";
+Query OK, 0 rows affected (0.21 sec)
+Records: 0  Duplicates: 0  Warnings: 0
 
+mysql> desc t12;
++-------+----------------------------+------+-----+---------+-------+
+| Field | Type                       | Null | Key | Default | Extra |
++-------+----------------------------+------+-----+---------+-------+
+| id    | int                        | NO   | PRI | NULL    |       |
+| name  | char(10)                   | YES  |     | NULL    |       |
+| sex   | enum('男','女','未知')     | NO   |     | 未知    |       |
++-------+----------------------------+------+-----+---------+-------+
+3 rows in set (0.02 sec)
+
+mysql>
 
 ```
+**添加的列在表中指定列后面**
+```sql
+alter table test03.t111 add column age tinyint not null default 18 after name;
+
+mysql> alter table t12 add column age int unsigned after name;
+Query OK, 0 rows affected (0.36 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc t12;
++-------+----------------------------+------+-----+---------+-------+
+| Field | Type                       | Null | Key | Default | Extra |
++-------+----------------------------+------+-----+---------+-------+
+| id    | int                        | NO   | PRI | NULL    |       |
+| name  | char(10)                   | YES  |     | NULL    |       |
+| age   | int unsigned               | YES  |     | NULL    |       |
+| sex   | enum('男','女','未知')     | NO   |     | 未知    |       |
++-------+----------------------------+------+-----+---------+-------+
+4 rows in set (0.01 sec
+```
+**添加的列在表中首行**
+```sql
+alter table table_name address char(20) not null default "未知" first;
+
+mysql> alter table t12 add column school_name varchar(20)  first;
+Query OK, 0 rows affected (0.37 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc t12;
++-------------+----------------------------+------+-----+---------+-------+
+| Field       | Type                       | Null | Key | Default | Extra |
++-------------+----------------------------+------+-----+---------+-------+
+| school_name | varchar(20)                | YES  |     | NULL    |       |
+| id          | int                        | NO   | PRI | NULL    |       |
+| name        | char(10)                   | YES  |     | NULL    |       |
+| age         | int unsigned               | YES  |     | NULL    |       |
+| sex         | enum('男','女','未知')     | NO   |     | 未知    |       |
++-------------+----------------------------+------+-----+---------+-------+
+5 rows in set (0.01 sec)
+
+mysql> 
+```
+###### 7.1.3.3.3.2 修改原有字段
+`alter table t111 modify column ...` 只修改列的数据类型、约束，不能修改列名
+
+`alter table t111 change column ...` 同时修改列名和列的数据类型
+
+```sql
+-- 修改原有字段名称
+alter table table_name column_old_name column_new_name char(3) not null default "18" comment "年龄";
+
+
+mysql> alter table t12 change column name mingcheng varchar(20) ;
+Query OK, 0 rows affected (0.85 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc t12;
++-------------+----------------------------+------+-----+---------+-------+
+| Field       | Type                       | Null | Key | Default | Extra |
++-------------+----------------------------+------+-----+---------+-------+
+| school_name | varchar(20)                | YES  |     | NULL    |       |
+| id          | int                        | NO   | PRI | NULL    |       |
+| mingcheng   | varchar(20)                | YES  |     | NULL    |       |
+| age         | int unsigned               | YES  |     | NULL    |       |
+| sex         | enum('男','女','未知')     | NO   |     | 未知    |       |
++-------------+----------------------------+------+-----+---------+-------+
+5 rows in set (0.01 sec)
+
+
+mysql> alter table t12 modify column mingcheng varchar(30) not null;
+Query OK, 0 rows affected (0.82 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc t12;
++-------------+----------------------------+------+-----+---------+-------+
+| Field       | Type                       | Null | Key | Default | Extra |
++-------------+----------------------------+------+-----+---------+-------+
+| school_name | varchar(20)                | YES  |     | NULL    |       |
+| id          | int                        | NO   | PRI | NULL    |       |
+| mingcheng   | varchar(30)                | NO   |     | NULL    |       |
+| age         | int unsigned               | YES  |     | NULL    |       |
+| sex         | enum('男','女','未知')     | NO   |     | 未知    |       |
++-------------+----------------------------+------+-----+---------+-------+
+5 rows in set (0.01 sec)
+
+
+-- 删除已有字段
+alter table t111 drop column_name ;
+mysql> alter table t12 drop school_name;
+Query OK, 0 rows affected (0.25 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc t12;
++-----------+----------------------------+------+-----+---------+-------+
+| Field     | Type                       | Null | Key | Default | Extra |
++-----------+----------------------------+------+-----+---------+-------+
+| id        | int                        | NO   | PRI | NULL    |       |
+| mingcheng | varchar(30)                | NO   |     | NULL    |       |
+| age       | int unsigned               | YES  |     | NULL    |       |
+| sex       | enum('男','女','未知')     | NO   |     | 未知    |       |
++-----------+----------------------------+------+-----+---------+-------+
+4 rows in set (0.02 sec)
+```
+#### 7.1.3.4 删除表
+##### 7.1.3.4.1 表和数据都删除
+**将磁盘中的表文件删除，删除后会释放磁盘空间**
+```sql
+mysql> drop table t12;
+Query OK, 0 rows affected (0.21 sec)
+```
+##### 7.1.3.4.2 清空表
+`truncate t111 ;` 会清除自增序列，效率快，可以释放磁盘空间
+
+`delete from t111;` 不会清除自增序列，效率慢，无法释放磁盘空间（标记删除）
+```sql
+mysql> create table t111 (id int primary key not null auto_increment,name char(10));
+Query OK, 0 rows affected (0.24 sec)
+
+mysql> insert into t111(name) values ("aaa"),("bbb");
+Query OK, 2 rows affected (0.05 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from t111;
++----+------+
+| id | name |
++----+------+
+|  4 | aaa  |
+|  9 | bbb  |
++----+------+
+2 rows in set (0.01 sec)
+
+-- truncate 
+mysql> truncate t111;
+Query OK, 0 rows affected (0.28 sec)
+
+mysql> select * from t111;
+Empty set (0.02 sec)
+
+mysql> insert into t111(name) values ("aaa"),("bbb");
+Query OK, 2 rows affected (0.03 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from t111;
++----+------+
+| id | name |
++----+------+
+|  4 | aaa  |
+|  9 | bbb  |
++----+------+
+2 rows in set (0.02 sec)
+
+
+-- delete
+mysql> delete from t111;
+Query OK, 2 rows affected (0.05 sec)
+
+mysql> select * from t111;
+Empty set (0.00 sec)
+
+mysql> insert into t111(name) values ("aaa"),("bbb");
+Query OK, 2 rows affected (0.03 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from t111;
++----+------+
+| id | name |
++----+------+
+| 25 | aaa  |
+| 30 | bbb  |
++----+------+
+2 rows in set (0.01 sec)
+```
+#### 7.1.3.5 练习
+
+> [!NOTE] 表级 DDL 练习
+> 01 创建一个school数据库，字符集设置设置为utf8mb3 
+> 
+> 02 在数据库中创建student(学生表) 
+> 	- 包含sno(学号 整数类型 非空 非负 主键约束 自增属性) 
+> 	- 包含sname(姓名 字符串类型 非空) 
+> 	- 包含sage(年龄 整数类型 非负 非空) 
+> 	- 包含ssex(性别 枚举类型 非空 默认为男) 
+> 
+> 03 在数据库中创建course(课程表) 
+> 	- 包含cno(课程编号 整数类型 非空 主键约束) 
+> 	- 包含cname(课程名称 字符串类型 非空) 
+> 	- 包含tno(教师编号 整数类型 非空) 
+> 	
+> 04 在数据库中创建sc(成绩表) 
+> 	- 包含sno(学号 整数类型 非空) 
+> 	- 包含cno(课程编号 整数类型 非空) 
+> 	- 包含score(成绩 整数类型 非空 默认值0) 
+> 	
+> 05 在数据库中创建teacher(教师表) 
+> 	- 包含tno(教师编号 整数类型 非负 主键约束) 
+> 	- 包含tname(教师名称 字符串类型 非空)
+
