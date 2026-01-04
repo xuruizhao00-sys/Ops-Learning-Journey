@@ -2820,6 +2820,7 @@ DQL语句（数据查询语句 Data Query Language） 查看表中的数据 sele
 create database db_name;
 create database db_name character set charset_name collate collation_name;
 
+-- 生产中推荐写法
 CREATE DATABASE db1
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_general_ci;
@@ -2834,4 +2835,170 @@ Query OK, 1 row affected (0.06 sec)
 
 mysql> create database test04 character set utf8mb4 collate utf8mb4_0900_ai_ci;
 Query OK, 1 row affected (0.05 sec)
+```
+#### 7.1.2.2 删除数据库
+```sql
+drop database db_name;
+```
+示例
+```sql
+mysql> drop database test05;
+Query OK, 0 rows affected (0.24 sec)
+```
+#### 7.1.2.3 修改数据库
+```sql
+alter database db_name character set charset_name collate collation_name;
+```
+示例
+```bash
+mysql> show create database test04 \G
+*************************** 1. row ***************************
+       Database: test04
+Create Database: CREATE DATABASE `test04` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */
+1 row in set (0.01 sec)
+
+
+mysql> alter database test04 character set utf8mb3 collate utf8mb3_general_ci;
+Query OK, 1 row affected, 2 warnings (0.04 sec)
+
+mysql> show create database test04 \G
+*************************** 1. row ***************************
+       Database: test04
+Create Database: CREATE DATABASE `test04` /*!40100 DEFAULT CHARACTER SET utf8mb3 */ /*!80016 DEFAULT ENCRYPTION='N' */
+1 row in set (0.01 sec)
+```
+#### 7.1.2.4 使用/切换数据库
+```sql
+use db_name;
+```
+示例
+```sql
+mysql> use test03;
+Database changed
+mysql> 
+```
+### 7.1.3 表级 DDL
+#### 7.1.3.1 创建表（CREATE TABLE）
+```sql
+create table 表名 (字段名 数据类型 约束 属性,字段名 数据类型 约束 属性,索引设置) 引擎设置 字符集 校对规则;
+
+
+mysql> create table t11  (id int primary key not null,name char(10) comment "姓名");
+Query OK, 0 rows affected (0.24 sec)
+
+mysql> show   create table t11 \G
+*************************** 1. row ***************************
+       Table: t11
+Create Table: CREATE TABLE `t11` (
+  `id` int NOT NULL,
+  `name` char(10) DEFAULT NULL COMMENT '姓名',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
+1 row in set (0.01 sec)
+
+mysql> 
+```
+==生产规范示例==
+```sql
+CREATE TABLE users (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
+  username VARCHAR(50) NOT NULL COMMENT '用户名',
+  email VARCHAR(100) NOT NULL COMMENT '邮箱',
+  status TINYINT NOT NULL DEFAULT 1 COMMENT '0禁用 1启用',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COMMENT='用户表';
+```
+
+| 项       | 原因       |
+| ------- | -------- |
+| InnoDB  | 支持事务     |
+| utf8mb4 | 支持 emoji |
+| COMMENT | 企业必备     |
+| BIGINT  | 扩展性      |
+#### 7.1.3.2 查看表结构
+`desc table_name;` （可以获取表结构 数据类型 约束属性设置）
+
+`show create table table_name;` （可以获取创建表语句 从而了解表的结构 表的引擎和字符集/校对规则 还有注释信息）
+
+`show index from t111;` （可以查看表的详细索引设置）
+```sql
+mysql> show   create table t11 \G
+*************************** 1. row ***************************
+       Table: t11
+Create Table: CREATE TABLE `t11` (
+  `id` int NOT NULL,
+  `name` char(10) DEFAULT NULL COMMENT '姓名',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
+1 row in set (0.01 sec)
+
+mysql> desc t11;
++-------+----------+------+-----+---------+-------+
+| Field | Type     | Null | Key | Default | Extra |
++-------+----------+------+-----+---------+-------+
+| id    | int      | NO   | PRI | NULL    |       |
+| name  | char(10) | YES  |     | NULL    |       |
++-------+----------+------+-----+---------+-------+
+2 rows in set (0.04 sec)
+
+mysql> show index from t11;
++-------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table | Non_unique | Key_name | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++-------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| t11   |          0 | PRIMARY  |            1 | id          | A         |           0 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
++-------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+1 row in set (0.04 sec)
+
+mysql>
+```
+#### 7.1.3.3 修改表
+##### 7.1.3.3.1 修改表名
+```sql
+alter table table_old_name rename to table_new_name;
+
+mysql> alter table t11 rename to t12;
+Query OK, 0 rows affected (0.18 sec)
+
+mysql> show tables;
++------------------+
+| Tables_in_test03 |
++------------------+
+| t12              |
++------------------+
+1 row in set (0.01 sec)
+
+mysql>
+```
+##### 7.1.3.3.2 修改字符集/校对规则
+```sql
+alter table t111 character set charset_new_name , collate collation_new_name;
+
+mysql> alter table t12 character set gbk,collate gbk_chinese_ci;
+Query OK, 0 rows affected (0.17 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> show create table t12;
++-------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table | Create Table                                                                                                                                                              |
++-------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| t12   | CREATE TABLE `t12` (
+  `id` int NOT NULL,
+  `name` char(10) CHARACTER SET utf8mb3 DEFAULT NULL COMMENT '姓名',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=gbk   |
++-------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+```
+##### 7.1.3.3.3 修改表字段信息
+###### 7.1.3.3.3.1 添加新的字段
+**添加的列在表中所有字段最后面**
+```sql
+alter table table_name add column new_column_name enum("男","女","未知") not null default "未知";
+
+
+
 ```
