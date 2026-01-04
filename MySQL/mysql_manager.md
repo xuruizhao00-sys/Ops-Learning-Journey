@@ -2567,9 +2567,110 @@ mysql> select * from t2;
 +----+------+
 2 rows in set (0.01 sec)
 ```
-自增列自定义起始值
+#### 6.3.2.1 自增列自定义起始值
 ```sql
+mysql> create table t3 (id int primary key not null auto_increment,name char(10) not null);
+Query OK, 0 rows affected (0.16 sec)
 
+mysql> insert into t3(name) values ("ccc");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from t3;
++----+------+
+| id | name |
++----+------+
+|  1 | ccc  |
++----+------+
+1 row in set (0.00 sec)
+
+mysql> insert into t3(name) values ("ddd");
+Query OK, 1 row affected (0.05 sec)
+
+mysql> select * from t3;
++----+------+
+| id | name |
++----+------+
+|  1 | ccc  |
+|  2 | ddd  |
++----+------+
+2 rows in set (0.00 sec)
+
+mysql> alter table t3 auto_increment=100;
+Query OK, 0 rows affected (0.18 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> insert into t3(name) values ("eee");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from t3;
++-----+------+
+| id  | name |
++-----+------+
+|   1 | ccc  |
+|   2 | ddd  |
+| 100 | eee  |
++-----+------+
+3 rows in set (0.01 sec)
+
+mysql> insert into t3(name) values ("aaa");
+Query OK, 1 row affected (0.06 sec)
+
+mysql> select * from t3;
++-----+------+
+| id  | name |
++-----+------+
+|   1 | ccc  |
+|   2 | ddd  |
+| 100 | eee  |
+| 101 | aaa  |
++-----+------+
+4 rows in set (0.00 sec)
+```
+设置自增列的步长
+```sql
+mysql> select @@auto_increment_increment;
++----------------------------+
+| @@auto_increment_increment |
++----------------------------+
+|                          1 |
++----------------------------+
+1 row in set (0.01 sec)
+
+mysql> set auto_increment_increment=3;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into t3(name) values ("555");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from t3;
++-----+------+
+| id  | name |
++-----+------+
+|   1 | ccc  |
+|   2 | ddd  |
+| 100 | eee  |
+| 101 | aaa  |
+| 103 | 555  |
++-----+------+
+5 rows in set (0.00 sec)
+
+mysql> insert into t3(name) values ("ggg");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from t3;
++-----+------+
+| id  | name |
++-----+------+
+|   1 | ccc  |
+|   2 | ddd  |
+| 100 | eee  |
+| 101 | aaa  |
+| 103 | 555  |
+| 106 | ggg  |
++-----+------+
+6 rows in set (0.00 sec)
+
+mysql> 
 ```
 ## 6.4 约束 vs 属性：对比总结
 |项目|约束|属性|
