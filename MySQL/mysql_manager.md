@@ -2520,10 +2520,57 @@ mysql>
 ## 6.3 字段属性（Column Attributes）
 ### 6.3.1 DEFAULT（默认值）
 设定默认数据信息，可以实现自动填充
+📌 建议：
+- 所有 NOT NULL 字段尽量有 DEFAULT
+```sql
+mysql> create table t1 (id int ,sex char(3) default "未知");
+Query OK, 0 rows affected (0.59 sec)
+
+mysql> insert into t1 values (1,'男');
+Query OK, 1 row affected (0.04 sec)
+
+mysql> insert into t1(id) values (2);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from t1;
++------+--------+
+| id   | sex    |
++------+--------+
+|    1 | 男     |
+|    2 | 未知   |
++------+--------+
+2 rows in set (0.00 sec)
+```
+### 6.3.2 AUTO_INCREMENT（自增）
+规则
+- 必须是索引
+- 一个表只能有一个
+设定数值信息自增，可以实现数值编号自增填充（一般配合主键使用）
+📌 **生产建议**
+- 自增主键只适合单库或非分布式系统
+```sql
+mysql> create table t2 (id int auto_increment unique,name varchar(5));
+Query OK, 0 rows affected (0.20 sec)
+
+mysql> insert into t2 values (1,'sss');
+Query OK, 1 row affected (0.04 sec)
+
+mysql> insert into t2(name) values('aaa');
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from t2;
++----+------+
+| id | name |
++----+------+
+|  1 | sss  |
+|  2 | aaa  |
++----+------+
+2 rows in set (0.01 sec)
+```
+自增列自定义起始值
 ```sql
 
 ```
-
 ## 6.4 约束 vs 属性：对比总结
 |项目|约束|属性|
 |---|---|---|
