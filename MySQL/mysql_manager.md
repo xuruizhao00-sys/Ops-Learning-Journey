@@ -2715,52 +2715,31 @@ Max_data_length: 0
 📌 **InnoDB 是持久化的**
 
 #### 6.3.2.2 设置自增列的步长
-##### 6.3
+##### 6.3.2.2.1 什么是“自增步长”？
+自增步长 = 每次生成 AUTO_INCREMENT 值时递增的幅度
 ```sql
-mysql> select @@auto_increment_increment;
-+----------------------------+
-| @@auto_increment_increment |
-+----------------------------+
-|                          1 |
-+----------------------------+
-1 row in set (0.01 sec)
+-- 默认情况下
+auto_increment_increment = 1
 
-mysql> set auto_increment_increment=3;
+-- 也就是说
+1, 2, 3, 4, 5 ...
+```
+##### 6.3.2.2.2 控制自增步长的两个核心参数
+|参数|含义|
+|---|---|
+|`auto_increment_increment`|自增步长|
+|`auto_increment_offset`|起始偏移量|
+
+👉 **increment 决定“跳多远”，offset 决定“从哪开始”**
+```sql
+mysql> SET GLOBAL auto_increment_increment = 5;
 Query OK, 0 rows affected (0.00 sec)
 
-mysql> insert into t3(name) values ("555");
-Query OK, 1 row affected (0.03 sec)
-
-mysql> select * from t3;
-+-----+------+
-| id  | name |
-+-----+------+
-|   1 | ccc  |
-|   2 | ddd  |
-| 100 | eee  |
-| 101 | aaa  |
-| 103 | 555  |
-+-----+------+
-5 rows in set (0.00 sec)
-
-mysql> insert into t3(name) values ("ggg");
-Query OK, 1 row affected (0.03 sec)
-
-mysql> select * from t3;
-+-----+------+
-| id  | name |
-+-----+------+
-|   1 | ccc  |
-|   2 | ddd  |
-| 100 | eee  |
-| 101 | aaa  |
-| 103 | 555  |
-| 106 | ggg  |
-+-----+------+
-6 rows in set (0.00 sec)
-
-mysql> 
+mysql> SET GLOBAL auto_increment_offset = 1;
+Query OK, 0 rows affected (0.00 sec)
 ```
+
+
 ### 6.3.3 COMMENT
 ```sql
 mysql> create table stu (id int primary key auto_increment not null comment '学号',name varchar(10) comment '学生姓名');
