@@ -2542,6 +2542,13 @@ mysql> select * from t1;
 2 rows in set (0.00 sec)
 ```
 ### 6.3.2 AUTO_INCREMENT（自增）
+在 MySQL（InnoDB）中：
+- `AUTO_INCREMENT` **不是简单的“当前最大值 + 1”**
+- MySQL 会维护一个 **自增计数器**
+- 每次插入时：
+    - 如果未显式指定该列 → 使用计数器值
+    - 如果显式插入了更大的值 → **计数器会被推进**
+👉 **起始值 = 计数器的初始值**
 规则
 - 必须是索引
 - 一个表只能有一个
@@ -2568,65 +2575,147 @@ mysql> select * from t2;
 2 rows in set (0.01 sec)
 ```
 #### 6.3.2.1 自增列自定义起始值
+##### 6.3.2.1.1 建表时指定
 ```sql
-mysql> create table t3 (id int primary key not null auto_increment,name char(10) not null);
-Query OK, 0 rows affected (0.16 sec)
+mysql> CREATE TABLE users (   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,   username VARCHAR(50) NOT NULL ) AUTO_INCREMENT = 1000;
+Query OK, 0 rows affected (0.23 sec)
 
-mysql> insert into t3(name) values ("ccc");
-Query OK, 1 row affected (0.02 sec)
+mysql> INSERT INTO users (username) VALUES ('alice');
+Query OK, 1 row affected (0.04 sec)
 
-mysql> select * from t3;
-+----+------+
-| id | name |
-+----+------+
-|  1 | ccc  |
-+----+------+
-1 row in set (0.00 sec)
+mysql> select * from users;
++------+----------+
+| id   | username |
++------+----------+
+| 1000 | alice    |
++------+----------+
+1 row in set (0.01 sec)
 
-mysql> insert into t3(name) values ("ddd");
-Query OK, 1 row affected (0.05 sec)
-
-mysql> select * from t3;
-+----+------+
-| id | name |
-+----+------+
-|  1 | ccc  |
-|  2 | ddd  |
-+----+------+
-2 rows in set (0.00 sec)
-
-mysql> alter table t3 auto_increment=100;
-Query OK, 0 rows affected (0.18 sec)
+mysql>
+```
+##### 6.3.2.1.2 建表后修改（常用）
+```sql
+mysql> alter table users AUTO_INCREMENT = 5000;
+Query OK, 0 rows affected (0.10 sec)
 Records: 0  Duplicates: 0  Warnings: 0
 
-mysql> insert into t3(name) values ("eee");
+mysql> INSERT INTO users (username) VALUES ('alice02');
 Query OK, 1 row affected (0.03 sec)
 
-mysql> select * from t3;
-+-----+------+
-| id  | name |
-+-----+------+
-|   1 | ccc  |
-|   2 | ddd  |
-| 100 | eee  |
-+-----+------+
-3 rows in set (0.01 sec)
-
-mysql> insert into t3(name) values ("aaa");
-Query OK, 1 row affected (0.06 sec)
-
-mysql> select * from t3;
-+-----+------+
-| id  | name |
-+-----+------+
-|   1 | ccc  |
-|   2 | ddd  |
-| 100 | eee  |
-| 101 | aaa  |
-+-----+------+
-4 rows in set (0.00 sec)
+mysql> select * from users;
++------+----------+
+| id   | username |
++------+----------+
+| 1000 | alice    |
+| 5002 | alice02  |
++------+----------+
+2 rows in set (0.01 sec)
 ```
-设置自增列的步长
+📌 **生效条件（重要）：**
+- 只有当 `5000 > 当前最大 id` 才会生效
+- 否则 MySQL 会忽略该设置
+```sql
+mysql> INSERT INTO users (id,username) VALUES (10000,'alice02');
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from users;
++-------+----------+
+| id    | username |
++-------+----------+
+|  1000 | alice    |
+|  5002 | alice02  |
+| 10000 | alice02  |
++-------+----------+
+3 rows in set (0.00 sec)
+
+mysql> alter table users AUTO_INCREMENT = 8000;
+Query OK, 0 rows affected (0.11 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO users (username) VALUES ('alice03');
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from users;
++-------+----------+
+| id    | username |
++-------+----------+
+|  1000 | alice    |
+|  5002 | alice02  |
+| 10000 | alice02  |
+| 10003 | alice03  |
++-------+----------+
+4 rows in set (0.01 sec)
+```
+此时表中已经存在 MAX(id) = 200
+
+##### 6.3.2.1.3 插入一个大值“推进”自增
+```sql
+mysql> insert into users values (20000,"tom");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> delete from users where id=20000;
+Query OK, 1 row affected (0.04 sec)
+
+mysql> INSERT INTO users (username) VALUES ('alice04');
+Query OK, 1 row affected (0.04 sec)
+
+mysql> select * from users;
++-------+----------+
+| id    | username |
++-------+----------+
+|  1000 | alice    |
+|  5002 | alice02  |
+| 10000 | alice02  |
+| 10003 | alice03  |
+| 20002 | alice04  |
++-------+----------+
+5 rows in set (0.00 sec)
+
+mysql> 
+```
+##### 6.3.2.1.4 查看当前自增值的方法
+```sql
+mysql> show table status like 'users' \G
+*************************** 1. row ***************************
+           Name: users
+         Engine: InnoDB
+        Version: 10
+     Row_format: Dynamic
+           Rows: 5
+ Avg_row_length: 3276
+    Data_length: 16384
+Max_data_length: 0
+   Index_length: 0
+      Data_free: 0
+ Auto_increment: 20005
+    Create_time: 2026-01-04 11:22:23
+    Update_time: 2026-01-04 11:24:13
+     Check_time: NULL
+      Collation: utf8mb3_general_ci
+       Checksum: NULL
+ Create_options: 
+        Comment: 
+1 row in set (0.02 sec)
+```
+关注：Auto_increment: 
+##### 6.3.2.1.5 自增起始值的关键规则
+- MySQL 不允许把 AUTO_INCREMENT 设置为小于或等于当前最大值
+- 删除数据 ≠ 回收自增值
+	- `DELETE FROM users;` 自增值 **不会重置**
+- TRUNCATE 会重置自增值
+	- 自增值回到
+		- 1（默认）
+		- 或建表时指定的 AUTO_INCREMENT
+##### 6.3.2.1.6 重启 MySQL 会不会影响？
+|情况|结果|
+|---|---|
+|InnoDB|❌ 不会|
+|MyISAM|可能变化|
+
+📌 **InnoDB 是持久化的**
+
+#### 6.3.2.2 设置自增列的步长
+##### 6.3
 ```sql
 mysql> select @@auto_increment_increment;
 +----------------------------+
@@ -2671,6 +2760,26 @@ mysql> select * from t3;
 6 rows in set (0.00 sec)
 
 mysql> 
+```
+### 6.3.3 COMMENT
+```sql
+mysql> create table stu (id int primary key auto_increment not null comment '学号',name varchar(10) comment '学生姓名');
+Query OK, 0 rows affected (0.28 sec)
+
+mysql>
+```
+### 6.3.4 UNSIGNED（无符号）
+📌 适用场景：
+- ID
+- 数量
+- 计数器
+```sql
+mysql> create table stu01 (id int unsigned primary key auto_increment not null   comment '学号',name varchar(10) comment '学生姓名');
+Query OK, 0 rows affected (0.40 sec)
+
+mysql> insert into stu01 values(-1,'aaa');
+ERROR 1264 (22003): Out of range value for column 'id' at row 1
+mysql>
 ```
 ## 6.4 约束 vs 属性：对比总结
 |项目|约束|属性|
