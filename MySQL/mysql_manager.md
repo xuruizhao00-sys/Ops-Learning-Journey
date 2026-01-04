@@ -2731,7 +2731,6 @@ auto_increment_increment = 1
 |`auto_increment_offset`|起始偏移量|
 
 👉 **increment 决定“跳多远”，offset 决定“从哪开始”**
-如果在建表时指定了 auto_increment 那么会按照建表时指定的来
 ```sql
 mysql> SET GLOBAL auto_increment_increment = 5;
 Query OK, 0 rows affected (0.00 sec)
