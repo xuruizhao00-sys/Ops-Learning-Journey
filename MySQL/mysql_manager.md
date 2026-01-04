@@ -3262,5 +3262,31 @@ column1 和 value1 要对应
 insert into table_name (column1,column2,...) values (value1,value2,...)
 ```
 ```sql
+mysql> desc t111;
++-------+--------------+------+-----+---------+----------------+
+| Field | Type         | Null | Key | Default | Extra          |
++-------+--------------+------+-----+---------+----------------+
+| id    | int          | NO   | PRI | NULL    | auto_increment |
+| age   | int unsigned | NO   |     | 18      |                |
+| name  | char(10)     | YES  |     | NULL    |                |
++-------+--------------+------+-----+---------+----------------+
+3 rows in set (0.01 sec)
+
+mysql> insert into  t111(id,age,name) values (1,12,"aaa"),(2,44,"sss");
+Query OK, 2 rows affected (0.03 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from t111;
++----+-----+------+
+| id | age | name |
++----+-----+------+
+|  1 |  12 | aaa  |
+|  2 |  44 | sss  |
++----+-----+------+
+2 rows in set (0.01 sec)
+```
+#### 7.2.2.2 简单插入方式
+表中具有自增列 默认值的列 可以为空的列 都可以忽略插入
+```sql
 
 ```
