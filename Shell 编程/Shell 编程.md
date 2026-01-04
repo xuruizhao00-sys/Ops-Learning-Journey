@@ -4034,7 +4034,7 @@ A=1 B= C=
 1 2 3
 A=1 B=2 C=3
 ```
-#### 3.2.1.2.3 带提示符
+#### 3.2.1.3 带提示符
 ```bash
 15:13:25 root@redis01:~/shell/lesson02# cat demo03.sh
 #!/bin/bash
@@ -4081,7 +4081,7 @@ echo "你的密码长度是 ${#pass} 位"
 你的密码长度是 3 位
 15:16:00 root@redis01:~/shell/lesson02#
 ```
-#### 3.2.1.3 信息提示
+#### 3.2.1.4 信息提示
 ```bash
 15:16:40 root@redis01:~/shell/lesson02# cat demo05.sh
 #!/bin/bash
@@ -4107,8 +4107,8 @@ read -rp "$(green '>>> 请输入文件名: ')" file
 15:16:51 root@redis01:~/shell/lesson02#
 ```
 
-#### 3.2.1.4 其他实践
-##### 3.2.1.4.1 指定分隔符
+#### 3.2.1.5 其他实践
+##### 3.2.1.5.1 指定分隔符
 ```bash
 15:17:52 root@redis01:~/shell/lesson02# cat demo06.sh
 #!/bin/bash
@@ -4128,7 +4128,7 @@ echo "学科=$subject, 分数=$score"
 学科=Linux, 分数=88
 15:18:04 root@redis01:~/shell/lesson02#
 ```
-##### 3.2.1.4.2 限时输入
+##### 3.2.1.5.2 限时输入
 ```bash
 15:18:45 root@redis01:~/shell/lesson02# cat demo07.sh
 #!/bin/bash
