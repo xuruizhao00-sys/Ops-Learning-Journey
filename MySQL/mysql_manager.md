@@ -3226,6 +3226,15 @@ mysql> show create database school;
 1 row in set (0.01 sec)
 
 
-2、
+mysql> create table student (sno int unsigned not null primary key auto_increment,sname varchar(10) not null,sage int unsigned not null,ssex enum("男","女") default "男");
+Query OK, 0 rows affected (0.35 sec)
 
+mysql> create table course (cno int not null primary key,cname varchar(10) not null,tno int not null);
+Query OK, 0 rows affected (0.25 sec)
+
+mysql> create table sc (sno int not null,cno int not null,score int not null default 0);
+Query OK, 0 rows affected (0.30 sec)
+
+mysql> create table teacher (tno int not null primary key,tname varchar(10) not null);
+Query OK, 0 rows affected (0.27 sec)
 ```
