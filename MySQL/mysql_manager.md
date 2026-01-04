@@ -3397,3 +3397,312 @@ mysql> select * from t111;
 Empty set (0.01 sec)
 ```
 ## 7.3 DCL
+> **DCL 用于管理数据库用户、权限和访问控制**
+
+它解决的核心问题只有一个：
+
+> **谁（User）可以在什么地方（DB / Table）做什么事情（Privilege）**
+
+|分类|语句|
+|---|---|
+|用户管理|`CREATE USER`、`DROP USER`、`ALTER USER`|
+|权限控制|`GRANT`、`REVOKE`|
+|权限查看|`SHOW GRANTS`|
+📌 **DCL 不操作数据、不操作表结构，只操作“权限体系”**
+### 7.3.1 MySQL 的用户模型
+#### 7.3.1.1 MySQL 用户的完整形式
+👉 **同一个用户名，不同 host，是完全不同的账号**
+```sql
+'用户名'@'来源主机'
+
+'root'@'localhost'
+'app'@'%'
+'app'@'10.0.0.%'
+```
+#### 7.3.1.2 host 的匹配规则
+|host 写法|含义|
+|---|---|
+|localhost|仅本机|
+|%|任意主机|
+|10.0.0.%|一个网段|
+|10.0.0.5|指定 IP|
+
+📌 **连接时 MySQL 会优先匹配“最精确”的 host**
+### 7.3.2 CREATE USER —— 创建用户
+```sql
+CREATE USER 'user1'@'localhost' IDENTIFIED BY 'StrongPass123!';
+```
+📌 MySQL 8.x 默认认证插件是：caching_sha2_password
+```sql
+-- 指定插件创建用户
+CREATE USER 'user2'@'%'
+IDENTIFIED WITH caching_sha2_password
+BY 'StrongPass123!';
+```
+示例：
+```sql
+mysql> create user mysql01@'localhost';  -- 此用户登录是免密登录
+Query OK, 0 rows affected (0.04 sec)     
+
+mysql> create user mysql02@'127.0.0.1' identified by '111';  -- 完整创建用户信息
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create user mysql03@'192.168.121.52' identified by '111';  -- 远程用户登录
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> create user mysql04@'192.168.121.%' identified by '111';  -- 指定一个网段登录
+Query OK, 0 rows affected (0.01 sec)
+```
+### 7.3.3 查看用户
+1.通过 user() 函数查询
+
+2.在 mysql.user 表中查询，authentication_string 列是加密显示的，如果该用户没有密码，则该列为空
+```sql
+mysql> select user();
++----------------+
+| user()         |
++----------------+
+| root@localhost |
++----------------+
+1 row in set (0.01 sec)
+
+mysql> 
+
+mysql> select user,host,authentication_string from mysql.user;
+```
+### 7.3.4 删除用户
+1.`drop user`
+
+2.`delete from mysql.user where ....`
+```sql
+mysql> drop user mysql01@'localhost';
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> delete from mysql.user where user='mysql03' and host='192.168.121.52';
+Query OK, 1 row affected (0.01 sec)
+```
+### 7.3.5 权限管理
+数据库系统环境中都有什么权限可以设置？
+```sql
+show privileges;
+Alter                 Tables                       To alter the table                   -- 修改表的属性信息 
+Create                Databases,Tables,Indexes     To create new databases and tables   -- 创建数据库和数据表权限
+Create user           Server Admin                 To create new users                  -- 可以创建新用户
+Delete                Tables                       To delete existing rows              -- 可以删除表中数据  	*****
+Drop                  Databases,Tables             To drop databases, tables, and views -- 可以删除库，可以删除表
+Grant option          Databases,Tables             To give to other users those privileges you possess  -- 可以给别人进行授权的权限
+Insert                Tables                       To insert data into tables           -- 可以插入数据权限  	*****
+Select                Tables                       To retrieve rows from table          -- 可以查询表数据信息	*****
+Show databases        Server Admin                 To see all databases with SHOW DATABASES    -- 可以查看所有数据库信息
+Update                Tables                       To update existing rows              -- 可以修改表数据信息 	*****
+Usage                 Server Admin                 No privileges - allow connect only   -- 只能登录数据库权限
+
+....
+```
+#### 7.3.5.1 设置用户权限
+权限操作对象： 
+_._ -- 可以管理所有库，以及库中的所有表 
+库名.* -- 可以管理指定库，以及库中的所有表 
+库名.表名 -- 可以管理指定库，以及库中的指定表
+
+grant 权限01,权限02 on database.table to 用户;
+```sql
+mysql> create user dba@'localhost' identified by '111';
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> grant all on *.* to dba@'localhost';
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> 
+
+
+mysql> create database xixi;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> grant Alter,Create,Delete,Drop,Insert,Select,Update on xixi.* to ops@'localhost';
+Query OK, 0 rows affected (0.00 sec)
+```
+🗒mysql 8.0之前版本：可以利用授权命令进行授权 并创建用户 
+grant select on _._ xiaoA@'localhost' identified by '123456'; 
+mysql 8.0之后版本：授权和用户创建要分开执行 
+create user ... 
+grant 权限 ...
+#### 7.3.5.2 查看用户权限
+show grants for 用户信息
+```sql
+mysql> show grants for ops@'localhost';
++--------------------------------------------------------------------------------------------+
+| Grants for ops@localhost                                                                   |
++--------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `ops`@`localhost`                                                    |
+| GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, ALTER ON `xixi`.* TO `ops`@`localhost` |
++--------------------------------------------------------------------------------------------+
+2 rows in set (0.00 sec)
+
+mysql> 
+```
+#### 7.3.5.3 撤销用户权限
+revoke 权限 on database.table from 用户信息;
+```sql
+mysql> revoke DROP on xixi.* from ops@'localhost';
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> show grants for ops@'localhost';
++--------------------------------------------------------------------------------------+
+| Grants for ops@localhost                                                             |
++--------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `ops`@`localhost`                                              |
+| GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER ON `xixi`.* TO `ops`@`localhost` |
++--------------------------------------------------------------------------------------+
+2 rows in set (0.00 sec)
+```
+#### 7.3.5.4 权限存储位置
+user -- 用户授权表 全局授权信息 
+db -- 用户授权表 数据库授权信息 
+tables_priv -- 用户授权表 数据表授权信息
+
+1.创建测试用户，并授予权限
+
+test01@'%' create,alter,drop _._ 
+test02@'%' select,update,insert xixi.* 
+test03@'%' delete xixi.t1
+```sql
+mysql> create user test01@'%' ;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create user test02@'%' ;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> create user test03@'%' ;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> grant create,alter,drop on *.* to test01@'%';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> grant select,update,insert  on xixi.* to test02@'%';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> create table xixi.t1(id int);
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> grant delete on xixi.t1 to test03@'%';
+Query OK, 0 rows affected (0.01 sec)
+```
+2.查看授权表中的信息
+
+test01 用户是对所有库、表的权限，所以保存在了 mysql.user 表中，在 mysql.db 和 mysql.tables_priv 表中没有保存
+
+test02 用户是对一个库及这个库下的所有表设置权限，所以权限保存在 mysql.db 表中，在 mysql.user 和 mysql.tables_priv 表中没有保存
+
+test03 用户是对某一个表设置权限，所以权限保存在 mysql.tables_priv 表中，在 mysql.db 和 mysql.user 表中没有保存
+```sql
+mysql> select * from mysql.user where user='test01' \G
+*************************** 1. row ***************************
+                    Host: %
+                    User: test01
+             Select_priv: N
+             Insert_priv: N
+             Update_priv: N
+             Delete_priv: N
+             Create_priv: Y
+               Drop_priv: Y
+             Reload_priv: N
+           Shutdown_priv: N
+            Process_priv: N
+               File_priv: N
+              Grant_priv: N
+         References_priv: N
+              Index_priv: N
+              Alter_priv: Y
+            Show_db_priv: N
+              Super_priv: N
+   Create_tmp_table_priv: N
+        Lock_tables_priv: N
+            Execute_priv: N
+         Repl_slave_priv: N
+        Repl_client_priv: N
+        Create_view_priv: N
+          Show_view_priv: N
+     Create_routine_priv: N
+      Alter_routine_priv: N
+        Create_user_priv: N
+              Event_priv: N
+            Trigger_priv: N
+  Create_tablespace_priv: N
+                ssl_type: 
+              ssl_cipher: 0x
+             x509_issuer: 0x
+            x509_subject: 0x
+           max_questions: 0
+             max_updates: 0
+         max_connections: 0
+    max_user_connections: 0
+                  plugin: caching_sha2_password
+   authentication_string: 
+        password_expired: N
+   password_last_changed: 2025-06-25 16:46:43
+       password_lifetime: NULL
+          account_locked: N
+        Create_role_priv: N
+          Drop_role_priv: N
+  Password_reuse_history: NULL
+     Password_reuse_time: NULL
+Password_require_current: NULL
+         User_attributes: NULL
+1 row in set (0.00 sec)
+
+mysql> select * from mysql.db  where user='test01' \G
+Empty set (0.00 sec)
+
+mysql> select * from mysql.tables_priv  where user='test01' \G
+Empty set (0.00 sec)
+
+
+mysql> select * from mysql.db  where user='test02' \G
+*************************** 1. row ***************************
+                 Host: %
+                   Db: xixi
+                 User: test02
+          Select_priv: Y
+          Insert_priv: Y
+          Update_priv: Y
+          Delete_priv: N
+          Create_priv: N
+            Drop_priv: N
+           Grant_priv: N
+      References_priv: N
+           Index_priv: N
+           Alter_priv: N
+Create_tmp_table_priv: N
+     Lock_tables_priv: N
+     Create_view_priv: N
+       Show_view_priv: N
+  Create_routine_priv: N
+   Alter_routine_priv: N
+         Execute_priv: N
+           Event_priv: N
+         Trigger_priv: N
+1 row in set (0.00 sec)
+
+
+
+mysql> select * from mysql.tables_priv  where user='test03' \G
+*************************** 1. row ***************************
+       Host: %
+         Db: xixi
+       User: test03
+ Table_name: t1
+    Grantor: root@localhost
+  Timestamp: 2025-06-25 16:52:02
+ Table_priv: Delete
+Column_priv: 
+1 row in set (0.00 sec)
+
+
+mysql> select * from mysql.db  where user='test03' \G
+Empty set (0.00 sec)
+
+mysql> 
+
+```
+## 7.4 DQL
