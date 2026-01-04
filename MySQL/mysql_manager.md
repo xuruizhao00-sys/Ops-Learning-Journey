@@ -2731,12 +2731,29 @@ auto_increment_increment = 1
 |`auto_increment_offset`|起始偏移量|
 
 👉 **increment 决定“跳多远”，offset 决定“从哪开始”**
+如果在建表时指定了 auto_increment 那么会按照建表时指定的来
 ```sql
 mysql> SET GLOBAL auto_increment_increment = 5;
 Query OK, 0 rows affected (0.00 sec)
 
 mysql> SET GLOBAL auto_increment_offset = 1;
 Query OK, 0 rows affected (0.00 sec)
+
+mysql> create table t6 (id int primary key auto_increment,name varchar(10));
+Query OK, 0 rows affected (0.18 sec)
+
+mysql> insert into t6(name) values ('ccc'),('ddd');
+Query OK, 2 rows affected (0.05 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from t6;
++----+------+
+| id | name |
++----+------+
+|  1 | ccc  |
+|  6 | ddd  |
++----+------+
+2 rows in set (0.00 sec)
 ```
 
 
