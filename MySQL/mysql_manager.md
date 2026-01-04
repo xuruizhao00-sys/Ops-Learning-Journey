@@ -3288,5 +3288,112 @@ mysql> select * from t111;
 #### 7.2.2.2 简单插入方式
 表中具有自增列 默认值的列 可以为空的列 都可以忽略插入
 ```sql
+mysql> insert into t111(name) values ("rrr"),("yyy");
+Query OK, 2 rows affected (0.03 sec)
+Records: 2  Duplicates: 0  Warnings: 0
 
+mysql> select * from t111;
++----+-----+------+
+| id | age | name |
++----+-----+------+
+|  1 |  12 | aaa  |
+|  2 |  44 | sss  |
+| 35 |  18 | rrr  |
+| 36 |  18 | yyy  |
++----+-----+------+
+4 rows in set (0.00 sec)
 ```
+可以省略字段列信息
+⚠️**在省略字段信息后，后面的 values 中就不能省略了，不管是自增还是可以为空都不被允许省略**
+```sql
+mysql> insert into t111 values(5,123,"asd");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from t111;
++----+-----+------+
+| id | age | name |
++----+-----+------+
+|  1 |  12 | aaa  |
+|  2 |  44 | sss  |
+|  5 | 123 | asd  |
+| 35 |  18 | rrr  |
+| 36 |  18 | yyy  |
++----+-----+------+
+5 rows in set (0.00 sec)
+```
+### 7.2.3 修改数据
+```sql
+update table_name column01=value,column02=value where 条件;
+
+mysql> select * from t111;
++----+-----+------+
+| id | age | name |
++----+-----+------+
+|  1 |  12 | aaa  |
+|  2 |  44 | sss  |
+|  5 | 123 | asd  |
+| 35 |  18 | rrr  |
+| 36 |  18 | yyy  |
++----+-----+------+
+5 rows in set (0.01 sec)
+
+mysql> update t111 set name="bbb" where id=1;
+Query OK, 1 row affected (0.04 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from t111;
++----+-----+------+
+| id | age | name |
++----+-----+------+
+|  1 |  12 | bbb  |
+|  2 |  44 | sss  |
+|  5 | 123 | asd  |
+| 35 |  18 | rrr  |
+| 36 |  18 | yyy  |
++----+-----+------+
+5 rows in set (0.01 sec)
+
+-- 一次性修改多个数据
+mysql> update t111 set name="zzz",age=34 where id=2 and name="sss";
+Query OK, 1 row affected (0.04 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from t111;
++----+-----+------+
+| id | age | name |
++----+-----+------+
+|  1 |  12 | bbb  |
+|  2 |  34 | zzz  |
+|  5 | 123 | asd  |
+| 35 |  18 | rrr  |
+| 36 |  18 | yyy  |
++----+-----+------+
+5 rows in set (0.00 sec)
+```
+### 7.2.4 删除数据
+如果不指定条件就是清空数据表
+```sql
+delete from table_name where 条件;
+
+mysql> delete from t111 where id>=35;
+Query OK, 2 rows affected (0.04 sec)
+
+mysql> select * from t111;
++----+-----+------+
+| id | age | name |
++----+-----+------+
+|  1 |  12 | bbb  |
+|  2 |  34 | zzz  |
+|  5 | 123 | asd  |
++----+-----+------+
+3 rows in set (0.01 sec)
+
+
+-- 清空数据表
+mysql> delete from t111;
+Query OK, 3 rows affected (0.06 sec)
+
+mysql> select * from t111;
+Empty set (0.01 sec)
+```
+## 7.3 DCL
