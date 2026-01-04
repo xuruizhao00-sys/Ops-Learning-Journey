@@ -2783,3 +2783,55 @@ mysql>
 |是否跨字段|可以|一般不|
 |是否强制|是|是|
 |示例|PRIMARY KEY|DEFAULT|
+# 七、数据库语句
+SQL语句（Structured Query Language）具有循环语句 判断语句功能 -- 数据库存储过程（数据库中的脚本）
+
+DDL语句（数据定义语句 Data Definition Language） create：创建数据库 创建数据表 创建索引信息 alter ：修改数据库属性信息（字符集 校对规则） 修改数据表属性信息（字符集 校对规则 表结构-列名 数据类型 约束属性 索引 引擎 名称） drop ：删除数据库 删除数据表（**磁盘层面删除数据**） 慎用 show ：做以上操作的查看确认
+
+DCL语句（数据控制语句 Data Control Language） grant： 授权权限信息 revoke：回收权限信息 create user：创建用户 alter user： 修改用户 commit： 操作提交语句 -- 数据库事务知识 rollback：操作回滚语句 -- 数据库事务知识
+
+DML语句（数据操作语句 Data Manipulation Language） 操作数据表中的数据内容 insert：在表中插入数据信息 delete：在表中删除数据信息 update：在表中修改数据信息
+
+DQL语句（数据查询语句 Data Query Language） 查看表中的数据 select 查看单表数据信息 select + from + where + group by + having + order by + limit 查看多表数据信息 select + join on + union all 其他信息查看 查看数据库变量信息（内置变量-状态变量 功能变量） 查看数据库函数信息（获取特定数据） [https://dev.mysql.com/doc/refman/8.4/en/indexes.html](https://dev.mysql.com/doc/refman/8.4/en/indexes.html)
+
+## 7.1 DDL 语句
+> DDL（数据定义语言）用于定义和管理数据库对象的结构
+
+操作对象包括：
+- 数据库（DATABASE）
+- 表（TABLE）
+- 字段（COLUMN）
+- 索引（INDEX）
+- 视图（VIEW）
+### 7.1.1 DDL 的核心特征
+|特性|说明|
+|---|---|
+|自动提交|❌ 不能回滚|
+|影响结构|✅|
+|风险等级|⚠️ 高|
+|执行频率|低（但重要）|
+
+📌 **DDL = 架构级操作，不是业务操作**
+
+### 7.1.2 数据库级 DDL
+#### 7.1.2.1 创建数据库
+基本语法
+```sql
+create database db_name;
+create database db_name character set charset_name collate collation_name;
+
+CREATE DATABASE db1
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
+  
+-- 查看数据库
+show databases;
+```
+示例
+```sql
+mysql> create database test03;
+Query OK, 1 row affected (0.06 sec)
+
+mysql> create database test04 character set utf8mb4 collate utf8mb4_0900_ai_ci;
+Query OK, 1 row affected (0.05 sec)
+```
