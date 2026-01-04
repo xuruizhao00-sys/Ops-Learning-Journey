@@ -3238,3 +3238,29 @@ Query OK, 0 rows affected (0.30 sec)
 mysql> create table teacher (tno int not null primary key,tname varchar(10) not null);
 Query OK, 0 rows affected (0.27 sec)
 ```
+## 7.2 DML 语句
+### 7.2.1 什么是 DML 语句
+> **DML 用于对表中的数据进行操作**
+
+包括四大核心语句：
+
+|类型|关键字|
+|---|---|
+|查询|SELECT|
+|插入|INSERT|
+|更新|UPDATE|
+|删除|DELETE|
+📌 **注意**
+- DML 作用的是 **数据**
+- DML **可以回滚（在事务中）**
+- DML 是生产事故高发区
+数据表相关数据管理 运维人员：插入数据 修改数据 删除数据 查询数据 开发人员：CRUD(create=创建数据-注册 read=读取数据-登录 update=修改数据-信息调整 delete=删除数据-订单信息删除)
+### 7.2.2 插入数据
+#### 7.2.2.1 标准插入语句
+column1 和 value1 要对应
+```sql
+insert into table_name (column1,column2,...) values (value1,value2,...)
+```
+```sql
+
+```
