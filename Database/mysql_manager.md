@@ -3885,6 +3885,9 @@ select * from city where district is not null;
 3）将排序后相同行信息进行合并
 ```sql
 -- 查询统计每个国家的人口总数
+mysql> select CountryCode as 国家,sum(Population) as 人口总数 from city group by CountryCode;
+
+-- 查询中国每个省份的城市数量
 
 ```
 # 八、SQL 高阶
