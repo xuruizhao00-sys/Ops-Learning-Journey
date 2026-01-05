@@ -3837,9 +3837,34 @@ mysql> select * from city where CountryCode="CHN" and Population<100000;
 mysql> select * from city where CountryCode="CHN" or  CountryCode="USA";
 
 -- 查询中国所有城市信息，并且人口数量小于 100000，再查询美国所有城市信息，并且人口数量大于1000000；
-
+mysql> select * from city where CountryCode="CHN" and Population<100000 or   CountryCode="USA" and Population>1000000;
 ```
 
+**用下列方式代替多条件查询**
+in：在....里
+not in：不再....里
+between and：在一个区间
+```sql
+-- 询美国和中国所有城市信息
+mysql> select * from city where CountryCode in ("USA","CHN");
+
+-- 查询全世界的所有城市信息，并且人口数量小于100000，但是大于10000;
+mysql> select * from city where Population between 10000 and 100000;
+```
+###### 7.4.1.2.2.4 特殊方式查询
+```sql
+-- 匹配查询
+mysql> select * from city where name like "shang%";
++------+----------+-------------+--------------+------------+
+| ID   | Name     | CountryCode | District     | Population |
++------+----------+-------------+--------------+------------+
+| 1890 | Shanghai | CHN         | Shanghai     |    9696300 |
+| 2051 | Shangzi  | CHN         | Heilongjiang |     215373 |
+| 2113 | Shangqiu | CHN         | Henan        |     164880 |
+| 2166 | Shangrao | CHN         | Jiangxi      |     132455 |
++------+----------+-------------+--------------+------------+
+4 rows in set (0.01 sec)
+```
 # 八、SQL 高阶
 
 # 九、MySQL 架构和性能优化
