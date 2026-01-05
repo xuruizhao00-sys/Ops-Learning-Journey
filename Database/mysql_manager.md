@@ -4285,6 +4285,16 @@ mysql> select count(cno) as 课程数量 from student inner join sc  on student.
 
 
 -- 查询 zhang3，学习的课程名称有哪些？
+mysql> select sname,cname  from student inner join sc  on student.sno=sc.sno  inner join course on sc.cno=course.cno where sname="zhang3";
++--------+--------+
+| sname  | cname  |
++--------+--------+
+| zhang3 | linux  |
+| zhang3 | python |
++--------+--------+
+2 rows in set (0.01 sec)
+
+-- 查询 t1 老师教的学生名？
 
 ```
 
