@@ -3866,6 +3866,25 @@ mysql> select * from city where name like "shang%";
 4 rows in set (0.01 sec)
 
 -- 去重查询
+mysql> select count(District)  from city where CountryCode='CHN';
++-----------------+
+| count(District) |
++-----------------+
+|             363 |
++-----------------+
+1 row in set (0.06 sec)
+
+-- 查看空字段信息
+select * from city where district is null;   
+select * from city where district is not null;  
+```
+#### 7.4.1.3 分组查询数据
+如何实现分组查询 
+1）指定分组查询的列 
+2）将分组列相同信息做排序 
+3）将排序后相同行信息进行合并
+```sql
+-- 查询统计每个国家的人口总数
 
 ```
 # 八、SQL 高阶
