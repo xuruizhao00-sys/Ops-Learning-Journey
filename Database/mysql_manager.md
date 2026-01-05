@@ -4295,9 +4295,96 @@ mysql> select sname,cname  from student inner join sc  on student.sno=sc.sno  in
 2 rows in set (0.01 sec)
 
 -- 查询 t1 老师教的学生名？
+mysql> select sname from teacher inner join course on course.tno=teacher.tno inner join sc on course.cno=sc.cno inner join student on  student.sno=sc.sno where tname="t1";
++--------+
+| sname  |
++--------+
+| zhang3 |
+| li4    |
+| wang5  |
+| zhao4  |
+| ma6    |
+| sadad  |
++--------+
+6 rows in set (0.02 sec)
 
+-- 查询 t1 老师教课程的平均分数？
+mysql> select avg(score) as 平均分数  from teacher inner join course on course.tno=teacher.tno inner join sc on course.cno=sc.cno inner join student on  student.sno=sc.sno where tname="t1";
++--------------+
+| 平均分数     |
++--------------+
+|      80.6667 |
++--------------+
+1 row in set (0.03 sec)
+
+-- 每位老师所教课程的平均分，并按平均分排序？
+mysql> select tname as 教师姓名,avg(score) as 平均分数 from teacher inner join course on course.tno=teacher.tno inner join sc on course.cno=sc.cno inner join student on  student.sno=sc.sno group by tname order by 平均分数 ;
++--------------+--------------+
+| 教师姓名     | 平均分数     |
++--------------+--------------+
+| t2           |      70.0000 |
+| t3           |      76.7500 |
+| t1           |      80.6667 |
++--------------+--------------+
+3 rows in set (0.01 sec)
+
+-- 查询 t1 老师教的小于80分的学生姓名？
+mysql> select sname as 学生姓名,score as 分数  from teacher inner join course on course.tno=teacher.tno inner join sc on course.cno=sc.cno inner join student on  student.sno=sc.sno where tname="t1" and score<
+80;
++--------------+--------+
+| 学生姓名     | 分数   |
++--------------+--------+
+| wang5        |     79 |
+| ma6          |     67 |
+| sadad        |     70 |
++--------------+--------+
+3 rows in set (0.02 sec)
+
+-- 查询所有老师所教学生不及格的信息？
+mysql> select sname as 学生姓名,cname as 课程名字,score as 分数   from teacher inner join course on course.tno=teacher.tno inner join sc on course.cno=sc.cno inner join student on  student.sno=sc.sno where sc
+ore<60;
++--------------+--------------+--------+
+| 学生姓名     | 课程名字     | 分数   |
++--------------+--------------+--------+
+| zhang3       | python       |     59 |
+| li4          | mysql        |     40 |
+| zh4          | mysql        |     40 |
++--------------+--------------+--------+
+3 rows in set (0.01 sec)
+
+mysql> 
 ```
+#### 7.4.2.5 视图
+简化连表语句重复执行时操作过程
 
+在我们进行多表拼接操作的到的新表，这个表不是真实存在于我们的数据库中的，为了后面可以继续使用这个表，可以设置视图
+```sql
+mysql> create view faild_student  as select sname as 学生姓名,cname as 课程名字,score as 分数   from teacher inner join course on course.tno=teacher.tno inner join sc on course.cno=sc.cno inner join student o
+n  student.sno=sc.sno  where score<60;
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> select * from faild_student;
++--------------+--------------+--------+
+| 学生姓名     | 课程名字     | 分数   |
++--------------+--------------+--------+
+| zhang3       | python       |     59 |
+| li4          | mysql        |     40 |
+| zh4          | mysql        |     40 |
++--------------+--------------+--------+
+3 rows in set (0.02 sec)
+
+mysql> show tables;
++------------------+
+| Tables_in_school |
++------------------+
+| course           |
+| faild_student    |
+| sc               |
+| student          |
+| teacher          |
++------------------+
+5 rows in set (0.01 sec)
+```
 # 八、SQL 高阶
 
 # 九、MySQL 架构和性能优化
