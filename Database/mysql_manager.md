@@ -4065,7 +4065,104 @@ mysql>
 ```
 ### 7.4.2 多表查询
 #### 7.4.2.1 创建测试数据
+```sql
+mysql> create database school;
+Query OK, 1 row affected (0.03 sec)
 
+mysql> use school
+Database changed
+mysql> CREATE TABLE student (sno INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '学号',sname VARCHAR(20) NOT NULL COMMENT '姓名',sage TINYINT UNSIGNED NOT NULL COMMENT '年龄',ssex ENUM('f','m') NOT NULL DEFAULT 'm' COMMENT '性别') ENGINE=INNODB CHARSET=utf8;
+Query OK, 0 rows affected, 1 warning (0.46 sec)
+
+mysql> CREATE TABLE course (cno INT NOT NULL PRIMARY KEY COMMENT '课程编号',cname VARCHAR(20) NOT NULL COMMENT '课程名字',tno INT NOT NULL COMMENT '教师编号') ENGINE=INNODB CHARSET=utf8;
+Query OK, 0 rows affected, 1 warning (0.22 sec)
+
+mysql> CREATE TABLE sc (sno INT NOT NULL COMMENT '学号',cno INT NOT NULL COMMENT '课程编号',score INT NOT NULL DEFAULT 0 COMMENT '成绩') ENGINE=INNODB CHARSET=utf8;
+Query OK, 0 rows affected, 1 warning (0.25 sec)
+
+mysql> CREATE TABLE teacher (tno INT NOT NULL PRIMARY KEY COMMENT '教师编号',tname VARCHAR(20) NOT NULL COMMENT '教师名字') ENGINE=INNODB CHARSET=utf8;
+Query OK, 0 rows affected, 1 warning (0.34 sec)
+
+mysql> INSERT INTO student(sno,sname,sage,ssex) VALUES (1,'zhang3',18,'m'),(2,'zhang4',18,'m'),(3,'li4',18,'m'),(4,'wang5',19,'f'),(5,'zh4',18,'m'),(6,'zhao4',18,'m'),(7,'ma6',19,'f'),(8,'sadad',20,'m'),(9,'tom',20,'f'),(10,'jerry',25,'m');
+Query OK, 10 rows affected (0.05 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO teacher(tno,tname) VALUES (101,'t1'),(102,'t2'),(103,'t3'),(104,'t4');
+Query OK, 4 rows affected (0.03 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO course(cno,cname,tno) VALUES (1001,'linux',101),(1002,'python',102),(1003,'mysql',103),(1004,'java',105);
+Query OK, 4 rows affected (0.05 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO sc(sno,cno,score) VALUES (1,1001,80),(1,1002,59),(2,1002,90),(2,1003,100),(3,1001,99),(3,1003,40),(4,1001,79),(4,1002,61),(4,1003,99),(5,1003,40),(6,1001,89),(6,1003,77),(7,1001,67),(7,1003,82),(8,1001,70),(9,1003,80),(10,1003,96);
+Query OK, 17 rows affected (0.05 sec)
+Records: 17  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++-----+--------+------+------+
+| sno | sname  | sage | ssex |
++-----+--------+------+------+
+|   1 | zhang3 |   18 | m    |
+|   2 | zhang4 |   18 | m    |
+|   3 | li4    |   18 | m    |
+|   4 | wang5  |   19 | f    |
+|   5 | zh4    |   18 | m    |
+|   6 | zhao4  |   18 | m    |
+|   7 | ma6    |   19 | f    |
+|   8 | sadad  |   20 | m    |
+|   9 | tom    |   20 | f    |
+|  10 | jerry  |   25 | m    |
++-----+--------+------+------+
+10 rows in set (0.01 sec)
+10 rows in set (0.00 sec)
+
+mysql> SELECT * FROM teacher;
++-----+-------+
+| tno | tname |
++-----+-------+
+| 101 | t1    |
+| 102 | t2    |
+| 103 | t3    |
+| 104 | t4    |
++-----+-------+
+4 rows in set (0.01 sec)
+
+mysql> SELECT * FROM course;
++------+--------+-----+
+| cno  | cname  | tno |
++------+--------+-----+
+| 1001 | linux  | 101 |
+| 1002 | python | 102 |
+| 1003 | mysql  | 103 |
+| 1004 | java   | 105 |
++------+--------+-----+
+4 rows in set (0.01 sec)
+
+mysql> SELECT * FROM sc;
++-----+------+-------+
+| sno | cno  | score |
++-----+------+-------+
+|   1 | 1001 |    80 |
+|   1 | 1002 |    59 |
+|   2 | 1002 |    90 |
+|   2 | 1003 |   100 |
+|   3 | 1001 |    99 |
+|   3 | 1003 |    40 |
+|   4 | 1001 |    79 |
+|   4 | 1002 |    61 |
+|   4 | 1003 |    99 |
+|   5 | 1003 |    40 |
+|   6 | 1001 |    89 |
+|   6 | 1003 |    77 |
+|   7 | 1001 |    67 |
+|   7 | 1003 |    82 |
+|   8 | 1001 |    70 |
+|   9 | 1003 |    80 |
+|  10 | 1003 |    96 |
++-----+------+-------+
+17 rows in set (0.01 sec)
+```
 # 八、SQL 高阶
 
 # 九、MySQL 架构和性能优化
