@@ -4221,6 +4221,16 @@ mysql> select * from teacher,course where teacher.tno=course.tno;
 | 103 | t3    | 1003 | mysql  | 103 |
 +-----+-------+------+--------+-----+
 3 rows in set (0.01 sec)
+
+mysql> select * from teacher inner join course on teacher.tno=course.tno; 
++-----+-------+------+--------+-----+
+| tno | tname | cno  | cname  | tno |
++-----+-------+------+--------+-----+
+| 101 | t1    | 1001 | linux  | 101 |
+| 102 | t2    | 1002 | python | 102 |
+| 103 | t3    | 1003 | mysql  | 103 |
++-----+-------+------+--------+-----+
+3 rows in set (0.00 sec)
 ```
 #### 7.4.2.4 外连接方式
 1)定义驱动表（主表），在定义被驱动表（子表） 
@@ -4265,6 +4275,16 @@ mysql> select * from teacher right join course on teacher.tno=course.tno;
 
 ```sql
 -- 统计 zhang3，学习了几门课？
+mysql> select count(cno) as 课程数量 from student inner join sc  on student.sno=sc.sno where student.sname="zhang3";
++--------------+
+| 课程数量     |
++--------------+
+|            2 |
++--------------+
+1 row in set (0.01 sec)
+
+
+-- 查询 zhang3，学习的课程名称有哪些？
 
 ```
 
