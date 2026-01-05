@@ -284,15 +284,15 @@
     "expandedKeys": []
   },
   "MySQL/mysql_manager.md": {
-    "scroll": 3688.530303030303,
+    "scroll": 3697.257575757576,
     "cursor": {
       "from": {
-        "line": 3708,
-        "ch": 0
+        "line": 3713,
+        "ch": 14
       },
       "to": {
-        "line": 3708,
-        "ch": 0
+        "line": 3713,
+        "ch": 14
       }
     },
     "expandedKeys": [
@@ -410,5 +410,74 @@
       }
     },
     "expandedKeys": []
+  },
+  "Database/mysql_manager.md": {
+    "scroll": 3685.949494949495,
+    "cursor": {
+      "from": {
+        "line": 3665,
+        "ch": 24
+      },
+      "to": {
+        "line": 3665,
+        "ch": 24
+      }
+    },
+    "expandedKeys": [
+      "item-1-0",
+      "item-2-4",
+      "item-2-17",
+      "item-2-67",
+      "item-2-71",
+      "item-2-80",
+      "item-3-82",
+      "item-4-84",
+      "item-1-109",
+      "item-2-111",
+      "item-2-112",
+      "item-2-113",
+      "item-3-114",
+      "item-1-116",
+      "item-2-118",
+      "item-2-75",
+      "item-3-43",
+      "item-3-18",
+      "item-4-19",
+      "item-4-22",
+      "item-5-24",
+      "item-4-36",
+      "item-4-47",
+      "item-4-50",
+      "item-4-56",
+      "item-4-57",
+      "item-5-59",
+      "item-5-62",
+      "item-2-106",
+      "item-1-121",
+      "item-1-124",
+      "item-2-127",
+      "item-2-130",
+      "item-2-134",
+      "item-1-136",
+      "item-2-137",
+      "item-2-140",
+      "item-2-145",
+      "item-3-147",
+      "item-4-148",
+      "item-4-155",
+      "item-1-161",
+      "item-2-162",
+      "item-3-164",
+      "item-3-169",
+      "item-4-172",
+      "item-5-175",
+      "item-4-178",
+      "item-5-179",
+      "item-2-182",
+      "item-3-184",
+      "item-2-189",
+      "item-3-190",
+      "item-3-196"
+    ]
   }
 }
