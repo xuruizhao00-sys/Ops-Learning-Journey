@@ -3741,6 +3741,105 @@ mysql> select name,age from t111;
 7 rows in set (0.00 sec)
 
 ```
+#### 7.4.1.2 条件查询数据
+`select column .. from table_name where 条件;`
+##### 7.4.1.2.1 创建测试数据
+```bash
+10:59:26 root@redis02:~/world-db# ls
+world.sql
+10:59:26 root@redis02:~/world-db# mysql -uroot -p123 < world.sql 
+mysql: [Warning] Using a password on the command line interface can be insecure.
+
+11:02:29 root@redis02:~/world-db# mysql -uroot -p123 
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 19
+Server version: 8.4.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| school             |
+| sys                |
+| test01             |
+| test02             |
+| test03             |
+| test04             |
+| world              |
++--------------------+
+10 rows in set (0.01 sec)
+
+mysql> use world;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++-----------------+
+| Tables_in_world |
++-----------------+
+| city            |
+| country         |
+| countrylanguage |
++-----------------+
+3 rows in set (0.01 sec)
+
+mysql> desc city;
++-------------+----------+------+-----+---------+----------------+
+| Field       | Type     | Null | Key | Default | Extra          |
++-------------+----------+------+-----+---------+----------------+
+| ID          | int      | NO   | PRI | NULL    | auto_increment |    id主键列 序号列
+| Name        | char(35) | NO   |     |         |                |    城市信息 shijiazhuang
+| CountryCode | char(3)  | NO   | MUL |         |                |    国家编码 USA CHN 
+| District    | char(20) | NO   |     |         |                |    省份信息 hebei
+| Population  | int      | NO   |     | 0       |                |    人口数量 
++-------------+----------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+```
+##### 7.4.1.2.2 条件表达式写法
+###### 7.4.1.2.2.1 等值查询数据
+```sql
+-- 查询中国的所有城市信息，中国代码信息 ”CHN”
+mysql> select * from city where CountryCode="CHN";
+
+-- 查询美国的所有城市信息，美国代码信息 ”USA”
+mysql> select * from city where CountryCode="USA";
+```
+###### 7.4.1.2.2.2 范围查询数据
+
+> [!NOTE] 范围表达式
+范围的表示方式：< > <= >= <> | !=不等于
+
+```sql
+-- 查询全世界所有城市信息，人口数量小于10000;
+mysql> select * from city where Population<10000;
+```
+###### 7.4.1.2.2.3 多条件查询数据(and / or)
+and：根据第一个条件先进行筛选过滤，然后将筛选后的结果在交给第二条件进行筛选过滤 
+or： 根据第一个条件先进行筛选过滤，然后在经过第二个条件重新筛选过滤，将两个条件筛选后的数据做合并
+```sql
+-- 查询中国的所有城市信息，并且人口数量小于 100000;
+mysql> select * from city where CountryCode="CHN" and Population<100000;
+
+-- 查询美国和中国所有城市信息
+mysql> select * from city where CountryCode="CHN" or  CountryCode="USA";
+
+-- 查询中国所有城市信息，并且人口数量小于 100000，再查询美国所有城市信息，并且人口数量大于1000000；
+
+```
+
 # 八、SQL 高阶
 
 # 九、MySQL 架构和性能优化
