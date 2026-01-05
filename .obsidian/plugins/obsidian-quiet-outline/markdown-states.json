@@ -1,6 +1,6 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 4344.3375,
+    "scroll": 4359.727485270738,
     "cursor": {
       "from": {
         "line": 4341,
@@ -417,14 +417,14 @@
     "expandedKeys": []
   },
   "Database/mysql_manager.md": {
-    "scroll": 3974.955,
+    "scroll": 4040.343434343434,
     "cursor": {
       "from": {
-        "line": 3996,
+        "line": 4067,
         "ch": 0
       },
       "to": {
-        "line": 3996,
+        "line": 4067,
         "ch": 0
       }
     },
@@ -488,7 +488,8 @@
       "item-4-204",
       "item-5-206",
       "item-4-211",
-      "item-5-213"
+      "item-5-213",
+      "item-3-223"
     ]
   }
 }

@@ -3994,6 +3994,77 @@ vi /etc/my.cnf
 sql_mode=配置的项目信息 
 ```
 #### 7.4.1.4 过滤查询
+where : 根据条件信息过滤数据 指定过滤数据表中有的数据 不识别聚合函数 
+having : 根据条件信息过滤数据 过滤聚合处理的数据信息，在表中并不存在 支持识别聚合函数
+```sql
+-- 查询中国每个省份城市数量，并且将城市数量大于10的省份显示
+mysql> select District as 省份,count(name) as 城市数量  from city where CountryCode="CHN" group by District having 城市数量>10;
++----------------+--------------+
+| 省份           | 城市数量     |
++----------------+--------------+
+| Hubei          |           22 |
+| Heilongjiang   |           21 |
+| Liaoning       |           21 |
+| Guangdong      |           20 |
+| Sichuan        |           21 |
+| Jiangsu        |           25 |
+| Jilin          |           20 |
+| Shandong       |           32 |
+| Zhejiang       |           16 |
+| Henan          |           18 |
+| Hebei          |           12 |
+| Hunan          |           18 |
+| Jiangxi        |           11 |
+| Fujian         |           12 |
+| Anhui          |           16 |
+| Inner Mongolia |           13 |
++----------------+--------------+
+16 rows in set (0.03 sec)
+
+-- 查询全世界各个国家人口数量，并且将人口数量大于500w国家显示输出
+mysql> select CountryCode as 国家名称,sum(Population) as 总人数  from city group by CountryCode  having 总人数>5000000;
+```
+#### 7.4.1.5 排序查询
+order by 升序/降序
+
+desc（descending order） -- 降序排序 
+asc （ascending order） -- 升序排序 **默认**
+```sql
+-- 查询全世界各个国家人口数量，并且将人口数量大于500w国家显示输出，将国家人口数量进行排序显示
+select CountryCode as 国家,sum(Population) as 国家总人数 from city group by CountryCode having 国家总人数 > 5000000 order by 国家总人数 asc;
+```
+#### 7.4.1.6 截取数据信息展示
+limit n 截取前 n 位
+
+limit n,m 截取从第 n 位开始，再往下取 m 位（不包含第 n 位）
+```sql
+-- 查询全世界各个国家人口数量，并且将人口数量大于500w国家显示输出，将国家人口数量进行排序显示，显示人口数量最多的前5名国家信息
+mysql> select CountryCode as 国家名称,sum(Population) as 总人数  from city group by CountryCode  having 总人数>5000000 order by 总人数 desc  limit 5;
++--------------+-----------+
+| 国家名称     | 总人数    |
++--------------+-----------+
+| CHN          | 175953614 |
+| IND          | 123298526 |
+| BRA          |  85876862 |
+| USA          |  78625774 |
+| JPN          |  77965107 |
++--------------+-----------+
+5 rows in set (0.43 sec)
+
+-- 查询全世界各个国家人口数量，并且将人口数量大于500w国家显示输出，将国家人口数量进行排序显示，显示人口数量最多的6-7名国家信息
+mysql> select CountryCode as 国家名称,sum(Population) as 总人数  from city group by CountryCode  having 总人数>5000000 order by 总人数 desc  limit 5,2;
++--------------+-----------+
+| 国家名称     | 总人数    |
++--------------+-----------+
+| RUS          |  69150700 |
+| MEX          |  59752521 |
++--------------+-----------+
+2 rows in set (0.44 sec)
+
+mysql>
+```
+### 7.4.2 多表查询
+#### 7.4.2.1 创建测试数据
 
 # 八、SQL 高阶
 
