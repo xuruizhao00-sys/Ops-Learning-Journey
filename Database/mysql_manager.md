@@ -3879,6 +3879,7 @@ select * from city where district is null;
 select * from city where district is not null;  
 ```
 #### 7.4.1.3 分组查询数据
+##### 7.4.1.3.1 分组查询示例
 如何实现分组查询 
 1）指定分组查询的列 
 2）将分组列相同信息做排序 
@@ -3932,6 +3933,67 @@ max()     -- 取出指定数值列最大值
 min()     -- 取出指定数值列最小值
 avg()     -- 取出指定数值列平均值 sum()/count()
 group_concat -- 将多行信息整合为一行显示
+##### 7.4.1.3.2 sql_mode 配置
+###### 7.4.1.3.2.1 什么是 sql_mode
+`sql_mode` 用来控制 MySQL 在执行 SQL 时的“行为规则和严格程度”
+它会影响：
+- 数据校验是否严格
+- 错误是报错还是警告
+- 隐式类型转换
+- 分组 / 日期 / 除零 / NULL 行为
+
+📌 **sql_mode = MySQL 的“SQL 行为开关集合”**
+###### 7.4.1.3.2.2 如何查看 sql_mode
+```sql
+mysql> select @@sql_mode;
++-----------------------------------------------------------------------------------------------------------------------+
+| @@sql_mode                                                                                                            |
++-----------------------------------------------------------------------------------------------------------------------+
+| ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION |
++-----------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+```
+ONLY_FULL_GROUP_BY：保证在分组查询数据信息时，分组合并的数据，和其他行数据只能一对一显示，不能出现异常显示输出
+
+STRICT_TRANS_TABLES：可以保证数据录入的完整性 日期信息出现不合理情况
+
+NO_ZERO_IN_DATE,NO_ZERO_DATE：在时间类型中，不能出现0000-00-00时间信息
+
+ERROR_FOR_DIVISION_BY_ZERO：保证数据表中数据信息做除法运算时，被除数不能为0；
+###### 7.4.1.3.2.3 STRICT_TRANS_TABLES
+作用：
+- 数据不合法 → 报错
+- 防止脏数据
+```sql
+INSERT INTO t(age) VALUES ('abc');
+-- ❌ ERROR
+```
+📌 **生产环境必须开启**
+###### 7.4.1.3.2.4 STRICT_ALL_TABLES
+- 所有存储引擎都严格
+- 很少单独使用
+###### 7.4.1.3.2.5 ONLY_FULL_GROUP_BY
+作用：
+- GROUP BY 必须符合 SQL 标准
+- 防止“随机值”
+```sql
+-- 错误示例
+SELECT id, name FROM users GROUP BY id;
+
+-- 正确示例
+SELECT id, MAX(name) FROM users GROUP BY id;
+```
+###### 7.4.1.3.2.6 如何配置 sql_mode
+```ini
+临时配置：
+set global sql_mode=配置的项目信息
+
+永久配置：配置文件中配置
+vi /etc/my.cnf 
+[mysqld]
+sql_mode=配置的项目信息 
+```
+#### 7.4.1.4 过滤查询
 
 # 八、SQL 高阶
 
