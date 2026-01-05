@@ -3888,8 +3888,51 @@ select * from city where district is not null;
 mysql> select CountryCode as 国家,sum(Population) as 人口总数 from city group by CountryCode;
 
 -- 查询中国每个省份的城市数量
-
+mysql> select District as 省份,count(Population) as 人口总数 from city where CountryCode="CHN"  group by District;
++----------------+--------------+
+| 省份           | 人口总数     |
++----------------+--------------+
+| Shanghai       |            1 |
+| Peking         |            2 |
+| Chongqing      |            1 |
+| Tianjin        |            1 |
+| Hubei          |           22 |
+| Heilongjiang   |           21 |
+| Liaoning       |           21 |
+| Guangdong      |           20 |
+| Sichuan        |           21 |
+| Jiangsu        |           25 |
+| Jilin          |           20 |
+| Shaanxi        |            8 |
+| Shandong       |           32 |
+| Zhejiang       |           16 |
+| Henan          |           18 |
+| Hebei          |           12 |
+| Shanxi         |            9 |
+| Yunnan         |            5 |
+| Hunan          |           18 |
+| Jiangxi        |           11 |
+| Fujian         |           12 |
+| Gansu          |            7 |
+| Guizhou        |            6 |
+| Anhui          |           16 |
+| Xinxiang       |           10 |
+| Guangxi        |            9 |
+| Inner Mongolia |           13 |
+| Qinghai        |            1 |
+| Ningxia        |            2 |
+| Hainan         |            2 |
+| Tibet          |            1 |
++----------------+--------------+
+31 rows in set (0.04 sec)
 ```
+count()   -- 做计数统计函数（统计行数）
+sum()     -- 对数值列进行求和
+max()     -- 取出指定数值列最大值
+min()     -- 取出指定数值列最小值
+avg()     -- 取出指定数值列平均值 sum()/count()
+group_concat -- 将多行信息整合为一行显示
+
 # 八、SQL 高阶
 
 # 九、MySQL 架构和性能优化
