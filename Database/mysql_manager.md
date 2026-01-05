@@ -3864,6 +3864,9 @@ mysql> select * from city where name like "shang%";
 | 2166 | Shangrao | CHN         | Jiangxi      |     132455 |
 +------+----------+-------------+--------------+------------+
 4 rows in set (0.01 sec)
+
+-- 去重查询
+
 ```
 # 八、SQL 高阶
 
