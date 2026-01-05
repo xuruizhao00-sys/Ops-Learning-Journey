@@ -3712,7 +3712,33 @@ mysql>
 
 `select name,age from table_name;` 指定列信息全部显示
 ```sql
+mysql> select * from t111;
++----+-------+---------+
+| id | age   | name    |
++----+-------+---------+
+|  1 |    11 | sss     |
+|  2 |   121 | aaasa   |
+|  3 |   144 | asds    |
+|  4 |    55 | asdgs   |
+|  5 |    11 | hhh     |
+|  6 |   311 | rrrrsss |
+|  7 | 77711 | sagnn   |
++----+-------+---------+
+7 rows in set (0.01 sec)
 
+mysql> select name,age from t111;
++---------+-------+
+| name    | age   |
++---------+-------+
+| sss     |    11 |
+| aaasa   |   121 |
+| asds    |   144 |
+| asdgs   |    55 |
+| hhh     |    11 |
+| rrrrsss |   311 |
+| sagnn   | 77711 |
++---------+-------+
+7 rows in set (0.00 sec)
 
 ```
 # 八、SQL 高阶
