@@ -3706,7 +3706,15 @@ mysql>
 
 ```
 ## 7.4 DQL
+### 7.4.1 单表查询数据
+#### 7.4.1.1 全表数据查询
+`select * from table_name;` 整个表数据都加载（需要对磁盘性能消耗更多--IO 磁盘-内存）
 
+`select name,age from table_name;` 指定列信息全部显示
+```sql
+
+
+```
 # 八、SQL 高阶
 
 # 九、MySQL 架构和性能优化
