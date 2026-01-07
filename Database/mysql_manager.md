@@ -4436,7 +4436,12 @@ SELECT function_name(parameter_value,...)
 ### 8.1.3 函数实践
 创建一个名为 simpleFun 的函数。这个函数不接受任何参数（无参函数），并且返回一个VARCHAR(20) 字符串。
 ```sql
+-- 在 mariadb 中可以直接创建成功
+MariaDB [db1]> CREATE FUNCTION simpleFun() RETURNS VARCHAR(20) RETURN "Hello World";
+Query OK, 0 rows affected (0.007 sec)
 
+
+-- 在 MySQL8.0 中默认情况创建失败
 ```
 # 九、MySQL 架构和性能优化
 
