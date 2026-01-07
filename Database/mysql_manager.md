@@ -4400,7 +4400,44 @@ mysql> show tables;
 +------------------+
 5 rows in set (0.01 sec)
 ```
+### 8.1.2 function 函数
+MySQL 提供了丰富的函数，用于处理各种数据类型，包括数值、字符串、日期和时间等，这些函数有助于进行复杂的数据操作，提高数据查询的效率和灵活性。
 
+MySQL 的函数种类繁多，功能强大，能够满足各种数据处理需求。在使用时，需要根据具体场景选择合适的函数，并遵循 MySQL 的语法规则进行调用。
+分为系统内置函数和自定义函数两种。
+```sql
+-- 自定义函数：user-defined function UDF，保存在 mysql.proc (MySQL8.0 中已经取消此表)表中。
+
+-- 系统内置函数参考：
+   https://dev.mysql.com/doc/refman/8.0/en/built-in-function-reference.html
+   https://dev.mysql.com/doc/refman/5.7/en/built-in-function-reference.html
+```
+函数语法格式
+```sql
+-- 创建
+CREATE [AGGREGATE] FUNCTION function_name RETURNS {STRING|INTEGER|REAL|DECIMAL} SONAME shared_library_name
+
+-- 查看函数列表
+SHOW FUNCTION STATUS;
+
+-- 查看函数定义
+SHOW CREATE FUNCTION function_name
+
+-- 删除
+DROP FUNCTION function_name
+
+-- 调用
+SELECT function_name(parameter_value,...)
+```
+- 参数可以有多个，也可以没有参数；
+- 无论有无参数，小括号（）是必须的；
+- 必须有且只有一个返回值；
+- 不能独立使用，必须要在 SQL 语句中使用；
+### 8.1.3 函数实践
+创建一个名为 simpleFun 的函数。这个函数不接受任何参数（无参函数），并且返回一个VARCHAR(20) 字符串。
+```sql
+
+```
 # 九、MySQL 架构和性能优化
 
 # 十、MySQL 日志管理
