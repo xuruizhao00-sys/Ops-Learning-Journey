@@ -4361,6 +4361,18 @@ mysql>
 简化连表语句重复执行时操作过程
 视图：虚拟表，保存有实表的查询结果，相当于别名。
 在我们进行多表拼接操作的到的新表，这个表不是真实存在于我们的数据库中的，为了后面可以继续使用这个表，可以设置视图
+视图 create view 格式
+```sql
+CREATE
+   [OR REPLACE]
+   [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+   [DEFINER = { user | CURRENT_USER }]
+   [SQL SECURITY { DEFINER | INVOKER }]
+   VIEW view_name [(column_list)]
+   AS select_statement
+   [WITH [CASCADED | LOCAL] CHECK OPTION]
+```
+
 ```sql
 mysql> create view faild_student  as select sname as 学生姓名,cname as 课程名字,score as 分数   from teacher inner join course on course.tno=teacher.tno inner join sc on course.cno=sc.cno inner join student o
 n  student.sno=sc.sno  where score<60;
