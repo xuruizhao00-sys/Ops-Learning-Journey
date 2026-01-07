@@ -4354,9 +4354,12 @@ ore<60;
 
 mysql> 
 ```
-#### 7.4.2.5 视图
-简化连表语句重复执行时操作过程
 
+# 八、SQL 高阶
+## 8.1 视图和函数
+### 8.1.1 视图
+简化连表语句重复执行时操作过程
+视图：虚拟表，保存有实表的查询结果，相当于别名。
 在我们进行多表拼接操作的到的新表，这个表不是真实存在于我们的数据库中的，为了后面可以继续使用这个表，可以设置视图
 ```sql
 mysql> create view faild_student  as select sname as 学生姓名,cname as 课程名字,score as 分数   from teacher inner join course on course.tno=teacher.tno inner join sc on course.cno=sc.cno inner join student o
@@ -4385,7 +4388,6 @@ mysql> show tables;
 +------------------+
 5 rows in set (0.01 sec)
 ```
-# 八、SQL 高阶
 
 # 九、MySQL 架构和性能优化
 

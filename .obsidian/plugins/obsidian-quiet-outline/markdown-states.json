@@ -417,15 +417,15 @@
     "expandedKeys": []
   },
   "Database/mysql_manager.md": {
-    "scroll": 4347.777777777777,
+    "scroll": 4359.0952380952385,
     "cursor": {
       "from": {
-        "line": 4395,
-        "ch": 13
+        "line": 4361,
+        "ch": 24
       },
       "to": {
-        "line": 4395,
-        "ch": 13
+        "line": 4361,
+        "ch": 24
       }
     },
     "expandedKeys": [
@@ -489,7 +489,9 @@
       "item-5-206",
       "item-4-211",
       "item-5-213",
-      "item-3-223"
+      "item-3-223",
+      "item-1-229",
+      "item-2-230"
     ]
   }
 }
