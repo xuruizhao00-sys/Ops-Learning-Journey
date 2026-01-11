@@ -4442,7 +4442,46 @@ Query OK, 0 rows affected (0.007 sec)
 
 
 -- 在 MySQL8.0 中默认情况创建失败
+-- 确认环境变量效果
+mysql> select @@log_bin_trust_function_creators;
++-----------------------------------+
+| @@log_bin_trust_function_creators |
++-----------------------------------+
+|                                 0 |
++-----------------------------------+
+1 row in set, 1 warning (0.00 sec)
+
+-- 这条命令的作用是调整数据库的全局设置，以允许创建存储函数或触发器时不受到严格的权限限制，特别是在启用了二进制日志（binary logging）的情况下。
+mysql> set global log_bin_trust_function_creators=ON;
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+mysql> select @@log_bin_trust_function_creators;
++-----------------------------------+
+| @@log_bin_trust_function_creators |
++-----------------------------------+
+|                                 1 |
++-----------------------------------+
+1 row in set, 1 warning (0.00 sec)
+
+-- 此时再去创建就可以了
+mysql> create function simpleFun() returns varchar(20) return "hello world";
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> show function status \G
+*************************** 1. row ***************************
+                  Db: school
+                Name: simpleFun
+                Type: FUNCTION
+             Definer: root@localhost
+            Modified: 2026-01-07 23:09:41
+             Created: 2026-01-07 23:09:41
+       Security_type: DEFINER
+             Comment: 
+character_set_client: utf8mb4
+collation_connection: utf8mb4_0900_ai_ci
+  Database Collation: utf8mb4_0900_ai_ci
 ```
+
 # 九、MySQL 架构和性能优化
 
 # 十、MySQL 日志管理
