@@ -103,11 +103,12 @@
 |**启动速度**​|秒级启动|分钟级启动|
 |**资源消耗**​|极低资源占用|较高资源开销|
 |**性能损耗**​|接近原生性能|明显性能损耗|
-
+Docker 服务设计
 - **客户端/服务端架构**：采用 C/S 模式，通过远程 API 进行管理和控制
 - **轻量级设计**：创建轻量级、可移植、自包含的容器环境
 - **核心理念**：构建（Build）、运输（Ship）、运行（Run）三大核心哲学
 
+Docker 服务安全隔离机制
 - **命名空间隔离**（namespace）：提供进程、网络、文件系统等资源的隔离
 - **控制组限制**（cgroup）：实现资源配额和限制管理
 - **安全保证**：确保容器间的安全边界和资源隔离
@@ -192,143 +193,143 @@ mindmap
 
 
 ```mermaid
-graph TD
-    A[Docker容器化应用意义] --> B1[环境标准化与一致性]
-    A --> B2[应用隔离与安全]
-    A --> B3[资源效率与成本优化]
-    A --> B4[敏捷开发与DevOps]
-    A --> B5[可移植性与云原生]
-    A --> B6[故障恢复与高可用]
-    A --> B7[监控与可观测性]
-    A --> B8[生态系统与工具链]
+graph LR
+    A[Docker Application Containerization Significance] --> B1[Environment Standardization & Consistency]
+    A --> B2[Application Isolation & Security]
+    A --> B3[Resource Efficiency & Cost Optimization]
+    A --> B4[Agile Development & DevOps]
+    A --> B5[Portability & Cloud Native]
+    A --> B6[Fault Recovery & High Availability]
+    A --> B7[Monitoring & Observability]
+    A --> B8[Ecosystem & Toolchain]
     
-    B1 --> C1_1[开发环境一致性]
-    B1 --> C1_2[测试环境一致性]
-    B1 --> C1_3[生产环境一致性]
+    B1 --> C1_1[Development Environment Consistency]
+    B1 --> C1_2[Testing Environment Consistency]
+    B1 --> C1_3[Production Environment Consistency]
     
-    C1_1 --> D1_1_1[消除"在我这能跑"问题]
-    C1_1 --> D1_1_2[统一依赖版本管理]
-    C1_1 --> D1_1_3[标准化配置管理]
+    C1_1 --> D1_1_1[Eliminate Environment-Specific Issues]
+    C1_1 --> D1_1_2[Unified Dependency Management]
+    C1_1 --> D1_1_3[Standardized Configuration Management]
     
-    C1_2 --> D1_2_1[自动化测试环境搭建]
-    C1_2 --> D1_2_2[测试结果可重现]
-    C1_2 --> D1_2_3[并行测试环境隔离]
+    C1_2 --> D1_2_1[Automated Test Environment Setup]
+    C1_2 --> D1_2_2[Reproducible Test Results]
+    C1_2 --> D1_2_3[Parallel Testing Environment Isolation]
     
-    C1_3 --> D1_3_1[部署环境标准化]
-    C1_3 --> D1_3_2[配置漂移预防]
-    C1_3 --> D1_3_3[版本控制追溯]
+    C1_3 --> D1_3_1[Standardized Deployment Environment]
+    C1_3 --> D1_3_2[Configuration Drift Prevention]
+    C1_3 --> D1_3_3[Version Control Traceability]
     
-    B2 --> C2_1[进程级隔离]
-    B2 --> C2_2[安全边界强化]
-    B2 --> C2_3[多租户环境支持]
+    B2 --> C2_1[Process-Level Isolation]
+    B2 --> C2_2[Security Boundary Enhancement]
+    B2 --> C2_3[Multi-Tenant Environment Support]
     
-    C2_1 --> D2_1_1[命名空间隔离]
-    C2_1 --> D2_1_2[控制组资源限制]
-    C2_1 --> D2_1_3[文件系统隔离]
+    C2_1 --> D2_1_1[Namespace Isolation]
+    C2_1 --> D2_1_2[Control Groups Resource Limits]
+    C2_1 --> D2_1_3[Filesystem Isolation]
     
-    C2_2 --> D2_2_1[最小权限原则实施]
-    C2_2 --> D2_2_2[漏洞影响范围控制]
-    C2_2 --> D2_2_3[安全策略集中管理]
+    C2_2 --> D2_2_1[Principle of Least Privilege]
+    C2_2 --> D2_2_2[Vulnerability Impact Containment]
+    C2_2 --> D2_2_3[Centralized Security Policy Management]
     
-    C2_3 --> D2_3_1[资源竞争避免]
-    C2_3 --> D2_3_2[故障传播隔离]
-    C2_3 --> D2_3_3[性能干扰消除]
+    C2_3 --> D2_3_1[Resource Competition Avoidance]
+    C2_3 --> D2_3_2[Failure Propagation Isolation]
+    C2_3 --> D2_3_3[Performance Interference Elimination]
     
-    B3 --> C3_1[轻量级虚拟化]
-    B3 --> C3_2[资源利用率提升]
-    B3 --> C3_3[成本效益显著]
+    B3 --> C3_1[Lightweight Virtualization]
+    B3 --> C3_2[Resource Utilization Improvement]
+    B3 --> C3_3[Cost Effectiveness]
     
-    C3_1 --> D3_1_1[共享操作系统内核]
-    C3_1 --> D3_1_2[快速启动与销毁]
-    C3_1 --> D3_1_3[低内存开销运行]
+    C3_1 --> D3_1_1[Shared OS Kernel]
+    C3_1 --> D3_1_2[Fast Startup and Shutdown]
+    C3_1 --> D3_1_3[Low Memory Overhead]
     
-    C3_2 --> D3_2_1[高密度部署能力]
-    C3_2 --> D3_2_2[动态资源分配]
-    C3_2 --> D3_2_3[闲置资源回收]
+    C3_2 --> D3_2_1[High-Density Deployment Capability]
+    C3_2 --> D3_2_2[Dynamic Resource Allocation]
+    C3_2 --> D3_2_3[Idle Resource Recovery]
     
-    C3_3 --> D3_3_1[硬件投资减少]
-    C3_3 --> D3_3_2[能源消耗降低]
-    C3_3 --> D3_3_3[运维成本下降]
+    C3_3 --> D3_3_1[Hardware Investment Reduction]
+    C3_3 --> D3_3_2[Energy Consumption Reduction]
+    C3_3 --> D3_3_3[Operational Cost Decrease]
     
-    B4 --> C4_1[持续集成/持续部署]
-    B4 --> C4_2[微服务架构支持]
-    B4 --> C4_3[基础设施即代码]
+    B4 --> C4_1[CI/CD Integration]
+    B4 --> C4_2[Microservices Architecture Support]
+    B4 --> C4_3[Infrastructure as Code]
     
-    C4_1 --> D4_1_1[自动化构建流水线]
-    C4_1 --> D4_1_2[标准化部署流程]
-    C4_1 --> D4_1_3[快速回滚机制]
+    C4_1 --> D4_1_1[Automated Build Pipeline]
+    C4_1 --> D4_1_2[Standardized Deployment Process]
+    C4_1 --> D4_1_3[Fast Rollback Mechanism]
     
-    C4_2 --> D4_2_1[服务解耦与独立部署]
-    C4_2 --> D4_2_2[技术栈多样性支持]
-    C4_2 --> D4_2_3[服务网格集成]
+    C4_2 --> D4_2_1[Service Decoupling & Independent Deployment]
+    C4_2 --> D4_2_2[Technology Stack Diversity Support]
+    C4_2 --> D4_2_3[Service Mesh Integration]
     
-    C4_3 --> D4_3_1[Dockerfile版本控制]
-    C4_3 --> D4_3_2[不可变基础设施]
-    C4_3 --> D4_3_3[环境配置代码化]
+    C4_3 --> D4_3_1[Dockerfile Version Control]
+    C4_3 --> D4_3_2[Immutable Infrastructure]
+    C4_3 --> D4_3_3[Environment Configuration as Code]
     
-    B5 --> C5_1[跨平台运行能力]
-    B5 --> C5_2[云原生应用基础]
-    B5 --> C5_3[标准化打包格式]
+    B5 --> C5_1[Cross-Platform Runtime Capability]
+    B5 --> C5_2[Cloud-Native Application Foundation]
+    B5 --> C5_3[Standardized Packaging Format]
     
-    C5_1 --> D5_1_1[开发机到云端无缝迁移]
-    C5_1 --> D5_1_2[多云部署策略支持]
-    C5_1 --> D5_1_3[混合云环境兼容]
+    C5_1 --> D5_1_1[Seamless Dev-to-Production Migration]
+    C5_1 --> D5_1_2[Multi-Cloud Deployment Strategy Support]
+    C5_1 --> D5_1_3[Hybrid Cloud Environment Compatibility]
     
-    C5_2 --> D5_2_1[Kubernetes原生支持]
-    C5_2 --> D5_2_2[服务发现与负载均衡]
-    C5_2 --> D5_2_3[自动扩缩容能力]
+    C5_2 --> D5_2_1[Kubernetes Native Support]
+    C5_2 --> D5_2_2[Service Discovery & Load Balancing]
+    C5_2 --> D5_2_3[Auto-Scaling Capability]
     
-    C5_3 --> D5_3_1[镜像仓库生态系统]
-    C5_3 --> D5_3_2[镜像签名与验证]
-    C5_3 --> D5_3_3[供应链安全保证]
+    C5_3 --> D5_3_1[Image Registry Ecosystem]
+    C5_3 --> D5_3_2[Image Signing & Verification]
+    C5_3 --> D5_3_3[Supply Chain Security Assurance]
     
-    B6 --> C6_1[快速故障恢复]
-    B6 --> C6_2[滚动更新与蓝绿部署]
-    B6 --> C6_3[灾难恢复策略]
+    B6 --> C6_1[Fast Fault Recovery]
+    B6 --> C6_2[Rolling Updates & Blue-Green Deployment]
+    B6 --> C6_3[Disaster Recovery Strategy]
     
-    C6_1 --> D6_1_1[容器自愈能力]
-    C6_1 --> D6_1_2[健康检查机制]
-    C6_1 --> D6_1_3[服务网格容错]
+    C6_1 --> D6_1_1[Container Self-Healing Capability]
+    C6_1 --> D6_1_2[Health Check Mechanism]
+    C6_1 --> D6_1_3[Service Mesh Fault Tolerance]
     
-    C6_2 --> D6_2_1[零停机部署]
-    C6_2 --> D6_2_2[版本回滚即时]
-    C6_2 --> D6_2_3[金丝雀发布支持]
+    C6_2 --> D6_2_1[Zero-Downtime Deployment]
+    C6_2 --> D6_2_2[Instant Version Rollback]
+    C6_2 --> D6_2_3[Canary Release Support]
     
-    C6_3 --> D6_3_1[镜像备份与恢复]
-    C6_3 --> D6_3_2[跨区域部署]
-    C6_3 --> D6_3_3[数据持久化方案]
+    C6_3 --> D6_3_1[Image Backup & Recovery]
+    C6_3 --> D6_3_2[Cross-Region Deployment]
+    C6_3 --> D6_3_3[Data Persistence Solutions]
     
-    B7 --> C7_1[标准化日志管理]
-    B7 --> C7_2[性能监控指标]
-    B7 --> C7_3[分布式追踪]
+    B7 --> C7_1[Standardized Log Management]
+    B7 --> C7_2[Performance Monitoring Metrics]
+    B7 --> C7_3[Distributed Tracing]
     
-    C7_1 --> D7_1_1[集中日志收集]
-    C7_1 --> D7_1_2[结构化日志输出]
-    C7_1 --> D7_1_3[日志驱动可插拔]
+    C7_1 --> D7_1_1[Centralized Log Collection]
+    C7_1 --> D7_1_2[Structured Log Output]
+    C7_1 --> D7_1_3[Pluggable Log Drivers]
     
-    C7_2 --> D7_2_1[资源使用率监控]
-    C7_2 --> D7_2_2[应用性能指标(APM)]
-    C7_2 --> D7_2_3[自定义指标暴露]
+    C7_2 --> D7_2_1[Resource Usage Monitoring]
+    C7_2 --> D7_2_2[Application Performance Metrics]
+    C7_2 --> D7_2_3[Custom Metrics Exposure]
     
-    C7_3 --> D7_3_1[请求链路追踪]
-    C7_3 --> D7_3_2[服务依赖关系可视化]
-    C7_3 --> D7_3_3[性能瓶颈定位]
+    C7_3 --> D7_3_1[Request Chain Tracing]
+    C7_3 --> D7_3_2[Service Dependency Visualization]
+    C7_3 --> D7_3_3[Performance Bottleneck Identification]
     
-    B8 --> C8_1[丰富的工具生态]
-    B8 --> C8_2[社区与市场支持]
-    B8 --> C8_3[标准化接口]
+    B8 --> C8_1[Rich Tool Ecosystem]
+    B8 --> C8_2[Community & Market Support]
+    B8 --> C8_3[Standardized Interfaces]
     
-    C8_1 --> D8_1_1[Docker Compose多容器编排]
-    C8_1 --> D8_1_2[Docker Swarm集群管理]
-    C8_1 --> D8_1_3[第三方工具集成]
+    C8_1 --> D8_1_1[Docker Compose Multi-Container Orchestration]
+    C8_1 --> D8_1_2[Docker Swarm Cluster Management]
+    C8_1 --> D8_1_3[Third-Party Tool Integration]
     
-    C8_2 --> D8_2_1[Docker Hub镜像仓库]
-    C8_2 --> D8_2_2[企业级镜像registry]
-    C8_2 --> D8_2_3[开源项目容器化]
+    C8_2 --> D8_2_1[Docker Hub Image Registry]
+    C8_2 --> D8_2_2[Enterprise Image Registry]
+    C8_2 --> D8_2_3[Open Source Project Containerization]
     
-    C8_3 --> D8_3_1[OCI(开放容器倡议)标准]
-    C8_3 --> D8_3_2[CNCF云原生基金会支持]
-    C8_3 --> D8_3_3[多运行时兼容]
+    C8_3 --> D8_3_1[OCI Open Container Initiative Standards]
+    C8_3 --> D8_3_2[CNCF Cloud Native Foundation Support]
+    C8_3 --> D8_3_3[Multi-Runtime Compatibility]
     
     %% 样式定义
     classDef level1 fill:#e1f5fe,stroke:#01579b,stroke-width:2px
@@ -340,5 +341,4 @@ graph TD
     class B1,B2,B3,B4,B5,B6,B7,B8 level2
     class C1_1,C1_2,C1_3,C2_1,C2_2,C2_3,C3_1,C3_2,C3_3,C4_1,C4_2,C4_3,C5_1,C5_2,C5_3,C6_1,C6_2,C6_3,C7_1,C7_2,C7_3,C8_1,C8_2,C8_3 level3
     class D1_1_1,D1_1_2,D1_1_3,D1_2_1,D1_2_2,D1_2_3,D1_3_1,D1_3_2,D1_3_3,D2_1_1,D2_1_2,D2_1_3,D2_2_1,D2_2_2,D2_2_3,D2_3_1,D2_3_2,D2_3_3,D3_1_1,D3_1_2,D3_1_3,D3_2_1,D3_2_2,D3_2_3,D3_3_1,D3_3_2,D3_3_3,D4_1_1,D4_1_2,D4_1_3,D4_2_1,D4_2_2,D4_2_3,D4_3_1,D4_3_2,D4_3_3,D5_1_1,D5_1_2,D5_1_3,D5_2_1,D5_2_2,D5_2_3,D5_3_1,D5_3_2,D5_3_3,D6_1_1,D6_1_2,D6_1_3,D6_2_1,D6_2_2,D6_2_3,D6_3_1,D6_3_2,D6_3_3,D7_1_1,D7_1_2,D7_1_3,D7_2_1,D7_2_2,D7_2_3,D7_3_1,D7_3_2,D7_3_3,D8_1_1,D8_1_2,D8_1_3,D8_2_1,D8_2_2,D8_2_3,D8_3_1,D8_3_2,D8_3_3 level4
-
 ```
