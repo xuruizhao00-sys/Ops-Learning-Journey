@@ -532,17 +532,31 @@
     "scroll": 571.6497968658199,
     "cursor": {
       "from": {
-        "line": 571,
-        "ch": 41
+        "line": 579,
+        "ch": 0
       },
       "to": {
-        "line": 571,
-        "ch": 41
+        "line": 579,
+        "ch": 0
       }
     },
     "expandedKeys": [
       "item-1-0",
       "item-2-1"
     ]
+  },
+  "Linux 基础/常见服务/未命名.md": {
+    "scroll": 0,
+    "cursor": {
+      "from": {
+        "line": 0,
+        "ch": 0
+      },
+      "to": {
+        "line": 0,
+        "ch": 0
+      }
+    },
+    "expandedKeys": []
   }
 }
