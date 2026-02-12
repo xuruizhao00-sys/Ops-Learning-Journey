@@ -563,14 +563,16 @@
     "scroll": 0,
     "cursor": {
       "from": {
-        "line": 1,
+        "line": 3,
         "ch": 0
       },
       "to": {
-        "line": 1,
+        "line": 3,
         "ch": 0
       }
     },
-    "expandedKeys": []
+    "expandedKeys": [
+      "item-1-0"
+    ]
   }
 }
