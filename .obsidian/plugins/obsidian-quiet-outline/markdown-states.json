@@ -155,15 +155,15 @@
     ]
   },
   "redis/redis.md": {
-    "scroll": 551.4505049580275,
+    "scroll": 2895.973628036375,
     "cursor": {
       "from": {
-        "line": 540,
-        "ch": 0
+        "line": 2907,
+        "ch": 59
       },
       "to": {
-        "line": 540,
-        "ch": 0
+        "line": 2907,
+        "ch": 31
       }
     },
     "expandedKeys": [
@@ -187,7 +187,6 @@
       "item-2-60",
       "item-3-63",
       "item-3-89",
-      "item-2-77",
       "item-3-79",
       "item-4-97",
       "item-3-96",
@@ -211,7 +210,12 @@
       "item-3-22",
       "item-3-25",
       "item-4-26",
-      "item-5-27"
+      "item-5-27",
+      "item-4-34",
+      "item-2-77",
+      "item-3-108",
+      "item-4-109",
+      "item-5-111"
     ]
   },
   "2025-12-14.md": {
@@ -525,7 +529,7 @@
     "expandedKeys": []
   },
   "cloud native/docker.md": {
-    "scroll": 562.2994968820861,
+    "scroll": 571.6497968658199,
     "cursor": {
       "from": {
         "line": 579,
