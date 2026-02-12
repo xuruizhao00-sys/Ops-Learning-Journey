@@ -569,7 +569,7 @@ Docker 镜像: https://hub.docker.com/
 
 Docker 中文网站: http://www.docker.org.cn/
 
-- Docker 主机(Host): 一个物理机或虚拟机，用于运行Docker服务进程和容器，也称为宿主机，node 节点
+- Docker 主机(Host): 一个物理机或虚拟机，用于运行 Docker 服务进程和容器，也称为宿主机，node 节点
 - Docker 服务端(Server): Docker 守护进程，运行 docker 容器 docker engine
 - Docker 客户端(Client): 客户端使用 docker 命令或其他工具调用 docker API
 - Docker 镜像(Images): 镜像可以理解为创建实例使用的模板,本质上就是一些程序文件的集合

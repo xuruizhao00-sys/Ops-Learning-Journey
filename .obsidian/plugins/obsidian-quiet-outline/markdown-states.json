@@ -529,20 +529,19 @@
     "expandedKeys": []
   },
   "cloud native/docker.md": {
-    "scroll": 571.6497968658199,
+    "scroll": 561.0028908411662,
     "cursor": {
       "from": {
-        "line": 579,
-        "ch": 0
+        "line": 571,
+        "ch": 41
       },
       "to": {
-        "line": 579,
-        "ch": 0
+        "line": 571,
+        "ch": 41
       }
     },
     "expandedKeys": [
       "item-1-0",
-      "item-3-2",
       "item-2-1"
     ]
   }
