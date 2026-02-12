@@ -560,15 +560,15 @@
     "expandedKeys": []
   },
   "Linux 基础/常见服务/共享存储.md": {
-    "scroll": 361.9040404040404,
+    "scroll": 273.5238095238095,
     "cursor": {
       "from": {
-        "line": 383,
-        "ch": 0
+        "line": 292,
+        "ch": 25
       },
       "to": {
-        "line": 383,
-        "ch": 0
+        "line": 292,
+        "ch": 25
       }
     },
     "expandedKeys": [
@@ -576,9 +576,11 @@
       "item-2-2",
       "item-2-6",
       "item-1-11",
-      "item-1-14",
-      "item-2-15",
-      "item-2-18"
+      "item-1-19",
+      "item-2-20",
+      "item-2-23",
+      "item-2-14",
+      "item-3-15"
     ]
   }
 }
