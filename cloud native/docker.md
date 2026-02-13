@@ -588,3 +588,17 @@ https://en.wikipedia.org/wiki/Linux_namespaces
 > - 每个容器都要不要有 root，怎么解决账户重名问题
 
 ![](assets/docker/file-20260213141126392.png)
+Namespace 是 Linux 系统的底层核心概念，其实现逻辑位于 Linux 内核层 —— 内核中部署了多种不同类型的命名空间，为容器隔离提供了基础能力。
+Docker 容器的运行机制有一个关键特征：所有容器都运行在宿主机的同一个 Docker 主进程下，并且共用宿主机的系统内核，容器自身仅运行在宿主机的**用户空间**中。尽管容器不像虚拟机那样拥有独立的内核，但仍需要实现与其他容器相互隔离的运行环境。
+容器技术的核心是**在单个进程内为指定服务构建独立的运行环境**，同时确保宿主机内核不受容器内进程的干扰和影响（比如文件读写、网络请求、进程调度等层面）。
+
+Linux Namespace 隔离类型详情表
+
+|隔离类型|英文全称 / 简称|核心功能|系统调用参数|内核版本|
+|---|---|---|---|---|
+|MNT Namespace|mount|提供磁盘挂载点和文件系统的隔离能力|CLONE_NEWNS|2.4.19|
+|PID Namespace|Process Identification|提供进程隔离能力（容器内进程 ID 独立编号，无法感知宿主机 / 其他容器进程）|CLONE_NEWPID|2.6.24|
+|IPC Namespace|Inter-Process Communication|提供进程间通信的隔离能力，包括信号量、消息队列和共享内存|CLONE_NEWIPC|2.6.19|
+|Net Namespace|network|提供网络隔离能力，包括网络设备、网络栈、端口等|CLONE_NEWNET|2.6.29|
+|UTS Namespace|UNIX Timesharing System|提供内核、主机名和域名的隔离能力|CLONE_NEWUTS|2.6.19|
+|User Namespace|user|提供用户隔离能力，包括用户和用户组的独立映射|CLONE_NEWUSER|3.8|
