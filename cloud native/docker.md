@@ -1282,10 +1282,241 @@ Server: Docker Engine - Community
 ```
 ### 2.2.2 查看 docker 详解信息
 ```bash
-
+docker info
 ```
+
+#### 一、客户端（Client）信息
+
+|字段|取值|说明|
+|---|---|---|
+|Debug Mode|false|客户端是否开启调试模式（开启后会输出更详细的日志）|
+
+#### 二、服务端（Server）核心运行信息
+
+|类别|字段|取值|说明|
+|---|---|---|---|
+|容器统计|Containers|2|主机上所有容器总数（运行 + 暂停 + 停止）|
+||Running|0|正在运行的容器数量|
+||Paused|0|暂停状态的容器数量|
+||Stopped|2|停止状态的容器数量|
+|镜像信息|Images|4|主机上本地存储的 Docker 镜像总数|
+|版本信息|Server Version|19.03.5|Docker 服务端（daemon）版本|
+||containerd version|b34a5c8af56e510852c35414db4c1f4fa6172339|容器运行时底层 containerd 版本|
+||runc version|3e425f80a8c931f88e6d94a8c831b9d5aa481657|默认运行时 runc 的版本|
+||init version|fec3683|容器初始化进程（pid=1）的版本|
+
+#### 三、存储与运行时配置
+
+|类别|字段|取值|说明|
+|---|---|---|---|
+|存储驱动|Storage Driver|overlay2|Docker 使用的存储引擎（overlay2 是主流高性能引擎）|
+||Backing Filesystem|extfs|宿主机底层文件系统（即磁盘格式）|
+||Supports d_type|true|是否支持 d_type（overlay2 必需，用于文件类型识别）|
+||Native Overlay Diff|true|是否支持原生差异存储（减少磁盘占用）|
+|运行时|Runtimes|runc|已安装的容器运行时列表|
+||Default Runtime|runc|默认使用的容器运行时（OCI 标准底层运行时）|
+||Init Binary|docker-init|容器初始化守护进程（负责容器内 pid=1 进程管理）|
+|Cgroup 驱动|Cgroup Driver|cgroupfs|资源限制（内存 / CPU）的管理驱动|
+
+#### 四、网络与插件配置
+
+|类别|字段|取值|说明|
+|---|---|---|---|
+|插件|Volume|local|已启用的存储卷插件（local 为本地卷）|
+||Network|bridge、host、ipvlan、macvlan、null、overlay|已启用的网络插件（overlay 支持跨主机容器通信）|
+||Log|awslogs、fluentd、gcplogs、gelf、journald、json-file、local、logentries、splunk、syslog|支持的日志驱动类型|
+|日志配置|Logging Driver|json-file|默认日志驱动（日志文件路径：/var/lib/docker/containers/<容器 ID>/< 容器 ID>-json.log）|
+|Swarm 模式|Swarm|inactive|是否启用 Swarm 集群模式（inactive 为未启用）|
+
+#### 五、系统环境信息
+
+
+| 字段               | 取值                                                          | 说明                             |
+| ---------------- | ----------------------------------------------------------- | ------------------------------ |
+| Kernel Version   | 4.15.0-29-generic                                           | 宿主机 Linux 内核版本（需兼容 Docker 运行时） |
+| Operating System | Ubuntu 18.04.1 LTS                                          | 宿主机操作系统版本                      |
+| OSType           | linux                                                       | 宿主机操作系统类型                      |
+| Architecture     | x86_64                                                      | 宿主机 CPU 架构（64 位 x86）           |
+| CPUs             | 1                                                           | 宿主机 CPU 核心数                    |
+| Total Memory     | 962MiB                                                      | 宿主机总内存                         |
+| Name             | [ubuntu180                                                  | 宿主机主机名                         |
+| ID               | IZHJ:WPIN:BRMC:XQUI:VVVR:UVGK:NZBM:YQXT:JDWB:33RS:45V7:SQWJ | Docker 节点唯一标识                  |
+
+#### 六、安全与仓库配置
+
+|类别|字段|取值|说明|
+|---|---|---|---|
+|安全选项|Security Options|apparmor、seccomp（Profile: default）|apparmor：系统安全模块；seccomp：限制容器系统调用（默认配置文件）|
+|仓库配置|Registry|[https://index.docker.io/v1/](https://index.docker.io/v1/)|默认镜像仓库地址（Docker Hub）|
+||Insecure Registries|127.0.0.0/8|非安全镜像仓库（无需 HTTPS 认证）|
+||Registry Mirrors|[https://si7y70hh.mirror.aliyuncs.com/](https://si7y70hh.mirror.aliyuncs.com/)|镜像加速地址（阿里云镜像源，提升拉取速度）|
+|数据目录|Docker Root Dir|/var/lib/docker|Docker 数据（镜像、容器、日志等）存储根目录（建议挂载独立高性能磁盘）|
+
+#### 七、其他配置与警告
+
+
+|字段|取值|说明|
+|---|---|---|
+|Debug Mode（Server）|false|服务端是否开启调试模式|
+|Experimental|false|是否启用 Docker 实验性功能|
+|Live Restore Enabled|false|重启 Docker 守护进程时是否保留容器运行（false 则重启 daemon 会关闭所有容器）|
+|警告信息|WARNING: No swap limit support|系统未开启 swap 资源限制（需修改内核参数启用，否则无法限制容器使用 swap 内存）|
+
 
 ### 2.2.3 查看 docker0 网卡
+在 docker 安装启动之后，默认会生成一个名称为 docker0 的网卡并且默认IP地址为172.17.0.1的网卡
 ```bash
-
+╭─[root@lnxguru] ~
+╰─➤ ifconfig docker0
+docker0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        inet6 fe80::346a:33ff:fed7:f8fd  prefixlen 64  scopeid 0x20<link>
+        ether 36:6a:33:d7:f8:fd  txqueuelen 0  (Ethernet)
+        RX packets 3  bytes 84 (84.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 313  bytes 63741 (63.7 KB)
+        TX errors 0  dropped 31 overruns 0  carrier 0  collisions 0
 ```
+
+### 2.2.4 docker 镜像仓库配置
+范例: 支持官方仓库和私有仓库镜像下载
+```json
+[root@ubuntu2004 ~]#cat /etc/docker/daemon.json
+
+{
+
+"registry-mirrors": [  #只支持docker官方镜像
+
+"https://docker.m.daocloud.io",
+
+"https://docker.1panel.live",
+
+"https://docker.1ms.run",
+
+"https://docker.xuanyuan.me"
+
+  ],
+
+"insecure-registries": ["harbor.wang.org"]
+
+}
+```
+
+#### 一、规范的配置文件内容
+```json
+{
+  "registry-mirrors": [
+    "https://registry.docker-cn.com",
+    "http://hub-mirror.c.163.com",
+    "https://docker.mirrors.ustc.edu.cn",
+    "https://si7y70hh.mirror.aliyuncs.com/"
+  ],
+  "hosts": ["unix:///var/run/docker.sock", "tcp://0.0.0.0:2375"],
+  "insecure-registries": ["harbor.wang.org"],
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "data-root": "/data/docker",
+  "max-concurrent-downloads": 10,
+  "max-concurrent-uploads": 5,
+  "log-opts": {
+    "max-size": "300m",
+    "max-file": "2"
+  },
+  "live-restore": true,
+  "proxies": {
+    "default": {
+      "httpProxy": "http://proxy.example.com:3128",
+      "httpsProxy": "https://proxy.example.com:3129",
+      "noProxy": "*.test.example.com,.example.org,127.0.0.0/8"
+    },
+    "tcp://docker-daemon1.example.com": {
+      "noProxy": "*.internal.example.net"
+    }
+  }
+}
+```
+
+#### 二、核心配置项详解（按功能分类）
+| 配置项                        | 取值/示例                                                  | 功能说明                                                                     | 注意事项                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **镜像加速**                   |                                                        |                                                                          |                                                                                                                                              |
+| `registry-mirrors`         | 国内镜像源列表                                                | 配置 Docker 镜像拉取加速地址，提升镜像下载速度                                              | 优先使用阿里云个人专属镜像源（替换示例中的 si7y70hh 为自己的）                                                                                                         |
+| **网络配置**                   |                                                        |                                                                          |                                                                                                                                              |
+| `hosts`                    | `unix:///var/run/docker.sock`<br/>`tcp://0.0.0.0:2375` | 配置 Docker 守护进程监听地址：<br/>- unix 套接字：本地通信<br/>- TCP 2375：允许远程访问 Docker API | 新版 Docker（20.10+）不推荐直接在 daemon.json 配置 `hosts`，建议修改 `docker.service` 文件（ExecStart 中加 `-H tcp://0.0.0.0:2375`）；<br/>2375 端口无加密，生产环境需配合 TLS 加密 |
+| `insecure-registries`      | `harbor.test.org`                                      | 配置非 HTTPS 协议的私有镜像仓库（如 Harbor），允许 Docker 拉取/推送镜像                          | 仅测试/内网环境使用，生产环境建议配置 HTTPS                                                                                                                    |
+| **资源与驱动**                  |                                                        |                                                                          |                                                                                                                                              |
+| `exec-opts`                | `native.cgroupdriver=systemd`                          | 指定 Docker 的 Cgroup 驱动为 systemd                                           | 适配 Systemd 系统（如 Ubuntu/CentOS 7+），与 k8s 兼容更佳                                                                                                 |
+| `data-root`                | `/data/docker`                                         | 指定 Docker 数据根目录（镜像、容器、日志等存储路径）                                           | 旧版字段为 `graph`（Docker 24.0+ 已废弃）；<br/>也可通过 `dockerd --data-root=/data/docker` 启动参数指定                                                          |
+| **镜像传输**                   |                                                        |                                                                          |                                                                                                                                              |
+| `max-concurrent-downloads` | 10                                                     | 镜像拉取时的最大并发下载数                                                            | 提升多层镜像的下载速度                                                                                                                                  |
+| `max-concurrent-uploads`   | 5                                                      | 镜像推送时的最大并发上传数                                                            | 避免上传占用过多网络资源                                                                                                                                 |
+| **日志配置**                   |                                                        |                                                                          |                                                                                                                                              |
+| `log-opts.max-size`        | 300m                                                   | 单个容器日志文件的最大大小                                                            | 超过该大小会自动切割日志                                                                                                                                 |
+| `log-opts.max-file`        | 2                                                      | 容器日志文件的最大保留个数                                                            | 日志文件循环写入（如 container.log.1 → container.log.2），超出则删除最旧的                                                                                       |
+| **服务稳定性**                  |                                                        |                                                                          |                                                                                                                                              |
+| `live-restore`             | true                                                   | 重启 Docker 守护进程时，不中断正在运行的容器                                               | 提升 Docker 服务升级/重启时的可用性                                                                                                                       |
+| **网络代理**                   |                                                        |                                                                          |                                                                                                                                              |
+| `proxies`                  | 示例代理配置                                                 | 配置 Docker 拉取镜像时使用的 HTTP/HTTPS 代理                                         | `noProxy` 为无需走代理的域名/IP段；<br/>可针对特定 daemon 地址配置独立代理规则                                                                                         |
+
+#### 三、配置生效命令
+修改 `daemon.json` 后，需重新加载配置并重启 Docker 服务使配置生效：
+```bash
+[root@ubuntu2004 ~]# systemctl daemon-reload && systemctl restart docker.service
+```
+
+#### 四、验证配置是否生效
+```bash
+# 查看 Docker 整体配置
+docker info
+
+# 查看具体配置项（如镜像加速、数据目录）
+docker info | grep -E "Registry Mirrors|Docker Root Dir"
+```
+### 2.2.5 docker 实现代理功能
+#### 一、问题现象：拉取 k8s 镜像失败
+执行 `docker pull` 拉取 ingress-nginx 镜像时，因网络问题无法连接镜像仓库，报错如下：
+```bash
+[root@ubuntu2204 ~]# docker pull registry.k8s.io/ingress-nginx/controller:v1.7.1
+Error response from daemon: Head "https://us-west2-docker.pkg.dev/v2/k8s-artifacts-prod/images/ingress-nginx/controller/manifests/v1.7.1": dial tcp 142.251.170.82:443: connect: connection refused
+```
+
+#### 二、解决步骤：配置 Docker 系统级代理
+##### 1. 前置准备（网络代理环境）
+先安装并配置科学上网软件，确保代理服务正常运行，且开启**局域网连接**（允许本机通过代理 IP:端口 访问外网）。
+
+##### 2. 创建 Docker 服务代理配置目录
+```bash
+[root@ubuntu2204 ~]# mkdir -p /etc/systemd/system/docker.service.d
+```
+
+##### 3. 编写代理配置文件（http-proxy.conf）
+```bash
+[root@ubuntu2204 ~]# cat >> /etc/systemd/system/docker.service.d/http-proxy.conf <<EOF
+[Service]
+Environment="HTTP_PROXY=http://${PROXY_SERVER_IP}:${PROXY_PORT}/"
+Environment="HTTPS_PROXY=http://${PROXY_SERVER_IP}:${PROXY_PORT}/"
+Environment="NO_PROXY=127.0.0.0/8,172.17.0.0/16,10.0.0.0/24,10.244.0.0/16,192.168.0.0/16,wang.org,cluster.local"
+EOF
+```
+**配置项说明**：
+- `HTTP_PROXY/HTTPS_PROXY`：替换 `${PROXY_SERVER_IP}` 和 `${PROXY_PORT}` 为实际的代理服务器 IP 和端口；
+- `NO_PROXY`：无需走代理的地址段/域名，包含：
+  - 本地回环（127.0.0.0/8）、Docker 网桥（172.17.0.0/16）；
+  - K8s 集群网段（10.0.0.0/24、10.244.0.0/16）、局域网（192.168.0.0/16）；
+  - 自定义域名（wang.org）、K8s 集群本地域名（cluster.local）。
+
+##### 4. 重新加载配置并重启 Docker 服务
+```bash
+[root@ubuntu2204 ~]# systemctl daemon-reload && systemctl restart docker.service
+```
+
+#### 三、验证结果：重新拉取镜像成功
+```bash
+[root@ubuntu2204 ~]# docker pull registry.k8s.io/ingress-nginx/controller:v1.7.1
+# 执行后镜像正常拉取，无连接拒绝报错
+```
+
+#### 关键补充说明
+1. **配置生效原理**：通过修改 Docker 服务的 systemd 配置文件，为 dockerd 进程注入代理环境变量，而非仅给当前终端配置代理（终端代理无法作用于 Docker 守护进程）；
+2. **NO_PROXY 必配项**：必须包含集群/局域网网段，否则 Docker 访问本地容器、K8s 集群内部镜像仓库时会走代理，导致通信失败；
+3. **变量替换**：实际使用时需将 `${PROXY_SERVER_IP}` 和 `${PROXY_PORT}` 替换为具体值（如 `192.168.1.100:7890`），不能直接使用变量符号。
+
