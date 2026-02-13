@@ -587,3 +587,4 @@ https://en.wikipedia.org/wiki/Linux_namespaces
 > - 多个容器的主机名能一样吗
 > - 每个容器都要不要有 root，怎么解决账户重名问题
 
+![](assets/docker/file-20260213141126392.png)
