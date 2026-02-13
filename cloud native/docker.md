@@ -1021,3 +1021,4 @@ Docker 目前已经支持多种操作系统的安装运行，比如 Ubuntu、Cen
 
 Docker 版本选择
 github 地址: https://github.com/moby/moby
+## 2.1 docker 安装和删除
