@@ -577,3 +577,7 @@ Docker 中文网站: http://www.docker.org.cn/
 	 可以搭建私有仓库 harbor
 - Docker 容器(Container): 容器是从镜像生成对外提供服务的一个或一组服务,其本质就是将镜像中的程序启动后生成的进程
 ### 1.1.5 Namespace
+https://man7.org/linux/man-pages/man7/namespaces.7.html
+https://en.wikipedia.org/wiki/Linux_namespaces
+
+>[!question] 一个宿主机运行了 N 个容器，多个容器公用一个 OS，必然带来以下问题
