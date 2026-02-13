@@ -602,3 +602,69 @@ Linux Namespace 隔离类型详情表
 |Net Namespace|network|提供网络隔离能力，包括网络设备、网络栈、端口等|CLONE_NEWNET|2.6.29|
 |UTS Namespace|UNIX Timesharing System|提供内核、主机名和域名的隔离能力|CLONE_NEWUTS|2.6.19|
 |User Namespace|user|提供用户隔离能力，包括用户和用户组的独立映射|CLONE_NEWUSER|3.8|
+
+
+```bash
+╭─[root@lnxguru] ~
+╰─➤ grep -A10 CONFIG_NAMESPACES /boot/config-5.15.0-52-generic
+grep: /boot/config-5.15.0-52-generic: No such file or directory
+╭─[root@lnxguru] ~
+╰─➤ grep -A10 CONFIG_NAMESPACES /boot/config-6.14.0-37-generic 
+CONFIG_NAMESPACES=y
+CONFIG_UTS_NS=y
+CONFIG_TIME_NS=y
+CONFIG_IPC_NS=y
+CONFIG_USER_NS=y
+CONFIG_PID_NS=y
+CONFIG_NET_NS=y
+CONFIG_CHECKPOINT_RESTORE=y
+CONFIG_SCHED_AUTOGROUP=y
+CONFIG_RELAY=y
+CONFIG_BLK_DEV_INITRD=y
+```
+
+namespace
+```bash
+╭─[root@lnxguru] ~
+╰─➤ lsns --help 
+
+Usage:
+ lsns [options] [<namespace>]
+
+List system namespaces.
+
+Options:
+ -J, --json             use JSON output format
+ -l, --list             use list format output
+ -n, --noheadings       don't print headings'
+ -o, --output <list>    define which output columns to use
+     --output-all       output all columns
+ -P, --persistent       namespaces without processes
+ -p, --task <pid>       print process namespaces
+ -r, --raw              use the raw output format
+ -u, --notruncate       don't truncate text in columns
+ -W, --nowrap           don't use multi-line representation
+ -t, --type <name>      namespace type (mnt, net, ipc, user, pid, uts, cgroup, time)
+ -T, --tree <rel>       use tree format (parent, owner, or process)
+
+ -h, --help             display this help
+ -V, --version          display version
+
+Available output columns:
+          NS  namespace identifier (inode number)
+        TYPE  kind of namespace
+        PATH  path to the namespace
+      NPROCS  number of processes in the namespace
+         PID  lowest PID in the namespace
+        PPID  PPID of the PID
+     COMMAND  command line of the PID
+         UID  UID of the PID
+        USER  username of the PID
+     NETNSID  namespace ID as used by network subsystem
+        NSFS  nsfs mountpoint (usually used network subsystem)
+         PNS  parent namespace identifier (inode number)
+         ONS  owner namespace identifier (inode number)
+
+For more details see lsns(8).
+
+```
