@@ -1020,3 +1020,4 @@ OS系统版本选择:
 Docker 目前已经支持多种操作系统的安装运行，比如 Ubuntu、CentOS、Redhat、Debian、Fedora，甚至是还支持了 Mac 和 Windows，在 linux 系统上需要内核版本在3.10或以上
 
 Docker 版本选择
+github 地址: https://github.com/moby/moby
