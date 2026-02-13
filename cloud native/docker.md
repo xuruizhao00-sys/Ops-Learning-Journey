@@ -1,4 +1,4 @@
-# 一、Docker 介绍和基础管理
+# 一、Docker 介绍
 ## 1.1 Docker 介绍
 ### 1.1.1 容器技术简史：Docker 并非起点
 #### 1.1.1.1 `chroot` Jail（1979）
@@ -576,7 +576,7 @@ Docker 中文网站: http://www.docker.org.cn/
 - Docker 仓库(Registry): 保存镜像的仓库，官方仓库: https://hub.docker.com
 	 可以搭建私有仓库 harbor
 - Docker 容器(Container): 容器是从镜像生成对外提供服务的一个或一组服务,其本质就是将镜像中的程序启动后生成的进程
-### 1.1.5 Namespace
+## 1.2 Namespace
 https://man7.org/linux/man-pages/man7/namespaces.7.html
 https://en.wikipedia.org/wiki/Linux_namespaces
 
@@ -602,7 +602,103 @@ Linux Namespace 隔离类型详情表
 |Net Namespace|network|提供网络隔离能力，包括网络设备、网络栈、端口等|CLONE_NEWNET|2.6.29|
 |UTS Namespace|UNIX Timesharing System|提供内核、主机名和域名的隔离能力|CLONE_NEWUTS|2.6.19|
 |User Namespace|user|提供用户隔离能力，包括用户和用户组的独立映射|CLONE_NEWUSER|3.8|
+### 1. MNT Namespace（挂载命名空间）
 
+#### 核心定义
+
+MNT（Mount）Namespace 是最早实现的 Linux 命名空间（内核 2.4.19），核心作用是为每个容器提供**独立的文件系统挂载视图**。
+
+#### 工作原理
+
+- 每个 MNT Namespace 有自己的挂载点列表，容器内执行 `mount`/`umount` 操作仅影响自身的挂载表，不会改变宿主机或其他容器的文件系统挂载状态；
+- 容器的根目录（`/`）会被挂载为独立的文件系统（如镜像层 + 可写层），使得容器 “看到” 的文件目录与宿主机、其他容器完全隔离。
+
+#### 实际应用
+
+- 容器可以拥有独立的 `/etc`、`/usr` 等目录，比如容器 A 的 `/etc/passwd` 和容器 B 的完全不同，互不干扰；
+- 宿主机的磁盘分区可以按需挂载到容器内（如 `-v /host/data:/container/data`），但容器内的挂载操作不会反向影响宿主机。
+
+### 2. PID Namespace（进程命名空间）
+
+#### 核心定义
+
+PID（Process Identification）Namespace（内核 2.6.24）实现**进程 ID 的隔离**，让每个容器拥有独立的进程编号空间。
+
+#### 工作原理
+
+- 每个 PID Namespace 内的第一个进程 PID 为 1（通常是容器的入口进程，如 `nginx`/`bash`），相当于容器内的 “init 进程”，负责回收子进程；
+- 容器内只能看到自己 Namespace 内的进程，无法感知宿主机或其他容器的进程（即使宿主机的 PID 1000 在容器内可能显示为 PID 2）；
+- PID Namespace 是层级化的，父 Namespace 可以看到子 Namespace 的进程（但 PID 编号不同），子 Namespace 无法看到父 Namespace 的进程。
+
+#### 实际应用
+
+- 容器内执行 `ps -ef` 只能看到容器自身的进程，避免进程 ID 冲突和误操作；
+- 容器内杀死 PID 1 会直接导致容器退出（类似宿主机杀死 init 进程），保证容器的进程生命周期独立。
+
+### 3. IPC Namespace（进程间通信命名空间）
+
+#### 核心定义
+
+IPC（Inter-Process Communication）Namespace（内核 2.6.19）隔离**进程间的通信方式**，防止不同容器的 IPC 资源互相干扰。
+
+#### 工作原理
+
+- IPC 资源包括：信号量（semaphores）、消息队列（message queues）、共享内存（shared memory）；
+- 每个 IPC Namespace 有独立的 IPC 资源标识符，容器 A 创建的共享内存，容器 B 无法访问或修改。
+
+#### 实际应用
+
+- 多进程容器内的进程可以通过 IPC 通信（如共享内存传输数据），但不会和其他容器的 IPC 资源冲突；
+- 避免不同容器的 IPC 资源耗尽对方的资源（比如一个容器的消息队列占满，不影响其他容器）。
+
+### 4. Net Namespace（网络命名空间）
+
+#### 核心定义
+
+Net（Network）Namespace（内核 2.6.29）是容器网络隔离的核心，为每个容器提供**独立的网络栈**。
+
+#### 工作原理
+
+- 每个 Net Namespace 有独立的网络设备（如 `eth0`）、IP 地址、端口号、路由表、防火墙规则（iptables）、套接字（socket）；
+- 宿主机通过虚拟网桥（如 `docker0`）连接所有容器的 Net Namespace，实现容器间 / 容器与外网的通信；
+- 端口映射（如 `-p 8080:80`）本质是在宿主机的 Net Namespace 和容器的 Net Namespace 之间做 NAT 转发。
+
+#### 实际应用
+
+- 多个容器可以同时监听 80 端口（容器内），通过宿主机不同端口映射对外提供服务（如容器 A:80→宿主机：8080，容器 B:80→宿主机：8081）；
+- 容器可以配置独立的 IP 地址（如 172.17.0.2），与其他容器或外网通信，网络故障仅影响自身。
+
+### 5. UTS Namespace（主机名命名空间）
+
+#### 核心定义
+
+UTS（UNIX Timesharing System）Namespace（内核 2.6.19）隔离**主机名和域名**，让每个容器有独立的主机标识。
+
+#### 工作原理
+
+- UTS 是 “UNIX 分时系统” 的缩写，核心作用是让容器可以设置自己的 `hostname` 和 `domainname`，且仅在自身 Namespace 内生效；
+- 宿主机执行 `hostname` 看到的是宿主机名，容器内执行 `hostname` 看到的是容器自定义的名称（如 `docker run --hostname my-container`）。
+
+#### 实际应用
+
+- 依赖主机名的应用（如集群软件、日志系统）可以在容器内独立配置主机名，无需修改宿主机；
+- 不同容器可以使用相同的主机名，互不冲突。
+
+### 6. User Namespace（用户命名空间）
+
+#### 核心定义
+
+User Namespace（内核 3.8）实现**用户和用户组的隔离与映射**，是容器安全的重要保障。
+
+#### 工作原理
+
+- 每个 User Namespace 有独立的 UID/GID（用户 / 组 ID）空间，容器内的 root 用户（UID 0）可以映射到宿主机的普通用户（如 UID 1000）；
+- 容器内的 root 仅在自己的 Namespace 内拥有最高权限，在宿主机上仅拥有映射后的普通用户权限，即使容器内进程逃逸到宿主机，也无法获得 root 权限。
+
+#### 实际应用
+
+- 容器内以 root 运行应用（满足应用权限需求），但宿主机层面无 root 风险，提升容器安全性；
+- 不同容器可以有独立的用户体系，比如容器 A 的 UID 1000 是普通用户，容器 B 的 UID 1000 可以是管理员，互不影响。
 
 ```bash
 ╭─[root@lnxguru] ~
@@ -752,6 +848,59 @@ Options:
  -h, --help             display this help
  -V, --version          display version
 
-For more details see nsenter(1).
+For more details see nsenter(1).'
+
+
+# 说明:5387 为容器在宿主机的 Pid,下面表示进入5387容器的对应网络名称空间执行命令
+╭─[root@lnxguru] ~
+╰─➤ ls -l /proc/5387/ns
+total 0
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 cgroup -> 'cgroup:[4026531835]'
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 ipc -> 'ipc:[4026531839]'
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 mnt -> 'mnt:[4026531841]'
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 net -> 'net:[4026531840]'
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 pid -> 'pid:[4026531836]'
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 pid_for_children -> 'pid:[4026531836]'
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 time -> 'time:[4026531834]'
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 time_for_children -> 'time:[4026531834]'
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 user -> 'user:[4026531837]'
+lrwxrwxrwx 1 root root 0 Feb 13 14:40 uts -> 'uts:[4026531838]'
+
+╭─[root@lnxguru] ~
+╰─➤ nsenter -t 5387 -n ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:0c:29:f7:69:7c brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    inet 192.168.121.197/24 brd 192.168.121.255 scope global dynamic noprefixroute ens33
+       valid_lft 1155sec preferred_lft 1155sec
+    inet6 fe80::20c:29ff:fef7:697c/64 scope link 
+       valid_lft forever preferred_lft forever
+3: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 36:6a:33:d7:f8:fd brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::346a:33ff:fed7:f8fd/64 scope link 
+       valid_lft forever preferred_lft forever
+4: veth4f8bbb4@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether 92:9c:a9:4c:70:7c brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet6 fe80::909c:a9ff:fe4c:707c/64 scope link 
+       valid_lft forever preferred_lft forever
 
 ```
+## 1.3 Control groups
+Linux Cgroups 的全称是 Linux Control Groups,是 Linux 内核的一个功能.最早是由 Google 的工程师（主要是 Paul Menage 和 Rohit Seth）在2006年发起，最早的名称为进程容器（process containers）。
+在2007年时，因为在 Linux 内核中，容器（container）这个名词有许多不同的意义，为避免混乱，被重命名为 cgroup，并且被合并到2.6.24版的内核中去。自那以后，又添加了很多功能。
+
+如果不对一个容器做任何资源限制，则宿主机会允许其占用无限大的内存空间，有时候会因为代码 bug 程序会一直申请内存，直到把宿主机内存占完，为了避免此类的问题出现，宿主机有必要对容器进行资源分配限制，比如 CPU、内存等
+Cgroups 最主要的作用，就是限制一个进程组能够使用的资源上限，包CPU、内存、磁盘、网络带宽等等。此外，还能够对进程进行优先级设置，资源的计量以及资源的控制(比如:将进程挂起和恢复等操作)。
+Cgroups 在内核层默认已经开启，从 CentOS 和 Ubuntu 不同版本对比，显然内核较新的支持的功能更多。
+## 1.4 容器管理工具
+有了以上的 namespace、cgroups 就具备了基础的容器运行环境，但是还需要有相应的容器创建与删除的管理工具、以及怎么样把容器运行起来、容器数据怎么处理、怎么进行启动与关闭等问题需要解决，于是容器管理技术出现了。目前主要是使用 docker，containerd 等，早期使用 LXC
+
+## 1.5 Docker 优势
