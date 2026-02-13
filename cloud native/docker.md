@@ -1022,3 +1022,19 @@ Docker 目前已经支持多种操作系统的安装运行，比如 Ubuntu、Cen
 Docker 版本选择
 github 地址: https://github.com/moby/moby
 ## 2.1 docker 安装和删除
+官方文档 : https://docs.docker.com/engine/install/
+阿里云文档: https://developer.aliyun.com/mirror/docker-ce?spm=a2c6h.13651102.0.0.3221b11guHCWE
+
+安装方法
+- 内置仓库
+- 官方仓库（国内镜像）
+- 二进制安装（离线）
+- 官方脚本
+### 2.1.1 Linux 二进制离线安装
+官方文档: https://docs.docker.com/install/linux/docker-ce/ubuntu/
+本方法适用于无法上网或无法通过包安装方式安装的主机上安装docker
+安装文档: https://docs.docker.com/install/linux/docker-ce/binaries/
+
+二进制安装下载路径
+https://download.docker.com/linux/
+https://mirrors.aliyun.com/docker-ce/linux/static/stable/x86_64/
