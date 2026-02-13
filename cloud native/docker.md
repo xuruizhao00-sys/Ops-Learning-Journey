@@ -1246,3 +1246,46 @@ sudo apt-get -y install docker-ce=5:24.0.6-1~ubuntu.22.04~jammy docker-ce-cli=5:
 2. **架构适配**：命令中 `[arch=amd64]` 适用于 x86_64 架构，若为 arm 架构（如树莓派），需改为 `[arch=arm64]` 或 `[arch=armhf]`。
 3. **权限验证**：安装完成后可执行 `sudo docker --version` 验证版本，执行 `sudo docker run hello-world` 验证是否能正常运行容器。
 4. **换行符修正**：原命令中部分换行导致的断行（如 `softwareproperties-common`）已修正为正确的 `software-properties-common`，避免执行报错。
+## 2.2 Docker 相关信息和优化配置
+### 2.2.1 查看 docker 版本
+```bash
+╭─[root@lnxguru] ~
+╰─➤ docker version
+Client:
+ Version:           29.1.1
+ API version:       1.52
+ Go version:        go1.25.4
+ Git commit:        0aedba5
+ Built:             Fri Nov 28 11:32:24 2025
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          29.1.1
+  API version:      1.52 (minimum version 1.44)
+  Go version:       go1.25.4
+  Git commit:       9a84135
+  Built:            Fri Nov 28 11:34:50 2025
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          v2.2.0
+  GitCommit:        1c4457e00facac03ce1d75f7b6777a7a851e5c41
+ runc:
+  Version:          1.3.3
+  GitCommit:        v1.3.3-0-gd842d77
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+
+```
+### 2.2.2 查看 docker 详解信息
+```bash
+
+```
+
+### 2.2.3 查看 docker0 网卡
+```bash
+
+```
