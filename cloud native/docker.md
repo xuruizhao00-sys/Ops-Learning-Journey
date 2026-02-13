@@ -1201,5 +1201,48 @@ systemd(1)─┬─NetworkManager(660)─┬─{NetworkManager}(669)
    - `containerd`：底层容器运行时管理进程，dockerd通过它调用runc；
    - `runc`：OCI标准的Low Level运行时，直接与内核交互创建容器；
 3. **验证结果**：`hello-world`容器正常运行，说明Docker客户端、服务端、镜像拉取、容器运行全流程均正常。
-### 2.1.2 ubuntu 包安装和删除 Docker
+### 2.1.2 ubuntu 包安装 Docker
 官方文档: https://docs.docker.com/install/linux/docker-ce/ubuntu/
+#### 方式一：安装最新版 Docker-CE
+```bash
+# Step 1: 更新系统包并安装必要依赖
+sudo apt-get update
+sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+
+# Step 2: 添加 Docker 官方 GPG 证书（阿里云镜像）
+curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+
+# Step 3: 添加阿里云 Docker 软件源
+sudo add-apt-repository "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+
+# Step 4: 更新源并安装最新版 Docker-CE
+sudo apt-get -y update
+sudo apt-get -y install docker-ce
+```
+
+---
+
+#### 方式二：安装指定版本 Docker-CE
+```bash
+# Step 1: 先执行方式一的 Step 1-3（安装依赖、添加证书和源）
+
+# Step 2: 查看可安装的 Docker-CE 版本列表
+apt-cache madison docker-ce
+
+# Step 3: 安装指定版本（替换 [VERSION] 为实际版本号）
+# 格式：sudo apt-get -y install docker-ce=[版本号] docker-ce-cli=[版本号]
+
+# 示例1：Ubuntu 18.04 (bionic) 安装 5:18.09.9~3-0~ubuntu-bionic
+sudo apt-get -y install docker-ce=5:18.09.9~3-0~ubuntu-bionic docker-ce-cli=5:18.09.9~3-0~ubuntu-bionic
+
+# 示例2：Ubuntu 22.04 (jammy) 安装 5:24.0.6-1~ubuntu.22.04~jammy
+sudo apt-get -y install docker-ce=5:24.0.6-1~ubuntu.22.04~jammy docker-ce-cli=5:24.0.6-1~ubuntu.22.04~jammy
+```
+
+---
+
+#### 关键补充说明
+1. **版本号获取**：`apt-cache madison docker-ce` 命令输出的第一列后紧跟的字符串即为完整版本号（如 `5:24.0.6-1~ubuntu.22.04~jammy`），需完整复制使用，不能省略部分内容。
+2. **架构适配**：命令中 `[arch=amd64]` 适用于 x86_64 架构，若为 arm 架构（如树莓派），需改为 `[arch=arm64]` 或 `[arch=armhf]`。
+3. **权限验证**：安装完成后可执行 `sudo docker --version` 验证版本，执行 `sudo docker run hello-world` 验证是否能正常运行容器。
+4. **换行符修正**：原命令中部分换行导致的断行（如 `softwareproperties-common`）已修正为正确的 `software-properties-common`，避免执行报错。
