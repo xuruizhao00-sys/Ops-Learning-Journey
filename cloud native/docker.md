@@ -667,4 +667,56 @@ Available output columns:
 
 For more details see lsns(8).
 
+
+╭─[root@lnxguru] ~
+╰─➤ lsns -l 
+        NS TYPE   NPROCS   PID USER             COMMAND
+4026531834 time      369     1 root             /sbin/init splash
+4026531835 cgroup    369     1 root             /sbin/init splash
+4026531836 pid       369     1 root             /sbin/init splash
+4026531837 user      367     1 root             /sbin/init splash
+4026531838 uts       361     1 root             /sbin/init splash
+4026531839 ipc       369     1 root             /sbin/init splash
+4026531840 net       367     1 root             /sbin/init splash
+4026531841 mnt       350     1 root             /sbin/init splash
+4026531862 mnt         1    71 root             kdevtmpfs
+4026532553 mnt         1   518 root             /usr/lib/systemd/systemd-udevd
+4026532554 uts         1   518 root             /usr/lib/systemd/systemd-udevd
+4026532555 mnt         1   932 systemd-timesync /usr/lib/systemd/systemd-timesyncd
+4026532556 mnt         1   906 systemd-resolve  /usr/lib/systemd/systemd-resolved
+4026532557 mnt         1   862 systemd-oom      /usr/lib/systemd/systemd-oomd
+4026532585 uts         1   862 systemd-oom      /usr/lib/systemd/systemd-oomd
+4026532586 uts         1   932 systemd-timesync /usr/lib/systemd/systemd-timesyncd
+4026532587 mnt         1  1374 root             /usr/lib/systemd/systemd-logind
+4026532589 uts         1  1374 root             /usr/lib/systemd/systemd-logind
+4026532591 uts         1  1411 syslog           /usr/sbin/rsyslogd -n -iNONE
+4026532592 mnt         1  1320 polkitd          /usr/lib/polkit-1/polkitd --no-debug
+4026532602 mnt         1  1485 root             /usr/sbin/NetworkManager --no-daemon
+4026532603 uts         1  1320 polkitd          /usr/lib/polkit-1/polkitd --no-debug
+4026532606 mnt         1  1560 root             /usr/sbin/ModemManager
+4026532613 mnt         1  4672 root             /usr/libexec/fwupd/fwupd
+4026532642 mnt         1  1322 root             /usr/libexec/power-profiles-daemon
+4026532644 net         1  1345 root             /usr/libexec/accounts-daemon
+4026532698 uts         1  1322 root             /usr/libexec/power-profiles-daemon
+4026532700 mnt         1  1345 root             /usr/libexec/accounts-daemon
+4026532701 mnt         1  1356 root             /usr/libexec/switcheroo-control
+4026532727 mnt         2  3748 xuruizhao        /snap/snapd-desktop-integration/343/usr/bin/snapd-desktop-integration
+4026532729 mnt         1  1734 root             /usr/libexec/bluetooth/bluetoothd
+4026532777 net         1  2453 rtkit            /usr/libexec/rtkit-daemon
+4026532832 mnt         1  2453 rtkit            /usr/libexec/rtkit-daemon
+4026532833 mnt         0       root             
+4026532834 mnt         1  2616 colord           /usr/libexec/colord
+4026532835 uts         1  2616 colord           /usr/libexec/colord
+4026532836 user        1  2616 colord           /usr/libexec/colord
+4026532894 mnt         1  2662 root             /usr/libexec/upowerd
+4026532895 user        1  2662 root             /usr/libexec/upowerd
+
+
+╭─[root@lnxguru] ~
+╰─➤ lsns -t  net
+        NS TYPE NPROCS   PID USER     NETNSID NSFS COMMAND
+4026531840 net     368     1 root  unassigned      /sbin/init splash
+4026532644 net       1  1345 root  unassigned      ├─/usr/libexec/accounts-daemon
+4026532777 net       1  2453 rtkit unassigned      └─/usr/libexec/rtkit-daemon
+
 ```
