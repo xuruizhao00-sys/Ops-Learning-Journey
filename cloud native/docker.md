@@ -900,7 +900,117 @@ Linux Cgroups 的全称是 Linux Control Groups,是 Linux 内核的一个功能.
 如果不对一个容器做任何资源限制，则宿主机会允许其占用无限大的内存空间，有时候会因为代码 bug 程序会一直申请内存，直到把宿主机内存占完，为了避免此类的问题出现，宿主机有必要对容器进行资源分配限制，比如 CPU、内存等
 Cgroups 最主要的作用，就是限制一个进程组能够使用的资源上限，包CPU、内存、磁盘、网络带宽等等。此外，还能够对进程进行优先级设置，资源的计量以及资源的控制(比如:将进程挂起和恢复等操作)。
 Cgroups 在内核层默认已经开启，从 CentOS 和 Ubuntu 不同版本对比，显然内核较新的支持的功能更多。
+```bash
+╭─[root@lnxguru] ~
+╰─➤ grep CGROUP /boot/config-6.14.0-37-generic 
+CONFIG_CGROUPS=y
+# CONFIG_CGROUP_FAVOR_DYNMODS is not set
+CONFIG_BLK_CGROUP=y
+CONFIG_CGROUP_WRITEBACK=y
+CONFIG_CGROUP_SCHED=y
+CONFIG_CGROUP_PIDS=y
+CONFIG_CGROUP_RDMA=y
+CONFIG_CGROUP_DMEM=y
+CONFIG_CGROUP_FREEZER=y
+CONFIG_CGROUP_HUGETLB=y
+CONFIG_CGROUP_DEVICE=y
+CONFIG_CGROUP_CPUACCT=y
+CONFIG_CGROUP_PERF=y
+CONFIG_CGROUP_BPF=y
+CONFIG_CGROUP_MISC=y
+# CONFIG_CGROUP_DEBUG is not set
+CONFIG_SOCK_CGROUP_DATA=y
+CONFIG_BLK_CGROUP_RWSTAT=y
+CONFIG_BLK_CGROUP_PUNT_BIO=y
+# CONFIG_BLK_CGROUP_IOLATENCY is not set
+CONFIG_BLK_CGROUP_FC_APPID=y
+CONFIG_BLK_CGROUP_IOCOST=y
+CONFIG_BLK_CGROUP_IOPRIO=y
+# CONFIG_BFQ_CGROUP_DEBUG is not set
+CONFIG_NETFILTER_XT_MATCH_CGROUP=m
+CONFIG_NET_CLS_CGROUP=m
+CONFIG_CGROUP_NET_PRIO=y
+CONFIG_CGROUP_NET_CLASSID=y
+# CONFIG_DEBUG_CGROUP_REF is not set
+```
 ## 1.4 容器管理工具
 有了以上的 namespace、cgroups 就具备了基础的容器运行环境，但是还需要有相应的容器创建与删除的管理工具、以及怎么样把容器运行起来、容器数据怎么处理、怎么进行启动与关闭等问题需要解决，于是容器管理技术出现了。目前主要是使用 docker，containerd 等，早期使用 LXC
 
 ## 1.5 Docker 优势
+- **极速部署交付**：支持短时间内批量部署成百上千个应用，大幅缩短从开发到上线的交付周期，快速响应业务需求。
+- **高效轻量虚拟化**：无需额外 hypervisor 虚拟化层，基于 Linux 内核原生技术实现应用级虚拟化，相比传统虚拟机，减少资源冗余开销，性能和运行效率显著提升。
+- **显著节省开支**：通过提高服务器资源利用率（支持多容器高密度部署），减少物理服务器采购、运维及能耗成本，降低整体 IT 支出。
+- **配置简化便捷**：将应用运行环境（依赖、配置、代码等）整体打包为容器镜像，使用时直接启动镜像即可快速部署，无需重复配置环境。
+- **环境标准化统一**：实现开发、测试、生产全流程环境的标准化，彻底解决 “开发环境能跑、测试 / 生产环境报错” 的环境不一致问题，减少调试成本。
+- **灵活迁移与扩展**：容器具备良好的跨平台兼容性，可无缝运行在物理机、虚拟机、公有云、私有云等不同环境，支持应用在不同宿主机、不同平台间快速迁移；同时支持横向弹性扩展，满足业务流量波动需求。
+- **适配微服务架构**：推荐 “一个容器运行一个应用” 的部署模式，天然契合面向服务的架构（SOA）和微服务理念，实现应用的分布式部署。这种模式符合 “高内聚、低耦合” 的开发原则，可降低不同服务间的相互干扰，便于独立升级、维护和横向扩展。
+## 1.6 容器相关技术
+### 1.6.1 容器规范
+![](assets/docker/file-20260213145045609.png)
+
+OCI 官网:https://opencontainers.org/
+
+容器技术除了的 docker 之外，还有 coreOS 的 rkt，还有阿里的 Pouch 等等
+为了保证容器生态的标准性和健康可持续发展，包括 Linux 基金会、Docker、微软、红帽、谷歌和 IBM 等公司在2015年6月共同成立了一个叫 Open Container Initiative（OCI）的组织，其目的就是制定开放的标准的容器规范
+目前 OCI 一共发布了两个规范，分别是 runtime spec 和 image format spec，有了这两个规范，不同的容器公司开发的容器只要兼容这两个规范，就可以保证容器的可移植性和相互可操作性。
+### 1.6.2 容器 runtime
+runtime 是真正运行容器的地方，因此为了运行不同的容器 runtime 需要和操作系统内核紧密合作相互在支持，以便为容器提供相应的运行环境
+对于容器运行时主要有两个级别：Low Level (使用接近内核层) 和 High Level (使用接近用户层)目前，市面上常用的容器引擎有很多，主要有下图的那几种。
+```mermaid
+graph TD
+    A[容器运行时 Runtime] --> B[Low Level 运行时<br/>(接近内核层)]
+    A --> C[High Level 运行时<br/>(接近用户层)]
+    
+    %% 底层运行时（贴近内核，提供基础容器运行能力）
+    B --> B1[runc<br/>（OCI 标准，Docker/Containerd 底层）]
+    B --> B2[crun<br/>（轻量级，替代 runc，性能更优）]
+    B --> B3[kata-runtime<br/>（安全隔离型，结合轻量虚拟机）]
+    B --> B4[runv<br/>（基于 Hypervisor 的虚拟化运行时）]
+    
+    %% 高层运行时（贴近用户，提供更友好的封装和管理能力）
+    C --> C1[Containerd<br/>（Docker 剥离的核心，K8s 默认）]
+    C --> C2[Docker Engine<br/>（经典引擎，包含完整工具链）]
+    C --> C3[CRI-O<br/>（专为 K8s CRI 设计的轻量引擎）]
+    C --> C4[Podman<br/>（无守护进程，兼容 Docker 命令）]
+    C --> C5[LXD/LXC<br/>（系统级容器，侧重完整系统环境）]
+    
+    %% 标注核心特性
+    B1 -. OCI 规范标准实现 .-> A
+    C1 -. 对接 K8s CRI 接口 .-> A
+    C2 -. 一站式容器管理（含镜像/网络/存储） .-> A
+```
+查看 docker  的 runtime
+```bash
+╭─[root@lnxguru] ~
+╰─➤ docker info  | grep Runtimes
+ Runtimes: io.containerd.runc.v2 runc
+
+```
+### 1.6.3 镜像仓库 Registry
+统一保存镜像而且是多个不同镜像版本的地方，叫做镜像仓库
+
+- Docker hub: docker 官方的公共仓库，已经保存了大量的常用镜像，可以方便大家直接使用
+- 阿里云，网易等第三方镜像的公共仓库
+- Image registry: docker 官方提供的私有仓库部署工具，无 web 管理界面，目前使用较少
+- Harbor: vmware 提供的自带 web 界面自带认证功能的镜像私有仓库，目前有很多公司使用
+```ini
+docker.io/library/alpine
+
+harbor.wang.org/project/centos:7.2.1511
+
+registry.cn-hangzhou.aliyuncs.com/wangxiaochun/busybox:v1.0
+
+172.18.200.101/project/centos: latest
+
+172.18.200.101/project/java-7.0.59:v1
+```
+### 1.6.4 容器编排工具
+当多个容器在多个主机运行的时候，单独管理容器是相当复杂而且很容易出错，而且也无法实现某一台主机宕机后容器自动迁移到其他主机从而实现高可用的目的，也无法实现动态伸缩的功能，因此需要有一种工具可以实现统一管理、动态伸缩、故障自愈、批量执行等功能，这就是容器编排引擎
+
+容器编排通常包括容器管理、调度、集群定义和服务发现等功能
+
+- Docker compose : docker 官方实现单机的容器的编排工具
+- Docker swarm: docker 官方开发的容器编排引擎,支持overlay network
+- Mesos+Marathon: Mesos 是 Apache 下的开源分布式资源管理框架，它被称为是分布式系统的内核。Mesos 最初是由加州大学伯克利分校的 AMPLab 开发的，后在 Twitter 得到广泛使用。通用的集群组员调度平台，mesos(资源分配)与 marathon(容器编排平台)一起提供容器编排引擎功能
+- Kubernetes: google 领导开发的容器编排引擎，内部项目为 Borg，且其同时支持 docker 和CoreOS,当前已成为容器编排工具事实上的标准
+# 二、Docker 部署
