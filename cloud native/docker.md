@@ -1038,6 +1038,168 @@ github 地址: https://github.com/moby/moby
 二进制安装下载路径
 https://download.docker.com/linux/
 https://mirrors.aliyun.com/docker-ce/linux/static/stable/x86_64/
+你希望将这段在CentOS 8上手动安装Docker 19.03.5并验证运行的操作日志，整理成**结构清晰、步骤明确、关键信息突出**的文档形式，我会按“操作步骤+关键输出+核心说明”的逻辑重新梳理，方便查阅和理解。
+
+>[!info] CentOS 8 手动安装 Docker 19.03.5 完整操作记录
+#### 2.1.1.1操作环境
+- 系统版本：CentOS 8
+- Docker版本：19.03.5（静态二进制包方式安装）
+
+#### 2.1.1.2 核心操作步骤
+##### 1. 下载Docker静态二进制包
+```bash
+[root@centos8 ~]# wget https://download.docker.com/linux/static/stable/x86_64/docker-19.03.5.tgz
 ```
 
+##### 2. 解压二进制包
+解压后生成`docker`目录，包含Docker核心组件（如dockerd、docker、runc、containerd等）：
+```bash
+[root@centos8 ~]# tar xvf docker-19.03.5.tgz 
+docker/
+docker/docker-init
+docker/docker
+docker/dockerd
+docker/runc
+docker/ctr
+docker/docker-proxy
+docker/containerd
+docker/containerd-shim
 ```
+
+##### 3. 复制核心组件到系统可执行目录
+将解压后的Docker组件复制到`/usr/local/bin`（系统PATH路径），确保可全局调用：
+```bash
+[root@centos8 ~]# cp docker/* /usr/local/bin/
+```
+
+##### 4. 启动Docker守护进程（dockerd）
+后台启动dockerd，并重定向日志到空设备（不输出终端）：
+```bash
+[root@centos8 ~]# dockerd &>/dev/null &
+```
+
+##### 5. 验证Docker版本与安装状态
+查看客户端和服务端版本信息，确认核心组件（containerd、runc、docker-init）正常：
+```bash
+[root@centos8 ~]# docker version
+Client: Docker Engine - Community
+ Version:           19.03.5
+ API version:       1.40
+ Go version:        go1.12.12
+ Git commit:        633a0ea838
+ Built:             Wed Nov 13 07:22:05 2019
+ OS/Arch:           linux/amd64
+ Experimental:      false
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          19.03.5
+  API version:      1.40 (minimum version 1.12)
+  Go version:       go1.12.12
+  Git commit:       633a0ea838
+  Built:            Wed Nov 13 07:28:45 2019
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          v1.2.10
+  GitCommit:        b34a5c8af56e510852c35414db4c1f4fa6172339
+ runc:
+  Version:          1.0.0-rc8+dev
+  GitCommit:        3e425f80a8c931f88e6d94a8c831b9d5aa481657
+ docker-init:
+  Version:          0.18.0
+  GitCommit:        fec3683
+```
+
+##### 6. 运行测试容器验证功能
+通过`hello-world`镜像验证Docker完整运行流程（拉取镜像→创建容器→运行→输出结果）：
+```bash
+[root@centos8 ~]# docker run hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+1b930d010525: Pull complete 
+Digest: sha256:9572f7cdcee8591948c2963463447a53466950b3fc15a247fcad1917ca215a2f
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+1. The Docker client contacted the Docker daemon.
+2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+   (amd64)
+3. The Docker daemon created a new container from that image which runs the
+   executable that produces the output you are currently reading.
+4. The Docker daemon streamed that output to the Docker client, which sent it
+   to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+$ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+
+##### 7. 查看Docker相关进程树
+通过`pstree -p`确认Docker核心进程（dockerd、containerd）正常运行，且隶属于systemd（PID 1）：
+```bash
+[root@centos8 ~]# pstree -p
+systemd(1)─┬─NetworkManager(660)─┬─{NetworkManager}(669)
+           │                     └─{NetworkManager}(671)
+           ├─VGAuthService(662)
+           ├─agetty(718)
+           ├─atd(712)
+           ├─auditd(625)───{auditd}(627)
+           ├─automount(905)─┬─{automount}(912)
+           │                 ├─{automount}(913)
+           │                 ├─{automount}(930)
+           │                 └─{automount}(937)
+           ├─containerd(679)─┬─{containerd}(693)
+           │                 ├─{containerd}(694)
+           │                 ├─{containerd}(696)
+           │                 ├─{containerd}(704)
+           │                 ├─{containerd}(705)
+           │                 ├─{containerd}(707)
+           │                 └─{containerd}(708)
+           ├─crond(713)
+           ├─dbus-daemon(658)
+           ├─dockerd(908)─┬─{dockerd}(922)
+           │               ├─{dockerd}(923)
+           │               ├─{dockerd}(925)
+           │               ├─{dockerd}(944)
+           │               ├─{dockerd}(1028)
+           │               ├─{dockerd}(1100)
+           │               └─{dockerd}(1114)
+           ├─polkitd(659)─┬─{polkitd}(670)
+           │               ├─{polkitd}(672)
+           │               ├─{polkitd}(677)
+           │               ├─{polkitd}(678)
+           │               └─{polkitd}(701)
+           ├─rngd(664)───{rngd}(666)
+           ├─rsyslogd(906)─┬─{rsyslogd}(911)
+           │                 └─{rsyslogd}(914)
+           ├─sshd(675)───sshd(1370)───sshd(1382)───bash(1383)───pstree(1441)
+           ├─sssd(661)─┬─sssd_be(688)
+           │             └─sssd_nss(703)
+           ├─systemd(1373)───(sd-pam)(1376)
+           ├─systemd-journal(551)
+           ├─systemd-logind(709)
+           ├─systemd-udevd(580)
+           ├─tuned(674)─┬─{tuned}(915)
+           │             ├─{tuned}(934)
+           │             └─{tuned}(948)
+           └─vmtoolsd(663)
+```
+
+#### 2.1.1.3关键信息说明
+1. **安装方式特点**：本次为“静态二进制包安装”，无需依赖包管理器（yum），直接解压即可使用，适合离线环境；
+2. **核心进程关系**：
+   - `dockerd`：Docker守护进程（服务端），处理容器创建/运行请求；
+   - `containerd`：底层容器运行时管理进程，dockerd通过它调用runc；
+   - `runc`：OCI标准的Low Level运行时，直接与内核交互创建容器；
+3. **验证结果**：`hello-world`容器正常运行，说明Docker客户端、服务端、镜像拉取、容器运行全流程均正常。
+### 2.1.2 ubuntu 包安装和删除 Docker
+官方文档: https://docs.docker.com/install/linux/docker-ce/ubuntu/
