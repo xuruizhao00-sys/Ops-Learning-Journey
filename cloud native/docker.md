@@ -1544,3 +1544,4 @@ graph TD
     style D fill:#f0f8ff,stroke:#4a90e2
 ```
 
+镜像即是创建容器的模板，
