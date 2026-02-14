@@ -27,5 +27,6 @@
   "blue-topaz-theme@@remove-custom-svg-icons": false,
   "Blue-Topaz-Codebox-Highlight@@code-theme-selection": "code-theme-sublime",
   "blue-topaz-theme@@text-indentation-two-em": true,
-  "blue-topaz-theme@@justify-align": true
+  "blue-topaz-theme@@justify-align": true,
+  "blue-topaz-theme@@file-line-width": 60
 }
