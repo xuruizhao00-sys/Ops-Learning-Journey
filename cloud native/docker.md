@@ -1616,3 +1616,6 @@ AUTOMATED: 使用第三方 docker 服务来帮助编译镜像，可以在互联�
 # 搜索点赞100个以上的镜像
 docker search --filter=starts=100 centos
 ```
+### 3.2.2 Alpine 介绍
+![](assets/docker/file-20260214101856981.png)
+
