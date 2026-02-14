@@ -1606,7 +1606,9 @@ Options:
   -f, --filter filter   Filter output based on conditions provided
       --format string   Pretty-print search using a Go template
       --limit int       Max number of search results
-      --no-trunc        Don't truncate output
+      --no-trunc        Don't truncate output'
 
-
+说明:  
+OFFICIAL: 官方
+AUTOMATED: 使用第三方 docker 服务来帮助编译镜像，可以在互联网上面直接拉取到镜像，减少了繁琐的编译过程
 ```
