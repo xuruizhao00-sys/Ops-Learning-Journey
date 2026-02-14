@@ -1837,6 +1837,35 @@ openeuler/openeuler:22.03-lts-sp4
 ```
 #### 示例 3：按行分隔的结构化输出
 ```bash
+╭─[root@lnxguru] ~
+╰─➤ docker images --format "=== 镜像信息 ===
+仓库: {{.Repository}}
+标签: {{.Tag}}
+ID: {{.ID}}
+大小: {{.Size}}
+创建时间: {{.CreatedSince}}
+"
+=== 镜像信息 ===
+仓库: openeuler/openeuler
+标签: 22.03
+ID: b8bd2a5778dc
+大小: 252MB
+创建时间: 2 weeks ago
 
+=== 镜像信息 ===
+仓库: openeuler/openeuler
+标签: 22.03-lts-sp4
+ID: b8bd2a5778dc
+大小: 252MB
+创建时间: 2 weeks ago
+
+```
+#### 示例 4：结合过滤 + 格式化
+先过滤出 `nginx` 相关镜像，再自定义输出格式：
+```bash
+docker images --filter "reference=nginx*" --format "{{.Repository}}:{{.Tag}} (ID: {{.ID}}) - {{.Size}}"
+```
+#### 示例 5：显示绝对创建时间（.CreatedAt）
+```bash
 
 ```
