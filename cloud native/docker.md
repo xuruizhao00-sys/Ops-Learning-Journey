@@ -2101,5 +2101,16 @@ For more examples and ideas, visit:
                                                                                                                                                         i Info →   U  In Use
 IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
 hello-world:latest   40dac9b7451f       29.1kB         12.7kB    U   
+╭─[root@lnxguru] ~
+╰─➤ docker ps -a
+CONTAINER ID   IMAGE                       COMMAND                CREATED         STATUS                     PORTS     NAMES
+9b237d87efb9   hello-world                 "/hello"               2 minutes ago   Exited (0) 2 minutes ago             flamboyant_matsumoto
+
+```
+### 4.1.2 启动容器的流程
+![](assets/docker/file-20260214161446130.png)
+
+### 4.1.3 启动容器用法
+```bash
 
 ```
