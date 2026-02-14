@@ -2221,3 +2221,4 @@ ctrl + p + q
 1. 临时容器用 `no`，业务容错用 `on-failure`；
 2. 核心服务优先选 `unless-stopped`（比 `always` 更可控）；
 3. `on-failure` 建议指定最大重启次数，避免无限重启占用资源。
+### 
