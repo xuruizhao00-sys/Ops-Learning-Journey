@@ -1907,3 +1907,9 @@ docker save IMAGE1 IMAGE2 ... > /path/file.tar
 # 导出为压缩格式
 docker save IMAGE1 IMAGE2 ... | gzip > /path/file.tar.gz
 ```
+
+导出指定镜像
+```bash
+
+
+```
