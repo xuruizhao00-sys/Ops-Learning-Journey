@@ -1636,3 +1636,40 @@ Alpine的Docker镜像完全继承了其发行版的核心优势，成为Docker�
 使用Alpine作为Docker基础镜像，能带来多方面的实际收益：镜像下载速度大幅提升、镜像本身的安全性更高、不同主机间的镜像迁移/切换更便捷，同时还能显著减少磁盘空间占用。
 
 ## 3.3 下载镜像
+从 docker 仓库将镜像下载到本地，命令格式如下
+```bash
+╭─[root@lnxguru] ~
+╰─➤ docker pull --help
+Usage:  docker pull [OPTIONS] NAME[:TAG|@DIGEST]
+
+Download an image from a registry
+
+Aliases:
+  docker image pull, docker pull
+
+Options:
+  -a, --all-tags          Download all tagged images in the repository
+      --platform string   Set platform if server is multi-platform capable
+  -q, --quiet             Suppress verbose output
+
+NAME: 是镜像名,格式:仓库服务器:端口/项目名称/镜像名称，仓库服务器:端口/项目名称/可以省略，默认docker.io/library/
+TAG: 即版本号,如果不指定:TAG,则下载最新版镜像,即 latest
+
+
+
+
+[root@ubuntu1804 ~]#docker pull hello-world
+Using default tag: latest   #默认下载最新版本
+latest: Pulling from library/hello-world
+1b930d010525: Pull complete  #分层下载
+Digest: sha256:9572f7cdcee8591948c2963463447a53466950b3fc15a247fcad1917ca215a2f
+#摘要
+Status: Downloaded newer image for hello-world:late
+
+
+# 镜像下载保存的路径
+/var/lib/docker/overlay2/镜像 ID
+```
+>[!info]
+>注意: 镜像下载完成后，会自动解压缩，比官网显示的可能会大很多，如: centos8.1.1911 下 载时只有 70MB，下载完后显示 237MB
+
