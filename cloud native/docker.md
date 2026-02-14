@@ -2200,10 +2200,15 @@ CONTAINER ID   IMAGE                       COMMAND                CREATED       
 | `always` | 容器无论以何种状态退出，始终重启 | 1. 容器正常/异常退出<br>2. 手动 `docker stop` 后，**主机重启/ Docker 服务重启**会重新启动容器 | 核心服务（需一直运行），如Nginx、Redis等基础组件 | `docker run --restart always redis` |
 | `unless-stopped` | 始终重启，除非**手动执行 `docker stop`** 或 Docker 服务停止 | 1. 容器正常/异常退出会重启<br>2. 手动 `docker stop` 后，即使主机/Docker重启也不会恢复<br>3. 仅手动 `docker start` 可恢复 | 生产环境核心服务（兼顾稳定性和可控性），避免手动停止后被自动重启 | `docker run --restart unless-stopped nginx` |
 
-如果 docker stop 停止容器后重启宿主机，always选项以外的其它选项的容器都不会随着宿主机启动而自动启动
-注意: 容器启动后,如果容器内没有前台运行的进程,将自动退出停止
+如果 docker stop 停止容器后重启宿主机，always 选项以外的其它选项的容器都不会随着宿主机启动而自动启动
+注意: 容器启动后,如果容器内没有前台运行的进程,将自动退出停止从容器内退出,并停止容器
+```bash
+# 从容器内退出并停止容器
+exit
 
-从容器内退出,并停止容器
+# 从容器内退出，且容器不停止
+ctrl + 
+```
 #### 4.1.4.2 补充关键说明
 1. **最大重启次数**：仅 `on-failure` 支持后缀 `:max-retries`（如 `on-failure:5`），超出次数后停止重启；
 2. **主机重启影响**：
