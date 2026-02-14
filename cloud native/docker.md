@@ -1544,3 +1544,36 @@ graph TD
     style D fill:#f0f8ff,stroke:#4a90e2
 ```
 
+Docker镜像可以理解为创建容器的“模板”，它封装了容器运行所需的完整文件系统和所有依赖内容。正因为如此，镜像的核心价值在于能够让你方便、快速地创建并启动容器。
+
+镜像的内部结构并非单一的文件系统，而是由多层文件系统叠加而成，这种技术被称为**Union FS（联合文件系统）**。你可以把它想象成“千层饼”“洋葱”或“俄罗斯套娃”——联合文件系统会把多个独立的目录层挂载在一起，最终形成一个统一的虚拟文件系统。这个虚拟文件系统的目录结构和普通Linux系统完全一致，镜像依靠这些文件层，再结合宿主机的Linux内核，就能为容器提供一个完整的Linux虚拟运行环境。
+镜像中的每一层文件系统都被称为一个**layer（层）**。虽然联合文件系统本身支持为不同层级设置只读（readonly）、读写（readwrite）、写出（whiteout-able）三种权限，但Docker镜像里的每一层文件系统都被设定为**只读**状态。
+构建镜像的过程，本质上是从一个最基础的操作系统层（比如Ubuntu、CentOS的基础镜像）开始，每执行一次构建操作并提交，就相当于在现有层级上新增一层文件系统，记录本次的修改内容。这些层级会一层层向上叠加，上层的修改会“覆盖”底层对应位置的内容（仅视觉上的覆盖，底层内容并未被删除）。
+
+当你使用这个镜像创建并运行容器时，你感知到的只是一个完整的、无差别的文件系统整体，完全不需要知道内部包含多少层——这也是Docker设计的初衷，对使用者屏蔽底层复杂的分层结构。
+
+### 1. bootfs（Boot File System，引导文件系统）
+bootfs的核心内容包含两部分：**bootloader（引导加载程序）** 和 **kernel（内核）**。
+- bootloader的作用是引导并加载内核，当Linux系统启动时，会首先加载bootfs文件系统；
+- 待bootloader完成引导、kernel被成功加载到内存并接管整个系统的控制权后，bootfs就完成了它的使命，会被系统卸载（umount），不再占用运行资源。
+
+### 2. rootfs（Root File System，根文件系统）
+rootfs是Linux系统的核心文件系统层，包含了标准Linux系统中所有的基础目录和文件，比如 `/dev`（设备文件）、`/proc`（进程信息）、`/bin`（可执行命令）、`/etc`（配置文件）等。
+不同Linux发行版（如Ubuntu、CentOS）的核心差异，本质上就体现在rootfs这一层——它们的目录结构框架一致，但内置的命令、配置、软件包等内容各不相同。
+
+### 镜像体积小的核心原因
+Docker镜像的体积通常远小于完整的Linux系统镜像（比如官方Ubuntu镜像仅60多MB，CentOS基础镜像约200MB，轻量级的busybox镜像仅1.22MB、alpine镜像仅5MB左右），核心原因在于：
+Docker镜像并不会包含完整的Linux内核（bootfs部分），而是直接复用宿主机的Linux内核；镜像中只需要提供rootfs层即可，也就是仅包含运行容器所需的最基础命令、配置文件、程序库等核心文件，无需冗余的引导和内核相关内容，因此体积能做到极致精简。
+
+查看镜像的分层结构
+```bash
+╭─[root@lnxguru] ~
+╰─➤ docker image history openeuler/openeuler:22.03-lts-sp4 
+IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
+b8bd2a5778dc   2 weeks ago   CMD ["bash"]                                    0B        buildkit.dockerfile.v0
+<missing>      2 weeks ago   RUN |1 TARGETARCH=amd64 /bin/sh -c ln -sf /u…   24.6kB    buildkit.dockerfile.v0
+<missing>      2 weeks ago   ADD openEuler-docker-rootfs.amd64.tar.xz / #…   188MB     buildkit.dockerfile.v0
+<missing>      2 weeks ago   ARG TARGETARCH=amd64                            0B        buildkit.dockerfile.v0
+ 
+
+```
