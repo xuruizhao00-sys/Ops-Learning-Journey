@@ -2003,3 +2003,4 @@ docker system prune
 2. **核心清理命令**：`docker image prune`（仅删Dangling镜像，安全）；
 3. **注意事项**：`docker system prune -a` 会删除更多无用镜像，需确认后再执行，避免误删有用镜像。
 ## 3.9 镜像打标签
+docker tag 可以给镜像打标签，类似于起别名,但通常要遵守一定的命名规范,才可以上传到指定的仓库
