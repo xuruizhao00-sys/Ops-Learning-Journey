@@ -1668,7 +1668,15 @@ Status: Downloaded newer image for hello-world:late
 
 
 # 镜像下载保存的路径
+# 在 docker19.03 及更早的存储路径如下
 /var/lib/docker/overlay2/镜像 ID
+# 在新版的 docker 中镜像的存储路径如下
+# 通过 docker info 查询
+╭─[root@lnxguru] ~
+╰─➤ docker info | grep -E "Docker Root Dir|Storage Driver"
+ Storage Driver: overlayfs
+ Docker Root Dir: /var/lib/docker
+ls -l  /var/lib/docker/containerd/daemon/
 ```
 >[!info]
 >注意: 镜像下载完成后，会自动解压缩，比官网显示的可能会大很多，如: centos8.1.1911 下 载时只有 70MB，下载完后显示 237MB
