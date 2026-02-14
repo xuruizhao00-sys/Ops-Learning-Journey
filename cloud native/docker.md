@@ -2028,3 +2028,48 @@ alpine             latest             e7d92cdc71fe        11 day
 centos             centos7.7.1908     08d05d1d5859        2 months ago      204MB
 ```
 # 四、容器操作基础命令
+容器相关命令
+```bash
+╭─[root@lnxguru] ~
+╰─➤ docker container
+Usage:  docker container COMMAND
+
+Manage containers
+
+Commands:
+  attach      Attach local standard input, output, and error streams to a running container
+  commit      Create a new image from a container's changes
+  cp          Copy files/folders between a container and the local filesystem
+  create      Create a new container
+  diff        Inspect changes to files or directories on a container's filesystem
+  exec        Execute a command in a running container
+  export      Export a container's filesystem as a tar archive
+  inspect     Display detailed information on one or more containers
+  kill        Kill one or more running containers
+  logs        Fetch the logs of a container
+  ls          List containers
+  pause       Pause all processes within one or more containers
+  port        List port mappings or a specific mapping for the container
+  prune       Remove all stopped containers
+  rename      Rename a container
+  restart     Restart one or more containers
+  rm          Remove one or more containers
+  run         Create and run a new container from an image
+  start       Start one or more stopped containers
+  stats       Display a live stream of container(s) resource usage statistics
+  stop        Stop one or more running containers
+  top         Display the running processes of a container
+  unpause     Unpause all processes within one or more containers
+  update      Update configuration of one or more containers
+  wait        Block until one or more containers stop, then print their exit codes
+
+Run 'docker container COMMAND --help' for more information on a command.
+
+```
+## 4.1 启动容器
+docker run 可以启动容器，进入到容器，并随机生成容器 ID 和名称
+### 4.1.1 启动第一个容器
+范例: 运行 docker 的 hello world
+```bash
+
+```
