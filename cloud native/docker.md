@@ -2071,5 +2071,5 @@ docker run 可以启动容器，进入到容器，并随机生成容器 ID 和�
 ### 4.1.1 启动第一个容器
 范例: 运行 docker 的 hello world
 ```bash
-
+docker run hello-world
 ```
