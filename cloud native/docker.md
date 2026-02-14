@@ -2110,7 +2110,85 @@ CONTAINER ID   IMAGE                       COMMAND                CREATED       
 ### 4.1.2 启动容器的流程
 ![](assets/docker/file-20260214161446130.png)
 
-### 4.1.3 启动容器用法
-```bash
+### 4.1.3 Docker run 命令核心整理
+`docker run [OPTIONS] IMAGE [COMMAND] [ARG...]`  
+**核心作用**：基于指定镜像创建并启动一个新容器，是 Docker 最常用的命令之一。  
+**别名**：`docker container run`（官方推荐的规范写法）
 
-```
+---
+
+#### 4.1.3.1 基础运行控制（最常用）
+| 选项 | 完整写法 | 作用说明 | 实用示例 |
+|------|----------|----------|----------|
+| `-d` | `--detach` | 后台运行容器（守护进程模式），仅输出容器ID | `docker run -d nginx` |
+| `-it` | `-i + --tty` | 交互式运行（-i 保持STDIN打开，-t 分配伪终端） | `docker run -it ubuntu /bin/bash` |
+| `--name` | `--name string` | 给容器指定自定义名称（默认随机生成） | `docker run --name my-nginx -d nginx` |
+| `--rm` | `--rm` | 容器退出后**自动删除**（避免残留无用容器） | `docker run --rm -it alpine` |
+| `--restart` | `--restart string` | 容器退出后的重启策略 | `docker run --restart always nginx`（始终重启）<br>`docker run --restart on-failure:3 nginx`（失败重启3次） |
+| `-u` | `--user string` | 指定容器运行的用户（UID/GID 或用户名） | `docker run -u root nginx`（root用户）<br>`docker run -u 1000:1000 nginx`（指定UID/GID） |
+| `-w` | `--workdir string` | 指定容器内的工作目录（默认/） | `docker run -w /app -it ubuntu` |
+
+---
+
+#### 4.1.3.2 网络配置
+| 选项 | 完整写法 | 作用说明 | 实用示例 |
+|------|----------|----------|----------|
+| `-p` | `--publish list` | 端口映射（主机端口:容器端口） | `docker run -p 8080:80 nginx`（主机8080→容器80） |
+| `-P` | `--publish-all` | 随机映射容器所有暴露的端口到主机 | `docker run -P nginx` |
+| `--network` | `--network string` | 指定容器连接的网络（默认bridge） | `docker run --network host nginx`（使用主机网络） |
+| `--add-host` | `--add-host list` | 添加自定义hosts映射（主机名:IP） | `docker run --add-host mysql:192.168.1.100 nginx` |
+| `--dns` | `--dns list` | 设置容器DNS服务器 | `docker run --dns 8.8.8.8 nginx` |
+| `-h` | `--hostname string` | 设置容器主机名 | `docker run -h my-container nginx` |
+
+---
+
+#### 4.1.3.3 数据挂载（持久化）
+| 选项 | 完整写法 | 作用说明 | 实用示例 |
+|------|----------|----------|----------|
+| `-v` | `--volume list` | 绑定挂载（主机目录:容器目录） | `docker run -v /host/data:/container/data nginx` |
+| `--mount` | `--mount mount` | 更灵活的挂载方式（推荐） | `docker run --mount type=bind,source=/host/data,target=/container/data nginx` |
+| `--volumes-from` | `--volumes-from list` | 从其他容器挂载卷 | `docker run --volumes-from my-db nginx` |
+| `--tmpfs` | `--tmpfs list` | 挂载临时文件系统（容器内，退出即删） | `docker run --tmpfs /tmp nginx` |
+
+---
+
+#### 4.1.3.4 环境配置
+| 选项 | 完整写法 | 作用说明 | 实用示例 |
+|------|----------|----------|----------|
+| `-e` | `--env list` | 设置容器环境变量 | `docker run -e MYSQL_ROOT_PASSWORD=123456 mysql` |
+| `--env-file` | `--env-file list` | 从文件读取环境变量 | `docker run --env-file .env nginx` |
+| `--entrypoint` | `--entrypoint string` | 覆盖镜像默认的ENTRYPOINT | `docker run --entrypoint /bin/bash nginx` |
+
+---
+
+#### 4.1.3.5 资源限制（性能管控）
+| 选项 | 完整写法 | 作用说明 | 实用示例 |
+|------|----------|----------|----------|
+| `-m` | `--memory bytes` | 限制容器内存使用（如100m、2g） | `docker run -m 1g nginx` |
+| `--cpus` | `--cpus decimal` | 限制容器使用的CPU核心数 | `docker run --cpus 2 nginx`（最多用2核） |
+| `--cpuset-cpus` | `--cpuset-cpus string` | 指定容器使用的CPU核心（0-3,0,1） | `docker run --cpuset-cpus 0,1 nginx`（仅用0、1核） |
+| `--cpu-shares` | `--cpu-shares int` | CPU权重（相对值，默认1024） | `docker run --cpu-shares 2048 nginx` |
+
+---
+
+#### 4.1.3.6 权限与安全
+| 选项 | 完整写法 | 作用说明 | 实用示例 |
+|------|----------|----------|----------|
+| `--privileged` | `--privileged` | 赋予容器扩展权限（接近主机root） | `docker run --privileged -d nginx` |
+| `--cap-add` | `--cap-add list` | 添加Linux内核能力 | `docker run --cap-add NET_ADMIN nginx` |
+| `--cap-drop` | `--cap-drop list` | 移除Linux内核能力 | `docker run --cap-drop ALL nginx` |
+| `--read-only` | `--read-only` | 将容器根文件系统设为只读 | `docker run --read-only nginx` |
+| `--oom-kill-disable` | `--oom-kill-disable` | 禁用OOM Killer（内存不足时不杀容器） | `docker run --oom-kill-disable nginx` |
+
+---
+
+#### 4.1.3.7 其他实用选项
+| 选项 | 完整写法 | 作用说明 | 实用示例 |
+|------|----------|----------|----------|
+| `-a` | `--attach list` | 附加到容器的STDIN/STDOUT/STDERR | `docker run -a stdout -d nginx` |
+| `--pull` | `--pull string` | 运行前拉取镜像策略（always/missing/never） | `docker run --pull always nginx`（强制拉取最新版） |
+| `--health-cmd` | `--health-cmd string` | 设置容器健康检查命令 | `docker run --health-cmd "curl -f http://localhost || exit 1" nginx` |
+| `--stop-timeout` | `--stop-timeout int` | 容器停止超时时间（秒） | `docker run --stop-timeout 30 nginx` |
+| `--gpus` | `--gpus gpu-request` | 给容器分配GPU（需宿主机有GPU） | `docker run --gpus all nvidia/cuda` |
+### 4.1.4 容器重启策略
+--restart 可以指定四种不同的 policy
