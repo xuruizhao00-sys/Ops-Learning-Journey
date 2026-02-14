@@ -1822,5 +1822,21 @@ docker images --format "{{.Repository}}:{{.Tag}} {{.Size}}"
 #### 示例 1：极简输出（仓库：标签）
 只显示镜像的 “仓库名 + 标签”，适合快速查看本地镜像列表：
 ```bash
+╭─[root@lnxguru] ~
+╰─➤ docker images --format "{{.Repository}}:{{.Tag}}"
+openeuler/openeuler:22.03
+openeuler/openeuler:22.03-lts-sp4
+
+```
+#### 示例 2：带体积的详细列表（自定义表头）
+```bash
+╭─[root@lnxguru] ~
+╰─➤ docker images --format "| {{.Repository}} | {{.Tag}} | {{.ID}} | {{.Size}} |"
+| openeuler/openeuler | 22.03 | b8bd2a5778dc | 252MB |
+| openeuler/openeuler | 22.03-lts-sp4 | b8bd2a5778dc | 252MB |
+```
+#### 示例 3：按行分隔的结构化输出
+```bash
+
 
 ```
