@@ -1879,3 +1879,9 @@ openeuler/openeuler:22.03-lts-sp4 创建于: 2026-01-31 07:57:05 +0800 CST
 - 常用占位符：`.Repository`（仓库）、`.Tag`（标签）、`.ID`（镜像 ID）、`.Size`（体积）是日常最常用的；
 - 可结合 `-f/--filter` 过滤镜像，再用 `--format` 格式化输出，精准获取所需信息，避免冗余
 ### 3.4.3 repository 镜像仓库
+- 由某特定的 docker 镜像的所有迭代版本组成的镜像仓库
+- 一个 Registry 中可以存在多个 Repository
+- Repository 可分为“顶层仓库”和“用户仓库”
+- Repository 用户仓库名称一般格式为“用户名/仓库名”
+- 每个 Repository 仓库可以包含多个 Tag (标签),每个标签对应一个镜像
+
