@@ -2004,3 +2004,10 @@ docker system prune
 3. **注意事项**：`docker system prune -a` 会删除更多无用镜像，需确认后再执行，避免误删有用镜像。
 ## 3.9 镜像打标签
 docker tag 可以给镜像打标签，类似于起别名,但通常要遵守一定的命名规范,才可以上传到指定的仓库
+```bash
+docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+
+# TARGET_IMAGE[:TAG] 格式一般形式
+
+仓库主机 FQDN 或 IP[:端口]/项目名(或用户名)/image名字:版本
+```
