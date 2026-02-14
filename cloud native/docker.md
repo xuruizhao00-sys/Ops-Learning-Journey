@@ -1611,4 +1611,8 @@ Options:
 说明:  
 OFFICIAL: 官方
 AUTOMATED: 使用第三方 docker 服务来帮助编译镜像，可以在互联网上面直接拉取到镜像，减少了繁琐的编译过程
+
+
+# 搜索点赞100个以上的镜像
+docker search --filter=starts=100 centos
 ```
