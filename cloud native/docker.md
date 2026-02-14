@@ -1898,3 +1898,12 @@ docker save [OPTIONS] IMAGE [IMAGE...]
 Docker save 使用 IMAGE ID 导出，在导入后的镜像没有 REPOSITORY 和 TAG,显示为 <none>
 
 ```
+常见用法
+```bash
+# 导出为 tar 格式
+docker save -o /path/file.tar IMAGE1 IMAGE2 ...
+docker save IMAGE1 IMAGE2 ... > /path/file.tar
+
+# 导出为压缩格式
+docker save IMAGE1 IMAGE2 ... | gzip > /path/file.tar.gz
+```
