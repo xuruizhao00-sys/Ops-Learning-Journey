@@ -1690,4 +1690,109 @@ docker 镜像官方的下载站点是: https://hub.docker.com/
 从国内下载官方的镜像站点有时候会很慢，因此可以更改 docker 配置文件添加一个加速器，可以通过加速器达到加速下载镜像的目的
 国内有许多公司都提供了docker 加速镜像，比如: 阿里云，腾讯云，网易云，以下以阿里云为例
 ### 3.4.1 阿里云获取加速地址
-浏览器打开http://cr.console.aliyun.com，注册或登录阿里云账号，点击左侧的镜像加速器，将会得到一个专属的加速地址，而且下面有使用配置说明:
+浏览器打开http://cr.console.aliyun.com，注册或登录阿里云账号，点击左侧的镜像加速器，将会得到一个专属的加速地址，而且下面有使用配置说明
+### 3.4.2 Docker 客户端安装与镜像加速器配置
+#### 1. 安装/升级 Docker 客户端
+推荐安装 **1.10.0 及以上版本** 的 Docker CE（社区版），官方安装文档可参考：[Docker CE 官方文档](https://docs.docker.com/engine/install/)。
+不同系统（CentOS/Ubuntu/Debian）的安装命令略有差异，以下是通用指引（以 CentOS 为例）：
+```bash
+# 卸载旧版本（如有）
+yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
+
+# 设置仓库
+yum install -y yum-utils
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+# 安装最新版 Docker CE
+yum install -y docker-ce docker-ce-cli containerd.io
+
+# 启动并设置开机自启
+systemctl start docker
+systemctl enable docker
+
+# 验证安装（查看版本）
+docker --version
+```
+
+#### 2. 配置 Docker 镜像加速器（核心步骤）
+通过修改 `daemon.json` 配置文件，添加镜像加速器、自定义数据目录等配置，**注意修正原配置中的语法错误（中文逗号）**：
+```bash
+# 1. 创建 docker 配置目录（若不存在）
+mkdir -p /etc/docker
+
+# 2. 写入 daemon.json 配置文件（修正中文逗号，规范注释）
+tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": [
+    "https://docker.mirrors.ustc.edu.cn",    # 中科大镜像
+    "http://hub-mirror.c.163.com/",         # 网易云镜像
+    "https://si7y70hh.mirror.aliyuncs.com"  # 阿里云镜像（需替换为自己的阿里云加速器地址）
+  ],
+  "live-restore": true,                     # Docker 服务重启时，不重启运行中的容器
+  "data-root": "/data/docker",              # 指定 Docker 数据存储目录（新版用 data-root，旧版用 graph）
+  "insecure-registries": ["harbor.wang.org"] # 信任的私有镜像仓库（非HTTPS）
+}
+EOF
+```
+
+#### 3. 常用公共镜像加速器列表（备用）
+| 服务商 | 加速器地址 |
+|--------|------------|
+| 中科大 | https://docker.mirrors.ustc.edu.cn |
+| 网易云 | http://hub-mirror.c.163.com/ |
+| 腾讯云 | https://mirror.ccs.tencentyun.com |
+| 七牛云 | https://reg-mirror.qiniu.com |
+| 阿里云 | https://<你的ID>.mirror.aliyuncs.com（需登录阿里云获取） |
+
+#### 4. 重启 Docker 服务使配置生效
+```bash
+# 重新加载 daemon 配置
+systemctl daemon-reload
+
+# 重启 Docker 服务
+systemctl restart docker
+
+# 验证配置是否生效（查看 registry-mirrors 字段）
+docker info | grep -A 5 "Registry Mirrors"
+```
+## 3.4 查看本地镜像
+docker images 可以查看下载至本地的镜像
+docker images 和 docker image ls 是完全等价的命令，作用都是列出本地主机上的 Docker 镜像。docker image ls 是 Docker 官方推荐的 “新式” 写法（按 docker 资源类型 操作 的规范），docker images 是传统简写，两者功能、参数完全一致。
+https://docs.docker.com/engine/reference/commandline/images/
+
+```bash
+# 两种写法均可
+docker images [OPTIONS] [REPOSITORY[:TAG]]
+docker image ls [OPTIONS] [REPOSITORY[:TAG]]
+
+[OPTIONS]：可选参数，用于过滤、格式化输出等；
+[REPOSITORY[:TAG]]：可选，指定仓库名 + 标签，用于精准查询某一个 / 一类镜像（比如 nginx:1.24 只查 nginx 1.24 版本，nginx 查所有 nginx 镜像）。
+
+# 基础使用，无参数
+docker images
+# 输出格式（默认列：仓库名、标签、ID、创建时间、大小）
+REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+nginx        1.24      08b152afcfae   2 months ago   187MB
+alpine       latest    7e01a0d0a8fa   3 months ago   7.64MB
+
+# 精准查询某镜像
+docker images nginx:1.24
+# 仅输出nginx 1.24版本的镜像信息
+REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+nginx        1.24      08b152afcfae   2 months ago   187MB
+
+# 组合参数
+# 显示所有镜像的完整ID，且仅输出ID
+docker images -a --no-trunc -q
+# 输出示例：
+sha256:08b152afcfae0f1fd2716dd5995888960784175fe4bd699f4c891fbf02d9f8f8
+sha256:7e01a0d0a8fa06e32bf50b9b807220f9b4d679198f1c03543c2d3f852a87878a
+```
+执行结果的显示信息说明
+```bash
+REPOSITORY      #镜像所属的仓库名称
+TAG         #镜像版本号（标识符），默认为 latest
+IMAGE ID       #镜像唯一 ID 标识,如果 ID 相同,说明是同一个镜像有多个名称
+CREATED       #镜像在仓库中被创建时间
+VIRTUAL SIZE    #镜像的大小
+```
