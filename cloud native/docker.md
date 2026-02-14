@@ -1937,3 +1937,16 @@ docker load -i /path/file.tar
 docker load < /path/file.tar.gz
 ```
 ## 3.7 删除镜像
+docker rmi 命令可以删除本地镜像
+旧版本强制删除正在使用的镜像，也会删除对应的容器，新版本不允许删除正在运行的容器对应的镜像
+```bash
+docker rmi [OPTIONS] IMAGE [IMAGE...]
+
+docker image rm [OPTIONS] IMAGE [IMAGE...]
+
+# 选项:
+
+-f, --force     Force removal of the image
+
+--no-prune   Do not delete untagged parents
+```
