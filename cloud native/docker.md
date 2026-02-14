@@ -1950,3 +1950,55 @@ docker image rm [OPTIONS] IMAGE [IMAGE...]
 
 --no-prune   Do not delete untagged parents
 ```
+## 3.8 清理 dangling 状态的镜像
+你想知道“清理dangling状态的镜像”具体是什么意思，以及该怎么操作，对吧？我会先解释核心概念，再说明为什么要清理，最后给出具体的操作方法，让你彻底理解这个知识点。
+
+### 一、什么是Dangling状态的镜像？
+Dangling（直译“悬空”）状态的镜像，也常被称为**虚悬镜像**，本质是：
+- 这类镜像的 `REPOSITORY`（仓库名）和 `TAG`（标签）均为 `<none>`；
+- 产生原因：当你基于同一个仓库名+标签重新构建/拉取镜像时，旧版本的镜像会失去仓库和标签的关联，变成“无主”的悬空状态（比如你先拉取 `nginx:latest`，之后官方更新了 `nginx:latest`，你重新拉取后，旧的 `nginx:latest` 就会变成 `<none>:<none>`）；
+- 识别特征：执行 `docker images` 时，能看到一行/多行 `REPOSITORY` 和 `TAG` 列都是 `<none>` 的镜像。
+
+简单说：**Dangling镜像就是没有名字、没有标签的“无主”镜像，是镜像更新/重建后留下的废弃版本，既无法通过仓库+标签调用，也没有实际用途，只会占用磁盘空间。**
+
+### 二、为什么要清理Dangling镜像？
+1. **释放磁盘空间**：每一个Dangling镜像都占用磁盘（哪怕是Alpine这类轻量镜像，累积多了也会占用大量空间）；
+2. **简化镜像列表**：清理后 `docker images` 输出更整洁，避免大量 `<none>` 镜像干扰查看有效镜像；
+3. **避免误操作**：减少因镜像ID混淆导致的错误（比如误删有用镜像）。
+
+### 三、如何清理Dangling镜像？
+#### 方法1：专用命令（推荐，安全）
+Docker提供了专门清理Dangling镜像的命令，**只会删除`<none>:<none>`的镜像，不会影响有标签的有效镜像**：
+```bash
+docker image prune
+```
+执行后会提示确认：
+```
+WARNING! This will remove all dangling images.
+Are you sure you want to continue? [y/N]
+```
+输入 `y` 回车即可完成清理。
+
+#### 方法2：过滤+删除（手动方式，适合理解原理）
+先筛选出Dangling镜像的ID，再删除（效果和方法1一致，但步骤更直观）：
+```bash
+# 1. 筛选出所有Dangling镜像的ID（-q仅输出ID，-f过滤条件）
+docker images -q -f "dangling=true"
+
+# 2. 批量删除这些镜像（组合命令，直接执行）
+docker rmi $(docker images -q -f "dangling=true")
+```
+如果没有Dangling镜像，会输出：`Error: No such image: `（无需担心，是正常提示）。
+
+#### 方法3：清理所有无用资源（进阶）
+如果想一次性清理Dangling镜像、停止的容器、无用的网络/卷等所有无用资源，可执行：
+```bash
+# 加 -a 会删除所有未被容器使用的镜像（包括有标签但没被使用的），谨慎使用！
+docker system prune
+```
+⚠️ 注意：`docker system prune -a` 会删除所有“未被任何容器（包括停止的容器）引用”的镜像，哪怕这些镜像有标签，因此**生产环境慎用 `-a` 参数**。
+
+### 总结
+1. **Dangling镜像**：就是`<none>:<none>`的无主镜像，由镜像更新/重建产生，无实际用途且占磁盘；
+2. **核心清理命令**：`docker image prune`（仅删Dangling镜像，安全）；
+3. **注意事项**：`docker system prune -a` 会删除更多无用镜像，需确认后再执行，避免误删有用镜像。
