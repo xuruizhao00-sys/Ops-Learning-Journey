@@ -1892,11 +1892,9 @@ openeuler/openeuler:22.03-lts-sp4 创建于: 2026-01-31 07:57:05 +0800 CST
 docker save [OPTIONS] IMAGE [IMAGE...]
 
 选项:  
-
 -o, --output string   Write to a file, instead of STDOUT
 
-#说明:
-
-Docker save 使用IMAGE ID导出，在导入后的镜像没有REPOSITORY和TAG,显示为<none>
+# 说明:
+Docker save 使用 IMAGE ID 导出，在导入后的镜像没有 REPOSITORY 和 TAG,显示为 <none>
 
 ```
