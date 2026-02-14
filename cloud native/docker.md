@@ -2192,3 +2192,27 @@ CONTAINER ID   IMAGE                       COMMAND                CREATED       
 | `--gpus` | `--gpus gpu-request` | 给容器分配GPU（需宿主机有GPU） | `docker run --gpus all nvidia/cuda` |
 ### 4.1.4 容器重启策略
 --restart 可以指定四种不同的 policy
+#### 4.1.4.1 docker run --restart 重启策略全解析
+| 策略值 | 核心含义 | 触发重启的场景 | 适用场景 | 实用示例 |
+|--------|----------|----------------|----------|----------|
+| `no` | **默认值**，容器退出后不重启 | 任何情况都不重启 | 临时测试容器、一次性任务容器（如数据处理） | `docker run --restart no nginx` |
+| `on-failure[:max-retries]` | 仅当容器**非0状态退出**时重启（可指定最大重启次数） | 1. 容器异常退出（退出码≠0）<br>2. 手动 `docker stop` 不触发<br>3. 主机重启后不恢复 | 业务容器（需容错，但正常停止不重启），如数据库、应用服务 | `docker run --restart on-failure:3 mysql`（失败最多重启3次） |
+| `always` | 容器无论以何种状态退出，始终重启 | 1. 容器正常/异常退出<br>2. 手动 `docker stop` 后，**主机重启/ Docker 服务重启**会重新启动容器 | 核心服务（需一直运行），如Nginx、Redis等基础组件 | `docker run --restart always redis` |
+| `unless-stopped` | 始终重启，除非**手动执行 `docker stop`** 或 Docker 服务停止 | 1. 容器正常/异常退出会重启<br>2. 手动 `docker stop` 后，即使主机/Docker重启也不会恢复<br>3. 仅手动 `docker start` 可恢复 | 生产环境核心服务（兼顾稳定性和可控性），避免手动停止后被自动重启 | `docker run --restart unless-stopped nginx` |
+
+如果 docker stop 停止容器后重启宿主机，always选项以外的其它选项的容器都不会随着宿主机启动而自动启动
+注意: 容器启动后,如果容器内没有前台运行的进程,将自动退出停止
+
+从容器内退出,并停止容器
+#### 4.1.4.2 补充关键说明
+1. **最大重启次数**：仅 `on-failure` 支持后缀 `:max-retries`（如 `on-failure:5`），超出次数后停止重启；
+2. **主机重启影响**：
+   - `always`：主机/Docker重启后，所有该策略的容器会自动启动；
+   - `unless-stopped`：仅未被手动 `stop` 的容器会恢复；
+   - `on-failure/no`：主机重启后不会自动恢复；
+3. **手动干预**：无论哪种策略，`docker stop` 可手动停止容器，`docker start` 可重新启动。
+
+#### 4.1.4.3 总结
+1. 临时容器用 `no`，业务容错用 `on-failure`；
+2. 核心服务优先选 `unless-stopped`（比 `always` 更可控）；
+3. `on-failure` 建议指定最大重启次数，避免无限重启占用资源。
