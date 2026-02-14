@@ -2071,5 +2071,35 @@ docker run 可以启动容器，进入到容器，并随机生成容器 ID 和�
 ### 4.1.1 启动第一个容器
 范例: 运行 docker 的 hello world
 ```bash
-docker run hello-world
+╭─[root@lnxguru] ~
+╰─➤ docker run hello-world 
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+# 查看下载的镜像
+╭─[root@lnxguru] ~
+╰─➤ docker image ls hello-world:latest 
+                                                                                                                                                        i Info →   U  In Use
+IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
+hello-world:latest   40dac9b7451f       29.1kB         12.7kB    U   
+
 ```
