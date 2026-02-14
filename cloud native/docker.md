@@ -2207,7 +2207,7 @@ CONTAINER ID   IMAGE                       COMMAND                CREATED       
 exit
 
 # 从容器内退出，且容器不停止
-ctrl + 
+ctrl + p + q
 ```
 #### 4.1.4.2 补充关键说明
 1. **最大重启次数**：仅 `on-failure` 支持后缀 `:max-retries`（如 `on-failure:5`），超出次数后停止重启；
