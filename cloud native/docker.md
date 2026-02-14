@@ -1595,3 +1595,18 @@ http://cr.console.aliyun.com #阿里云仓库
 ```
 
 #### 3.2.1.2 执行 docker search 命令进行搜索
+```bash
+╭─[root@lnxguru] ~
+╰─➤ docker search --help 
+Usage:  docker search [OPTIONS] TERM
+
+Search Docker Hub for images
+
+Options:
+  -f, --filter filter   Filter output based on conditions provided
+      --format string   Pretty-print search using a Go template
+      --limit int       Max number of search results
+      --no-trunc        Don't truncate output
+
+
+```
