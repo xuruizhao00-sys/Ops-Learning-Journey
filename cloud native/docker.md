@@ -2011,3 +2011,19 @@ docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
 
 仓库主机 FQDN 或 IP[:端口]/项目名(或用户名)/image名字:版本
 ```
+tag 默认为 lastest
+```bash
+[root@ubuntu1804 ~]#docker images
+
+REPOSITORY         TAG                 IMAGE ID           CREATED            SIZE
+alpine             latest             e7d92cdc71fe        11 days ago        5.59MB
+centos             centos7.7.1908     08d05d1d5859        2 months ago      204MB
+
+[root@ubuntu1804 ~]#docker tag alpine alpine:3.11
+[root@ubuntu1804 ~]#docker images
+
+REPOSITORY         TAG                 IMAGE ID           CREATED            SIZE
+alpine              3.11               e7d92cdc71fe        11 days ago        5.59MB
+alpine             latest             e7d92cdc71fe        11 days ago        5.59MB
+centos             centos7.7.1908     08d05d1d5859        2 months ago      204MB
+```
