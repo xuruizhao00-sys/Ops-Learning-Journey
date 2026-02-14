@@ -1522,3 +1522,25 @@ EOF
 
 # 三、docker 镜像管理 
 ## 3.1 镜像结构和原理
+```mermaid
+graph TD
+    A[Docker 镜像 Image] --> B[Layer 3: 应用程序代码<br><i>（只读）</i>]
+    A --> C[Layer 2: 运行时依赖<br><i>（只读）</i>]
+    A --> D[Layer 1: 基础操作系统<br><i>（只读）</i>]
+
+    subgraph "联合文件系统 (UnionFS)"
+        direction TB
+        D --> C --> B
+    end
+
+    E[Docker 容器 Container] --> F[可写层 Container Layer<br><i>（读写）</i>]
+    F -->|叠加在| B
+
+    style A fill:#e6f7ff,stroke:#333
+    style E fill:#ffe6e6,stroke:#333
+    style F fill:#ffe0e0,stroke:#d9534f
+    style B fill:#f0f8ff,stroke:#4a90e2
+    style C fill:#f0f8ff,stroke:#4a90e2
+    style D fill:#f0f8ff,stroke:#4a90e2
+```
+
