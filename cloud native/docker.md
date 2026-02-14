@@ -1756,6 +1756,7 @@ systemctl restart docker
 docker info | grep -A 5 "Registry Mirrors"
 ```
 ## 3.4 查看本地镜像
+### 3.4.1 查看本地镜像
 docker images 可以查看下载至本地的镜像
 docker images 和 docker image ls 是完全等价的命令，作用都是列出本地主机上的 Docker 镜像。docker image ls 是 Docker 官方推荐的 “新式” 写法（按 docker 资源类型 操作 的规范），docker images 是传统简写，两者功能、参数完全一致。
 https://docs.docker.com/engine/reference/commandline/images/
@@ -1799,6 +1800,7 @@ VIRTUAL SIZE    #镜像的大小
 
 `docker images --format` 的本质是**用 Go 模板语法**自定义 `docker images` 的输出内容，你可以通过指定 “占位符” 筛选、重组镜像的属性，只展示你关心的信息，避免默认输出的冗余内容。
 
+### 3.4.2 --format 格式化输出
 格式字符串的基本语法：
 ```bash
 docker images --format "{{.属性名}}"
@@ -1876,3 +1878,4 @@ openeuler/openeuler:22.03-lts-sp4 创建于: 2026-01-31 07:57:05 +0800 CST
 - `--format` 通过 Go 模板的 `{{.属性名}}` 占位符自定义输出，属性名首字母必须大写；
 - 常用占位符：`.Repository`（仓库）、`.Tag`（标签）、`.ID`（镜像 ID）、`.Size`（体积）是日常最常用的；
 - 可结合 `-f/--filter` 过滤镜像，再用 `--format` 格式化输出，精准获取所需信息，避免冗余
+### 3.4.3 repository 镜像仓库
