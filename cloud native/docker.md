@@ -1910,6 +1910,30 @@ docker save IMAGE1 IMAGE2 ... | gzip > /path/file.tar.gz
 
 导出指定镜像
 ```bash
+docker save mysql:5.7.30 alpine:3.11.3 -o /data/myimages.tar
 
+# 导出镜像并压缩
+docker save rockylinux:9.1-minimal | gzip - > rockylinux-9.1-minimal.tar.gz
+
+# 导出所有镜像至不同的文件中
+docker images | awk 'NR!=1{print $1,$2}' | while read repo tag;do docker save   $repo:$tag -o /opt/$repo-$tag.tar ;done
+
+# 导出所有镜像到一个打包文件
+[root@ubuntu1804 ~]# docker save `docker images -qa` -o all.tar
 
 ```
+## 3.6 镜像导入
+利用 docker load 命令可以将镜像导出的打包或压缩文件再导入
+
+注意：镜像导入只能支持单个镜像导入，不支持多个镜像导入
+```bash
+docker load [OPTIONS]
+
+# 选项
+-i, --input string   Read from tar archive file, instead of STDIN
+-q, --quiet         Suppress the load output
+
+docker load -i /path/file.tar
+docker load < /path/file.tar.gz
+```
+## 3.7 删除镜像
