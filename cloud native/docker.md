@@ -1885,3 +1885,18 @@ openeuler/openeuler:22.03-lts-sp4 创建于: 2026-01-31 07:57:05 +0800 CST
 - Repository 用户仓库名称一般格式为“用户名/仓库名”
 - 每个 Repository 仓库可以包含多个 Tag (标签),每个标签对应一个镜像
 
+## 3.5 镜像导出
+利用 docker save 命令可以将从本地镜像导出为一个打包 tar 文件，然后复制到其他服务器进行导入使用
+注意：镜像导出支持多个镜像导出
+```bash
+docker save [OPTIONS] IMAGE [IMAGE...]
+
+选项:  
+
+-o, --output string   Write to a file, instead of STDOUT
+
+#说明:
+
+Docker save 使用IMAGE ID导出，在导入后的镜像没有REPOSITORY和TAG,显示为<none>
+
+```
