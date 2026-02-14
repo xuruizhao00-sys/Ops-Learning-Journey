@@ -1575,5 +1575,23 @@ b8bd2a5778dc   2 weeks ago   CMD ["bash"]                                    0B 
 <missing>      2 weeks ago   ADD openEuler-docker-rootfs.amd64.tar.xz / #…   188MB     buildkit.dockerfile.v0
 <missing>      2 weeks ago   ARG TARGETARCH=amd64                            0B        buildkit.dockerfile.v0
  
-
 ```
+## 3.2 搜索镜像
+### 3.2.1 搜索镜像
+#### 3.2.1.1 官方网站进行镜像的搜索
+http://hub.docker.com
+
+http://dockerhub.com
+
+https://hub-stage.docker.com/
+在官方的 docker 仓库中搜索指定名称的 docker 镜像，也会有很多三方镜像。
+第三方仓库
+```go
+https://quay.io/ #红帽公司维护
+
+https://registry.k8s.io  #kubernetes 仓库
+
+http://cr.console.aliyun.com #阿里云仓库
+```
+
+#### 3.2.1.2 执行 docker search 命令进行搜索
