@@ -25,5 +25,7 @@
   "blue-topaz-theme@@table-format-options": "no-wrapped-table",
   "blue-topaz-theme@@show-border-table": false,
   "blue-topaz-theme@@remove-custom-svg-icons": false,
-  "Blue-Topaz-Codebox-Highlight@@code-theme-selection": "code-theme-sublime"
+  "Blue-Topaz-Codebox-Highlight@@code-theme-selection": "code-theme-sublime",
+  "blue-topaz-theme@@text-indentation-two-em": true,
+  "blue-topaz-theme@@justify-align": true
 }

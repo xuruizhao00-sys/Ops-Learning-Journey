@@ -1681,3 +1681,11 @@ ls -l  /var/lib/docker/containerd/daemon/
 >[!info]
 >注意: 镜像下载完成后，会自动解压缩，比官网显示的可能会大很多，如: centos8.1.1911 下 载时只有 70MB，下载完后显示 237MB
 
+下载公有云镜像
+```bash
+[root@ubuntu2204 ~]#docker pull registry.cn-beijing.aliyuncs.com/wangxiaochun/alpine:3.20.
+```
+## 3.4 镜像加速配置和优化
+docker 镜像官方的下载站点是: https://hub.docker.com/
+从国内下载官方的镜像站点有时候会很慢，因此可以更改 docker 配置文件添加一个加速器，可以通过加速器达到加速下载镜像的目的
+国内有许多公司都提供了docker 加速镜像，比如: 阿里云，腾讯云，网易云，以下以阿里云为例
