@@ -1867,5 +1867,12 @@ docker images --filter "reference=nginx*" --format "{{.Repository}}:{{.Tag}} (ID
 ```
 #### 示例 5：显示绝对创建时间（.CreatedAt）
 ```bash
+╭─[root@lnxguru] ~
+╰─➤ docker images --format "{{.Repository}}:{{.Tag}} 创建于: {{.CreatedAt}}"
+openeuler/openeuler:22.03 创建于: 2026-01-31 07:57:05 +0800 CST
+openeuler/openeuler:22.03-lts-sp4 创建于: 2026-01-31 07:57:05 +0800 CST
 
 ```
+- `--format` 通过 Go 模板的 `{{.属性名}}` 占位符自定义输出，属性名首字母必须大写；
+- 常用占位符：`.Repository`（仓库）、`.Tag`（标签）、`.ID`（镜像 ID）、`.Size`（体积）是日常最常用的；
+- 可结合 `-f/--filter` 过滤镜像，再用 `--format` 格式化输出，精准获取所需信息，避免冗余
