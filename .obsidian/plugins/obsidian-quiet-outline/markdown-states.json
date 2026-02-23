@@ -1,14 +1,14 @@
 {
   "Shell 编程/Shell 编程.md": {
-    "scroll": 2620.3958964492335,
+    "scroll": 3287.6520825781004,
     "cursor": {
       "from": {
-        "line": 2625,
-        "ch": 3
+        "line": 3292,
+        "ch": 21
       },
       "to": {
-        "line": 2625,
-        "ch": 28
+        "line": 3284,
+        "ch": 0
       }
     },
     "expandedKeys": [
@@ -16,7 +16,6 @@
       "item-4-517",
       "item-3-189",
       "item-4-204",
-      "item-4-197",
       "item-5-205",
       "item-4-216",
       "item-4-50",
@@ -75,7 +74,14 @@
       "item-5-14",
       "item-4-3",
       "item-3-22",
-      "item-4-176"
+      "item-4-176",
+      "item-4-179",
+      "item-4-183",
+      "item-4-197",
+      "item-4-190",
+      "item-2-699",
+      "item-1-627",
+      "item-3-105"
     ]
   },
   "Python/python.md": {
