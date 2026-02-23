@@ -1485,7 +1485,8 @@ disk_usage=$(df -h $LOG_DIR | grep -v Filesystem | awk '{print $5}' | sed 's/%//
     4. 长命令用 `\` 换行（每行不超过 80 字符）。
 ```bash
 # 条件语句（then单独一行，缩进4空格）
-if [[ $disk_usage -gt 80 ]]; then
+if [[ $disk_usage -gt 80 ]]; 
+then
     log_error "磁盘使用率超标"
 fi
 
