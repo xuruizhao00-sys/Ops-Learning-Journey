@@ -2318,7 +2318,7 @@ https://docs.docker.com/engine/reference/commandline/ps/
 
 #### 💡 常用组合示例
 
-```bash
+```python
 # 仅列出所有容器的 ID（用于批量操作）
 docker ps -aq
 
@@ -2329,7 +2329,23 @@ docker ps -n 3
 docker ps -a --filter "status=exited"
 
 # 自定义表格输出：ID、名称、状态、镜像
-docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}"
+#以下是一些常用的占位符：
+{{.ID}}：容器的ID。
+{{.Image}}：容器使用的映像名称。
+{{.Command}}：容器的启动命令。
+{{.CreatedAt}}：容器的创建时间。
+{{.RunningFor}}：容器运行的时间。
+{{.Ports}}：容器的端口映射信息。
+{{.Status}}：容器的状态。
+{{.Size}}：容器的大小。
+{{.Names}}：容器的名称。
+{{.Label}}：容器的标签。
+╭─[root@lnxguru] /home/xuruizhao
+╰─➤ docker ps --all  --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}"
+CONTAINER ID   NAMES                  STATUS                      IMAGE
+8363480e70dd   asda                   Exited (0) 10 seconds ago   hello-world:latest
+9b237d87efb9   flamboyant_matsumoto   Exited (0) 10 days ago      hello-world
+c9661a9834da   op                     Exited (255) 10 days ago    openeuler/openeuler:22.03
 ```
 
 ---
