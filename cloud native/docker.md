@@ -2299,9 +2299,39 @@ docker run --privileged centos fdisk -l /dev/sda
 
 ## 4.2 查看容器信息
 ### 4.2.1 查看当前存在的容器
+`docker ps` 命令
 https://docs.docker.com/engine/reference/commandline/ps/
 
-```python
+#### 🐳 `docker ps` / `docker container ls` 常用选项
 
+| 选项 | 全称 | 说明 |
+|------|------|------|
+| `-a` | `--all` | 显示 **所有容器**（默认仅显示运行中的） |
+| `-q` | `--quiet` | 仅输出容器的 **短 ID**（适合脚本中使用） |
+| `-s` | `--size` | 显示容器的 **磁盘占用大小**（包括可写层和日志） |
+| `-f` | `--filter` | 根据条件过滤输出，例如：• `status=exited`• `ancestor=image_name`• `label=key=value` |
+| `-l` | `--latest` | 显示 **最新创建的容器**（无论状态） |
+| `-n` | `--last int` | 显示最近创建的 **前 N 个容器**（默认 `-1` 表示全部） |
+| `--format` | — | 自定义输出格式（使用 Go 模板），例如：```--format "table {{.ID}}\t{{.Names}}\t{{.Status}}"``` |
 
+---
+
+#### 💡 常用组合示例
+
+```bash
+# 仅列出所有容器的 ID（用于批量操作）
+docker ps -aq
+
+# 查看最近 3 个创建的容器（包括已停止的）
+docker ps -n 3
+
+# 过滤出已退出的容器
+docker ps -a --filter "status=exited"
+
+# 自定义表格输出：ID、名称、状态、镜像
+docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}"
 ```
+
+---
+
+> ✅ 提示：`docker ps` 是 `docker container ls` 的别名，两者功能完全相同。
