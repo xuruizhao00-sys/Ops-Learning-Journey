@@ -3144,6 +3144,7 @@ docker rm -v my-container
 docker rm $(docker ps -aq)
 
 # 删除指定状态的容器
+docker rm -f  `docker ps -q -f status=running`
 ```
 ### 4.3.2 `docker container prune`
 **作用**：**批量清理** 所有 **已停止的容器**（一次性删除，无需逐个指定）。
