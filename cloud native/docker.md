@@ -2420,5 +2420,18 @@ docker stats --no-trunc
 
 #### 4.2.3.4 示例
 ```python
+# 默认启动 elasticsearch 会使用较多的内存
+docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.6.2
 
+# 查看所有容器
+[root@ubuntu1804 ~]#docker stats
+
+CONTAINER ID NAME   CPU %   MEM USAGE / LIMIT MEM % NET I/O BLOCK I/O     PIDS
+
+5e470e7970f6 suspi  0.00%   3.992MiB / 1.924Gi0.20% 656B / 0B9.2MB / 8.19kB    2
+
+829bcebbc9f6 elast  0.58%   1.24GiB / 1.924GiB64.43%2.97kB / 512kB / 729kB    47
+
+# 限制内存使用大小
+docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300  -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms64m -Xmx128m" elasticsearch:7.6.2
 ```
