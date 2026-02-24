@@ -622,12 +622,12 @@
     "scroll": 1884.0833333333333,
     "cursor": {
       "from": {
-        "line": 1907,
-        "ch": 18
+        "line": 1908,
+        "ch": 0
       },
       "to": {
-        "line": 1907,
-        "ch": 18
+        "line": 1908,
+        "ch": 0
       }
     },
     "expandedKeys": [
