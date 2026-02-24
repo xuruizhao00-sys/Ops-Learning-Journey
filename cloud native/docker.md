@@ -594,14 +594,14 @@ Docker 容器的运行机制有一个关键特征：所有容器都运行在宿�
 
 Linux Namespace 隔离类型详情表
 
-|隔离类型|英文全称 / 简称|核心功能|系统调用参数|内核版本|
-|---|---|---|---|---|
-|MNT Namespace|mount|提供磁盘挂载点和文件系统的隔离能力|CLONE_NEWNS|2.4.19|
-|PID Namespace|Process Identification|提供进程隔离能力（容器内进程 ID 独立编号，无法感知宿主机 / 其他容器进程）|CLONE_NEWPID|2.6.24|
-|IPC Namespace|Inter-Process Communication|提供进程间通信的隔离能力，包括信号量、消息队列和共享内存|CLONE_NEWIPC|2.6.19|
-|Net Namespace|network|提供网络隔离能力，包括网络设备、网络栈、端口等|CLONE_NEWNET|2.6.29|
-|UTS Namespace|UNIX Timesharing System|提供内核、主机名和域名的隔离能力|CLONE_NEWUTS|2.6.19|
-|User Namespace|user|提供用户隔离能力，包括用户和用户组的独立映射|CLONE_NEWUSER|3.8|
+| 隔离类型           | 英文全称 / 简称                   | 核心功能                                     | 系统调用参数        | 内核版本   |
+| -------------- | --------------------------- | ---------------------------------------- | ------------- | ------ |
+| MNT Namespace  | mount                       | 提供磁盘挂载点和文件系统的隔离能力                        | CLONE_NEWNS   | 2.4.19 |
+| PID Namespace  | Process Identification      | 提供进程隔离能力（容器内进程 ID 独立编号，无法感知宿主机 / 其他容器进程） | CLONE_NEWPID  | 2.6.24 |
+| IPC Namespace  | Inter-Process Communication | 提供进程间通信的隔离能力，包括信号量、消息队列和共享内存             | CLONE_NEWIPC  | 2.6.19 |
+| Net Namespace  | network                     | 提供网络隔离能力，包括网络设备、网络栈、端口等                  | CLONE_NEWNET  | 2.6.29 |
+| UTS Namespace  | UNIX Timesharing System     | 提供内核、主机名和域名的隔离能力                         | CLONE_NEWUTS  | 2.6.19 |
+| User Namespace | user                        | 提供用户隔离能力，包括用户和用户组的独立映射                   | CLONE_NEWUSER | 3.8    |
 ### 1. MNT Namespace（挂载命名空间）
 
 #### 核心定义
