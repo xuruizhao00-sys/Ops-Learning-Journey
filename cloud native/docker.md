@@ -3140,7 +3140,9 @@ docker rm -f my-container
 # 删除容器及其匿名数据卷
 docker rm -v my-container
 
-# 批量删除所有已停止的容器（结合 docker ps -q）
+# 批量删除容器（结合 docker ps -q）
 docker rm $(docker ps -aq)
 
 ```
+### 4.3.2 `docker container prune`
+**作用**：**批量清理** 所有 **已停止的容器**（一次性删除，无需逐个指定）。
