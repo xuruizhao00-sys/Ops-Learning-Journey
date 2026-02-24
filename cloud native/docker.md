@@ -2296,3 +2296,12 @@ docker run centos fdisk -l /dev/sda
 docker run --privileged centos fdisk -l /dev/sda
 # 输出：Disk /dev/sda: 100 GiB, 107374182400 bytes, 209715200 sectors...
 ```
+
+## 4.2 查看容器信息
+### 4.2.1 查看当前存在的容器
+https://docs.docker.com/engine/reference/commandline/ps/
+
+```python
+
+
+```
