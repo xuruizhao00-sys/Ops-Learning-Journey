@@ -3050,3 +3050,7 @@ Command: tail -f /etc/hosts
 
 ```
 ### 4.2.5 查看容器日志
+docker logs 可以查看容器中运行的进程在控制台的标准输出和标准错误，一般对应是日志信息
+docker 日志是存放在宿主机的 /var/lib/docker/containers/<container_id>/<container_id>-json.log 文件中
+
+
