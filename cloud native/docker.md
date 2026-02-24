@@ -2373,6 +2373,51 @@ docker ps -f  'status=exited'
 ```
 ### 4.2.2 查看容器内的进程
 
+#### 4.2.2.1 `docker top CONTAINER [ps OPTIONS]`
+
+**作用**：查看指定容器内运行的 **进程列表**，类似于在宿主机上执行 `ps` 命令，但仅限于该容器的进程命名空间。
+
+```bash
+docker top <CONTAINER> [ps选项]
+```
+
+> 💡 底层原理：`docker top` 实际上调用的是容器内部的 `ps` 命令（通过 Linux 的 `/proc` 文件系统），因此其输出格式和选项依赖于宿主机的 `ps` 工具（通常是 `procps`）。
+
+#### 4.2.2.2 常用示例
+
+```bash
+# 查看容器 my-nginx 中的所有进程
+docker top my-nginx
+
+# 只显示 PID 和命令（类似 ps -o pid,cmd）
+docker top my-nginx pid,cmd
+
+# 显示完整格式（用户、PID、CPU、内存、启动时间、命令等）
+docker top my-nginx aux
+```
+
+> 📌 注意：`[ps OPTIONS]` 是传递给宿主机 `ps` 命令的参数，例如 `aux`、`-ef`、`-o pid,ppid,cmd` 等。
+
+---
+
+### 🆚 与 `docker stats` 的区别
+
+| 命令 | 用途 |
+|------|------|
+| `docker top` | 查看容器内的 **具体进程**（如 nginx worker、node 进程等） |
+| `docker stats` | 查看容器整体的 **资源使用统计**（CPU%、内存、网络等） |
+
+---
+
+### ⚠️ 注意事项
+
+- 容器必须处于 **运行中（running）** 状态，否则会报错。
+- 输出中的 **PID 是宿主机上的真实 PID**（因为容器共享内核），可通过此 PID 在宿主机进一步排查（如 `kill`、`strace` 等）。
+- 若容器内没有 `ps` 所需的 `/proc` 信息（极简镜像如 `scratch`），可能无法正常工作。
+
+---
+
+你可以将以上内容直接保存到 Obsidian 中，作为 Docker 调试命令的一部分。需要我帮你整合成一张“Docker 容器监控命令速查表”吗？
 
 ### 4.2.3 查看容器资源使用情况
 #### 4.2.3.1 `docker stats` — 实时查看容器资源使用情况
