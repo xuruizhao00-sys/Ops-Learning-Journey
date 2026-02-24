@@ -3111,3 +3111,7 @@ docker logs --tail 20 -f my-app
 - **时间格式**：
   - 支持 RFC3339（如 `2026-02-24T10:30:00Z`）
   - 相对时间单位：`s`（秒）、`m`（分）、`h`（小时）
+## 4.3 删除容器
+https://docs.docker.com/engine/reference/commandline/rm/
+docker rm 可以删除容器，即使容器正在运行当中，也可以被强制删除
+
