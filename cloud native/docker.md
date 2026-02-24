@@ -2302,7 +2302,7 @@ docker run --privileged centos fdisk -l /dev/sda
 `docker ps` 命令
 https://docs.docker.com/engine/reference/commandline/ps/
 
-#### 🐳 `docker ps` / `docker container ls` 常用选项
+#### 4.2.1.1 `docker ps` / `docker container ls` 常用选项
 
 | 选项         | 全称           | 说明                                                                           |
 | ---------- | ------------ | ---------------------------------------------------------------------------- |
@@ -2316,7 +2316,7 @@ https://docs.docker.com/engine/reference/commandline/ps/
 
 ---
 
-#### 💡 常用组合示例
+#### 4.2.1.2 常用组合示例
 
 ```python
 # 仅列出所有容器的 ID（用于批量操作）
@@ -2351,3 +2351,23 @@ c9661a9834da   op                     Exited (255) 10 days ago    openeuler/open
 ---
 
 > ✅ 提示：`docker ps` 是 `docker container ls` 的别名，两者功能完全相同。
+#### 4.2.1.3 案例
+```python
+# 显示正在运行的容器
+docker ps 
+
+# 显示全部的容器，包括退出状态容器
+docker ps --all
+
+# 只显示容器 id
+docker ps -aq
+
+# 显示容器大小
+docker ps -a -s
+
+# 显示最新创建的容器(停止的容器也能显示)
+docker ps -l
+
+# 显示指定状态的容器
+docker ps -f  'status=exited'
+```
