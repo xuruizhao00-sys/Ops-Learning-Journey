@@ -3114,4 +3114,33 @@ docker logs --tail 20 -f my-app
 ## 4.3 删除容器
 https://docs.docker.com/engine/reference/commandline/rm/
 docker rm 可以删除容器，即使容器正在运行当中，也可以被强制删除
+### 4.3.1 `docker rm` / `docker container rm`
+**作用**：删除一个或多个 **已停止的容器**。若容器仍在运行，需加 `-f` 强制删除。
+```python
+docker rm [OPTIONS] CONTAINER [CONTAINER...]
+# 或
+docker container rm [OPTIONS] CONTAINER [CONTAINER...]
+```
+选项说明
 
+|选项|全称|说明|
+|---|---|---|
+|`-f`|`--force`|**强制删除运行中的容器**（先发送 `SIGKILL` 终止进程）|
+|`-v`|`--volumes`|同时删除容器关联的 **匿名卷（anonymous volumes）**  <br>⚠️ 注意：不会删除命名卷（named volumes）|
+
+> 💡 匿名卷：在 `Dockerfile` 中用 `VOLUME` 声明但未指定名称的卷，或运行时未用 `-v name:/path` 挂载的卷。**
+
+```python
+# 删除已停止的容器
+docker rm my-container
+
+# 强制删除正在运行的容器
+docker rm -f my-container
+
+# 删除容器及其匿名数据卷
+docker rm -v my-container
+
+# 批量删除所有已停止的容器（结合 docker ps -q）
+docker rm $(docker ps -aq)
+
+```
