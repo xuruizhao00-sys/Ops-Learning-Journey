@@ -2247,13 +2247,13 @@ Docker 本质是通过 Linux 的 `cgroup`（资源限制）和 `namespace`（资
 #### 4.1.5.3 适用场景（必须用的情况）
 只有当容器需要操作宿主机核心资源时，才需要开启，常见场景：
 
-| 场景 | 示例命令 | 说明 |
-|------|----------|------|
-| 容器内操作宿主机磁盘（如格式化、分区） | `docker run --privileged -v /dev:/dev centos fdisk -l` | 需访问 `/dev/sda` 等磁盘设备 |
-| 容器内修改主机网络（如添加路由、修改 iptables） | `docker run --privileged --net host ubuntu iptables -L` | 需操作主机网络栈 |
+| 场景                             | 示例命令                                                                               | 说明                        |
+| ------------------------------ | ---------------------------------------------------------------------------------- | ------------------------- |
+| 容器内操作宿主机磁盘（如格式化、分区）            | `docker run --privileged -v /dev:/dev centos fdisk -l`                             | 需访问 `/dev/sda` 等磁盘设备      |
+| 容器内修改主机网络（如添加路由、修改 iptables）   | `docker run --privileged --net host ubuntu iptables -L`                            | 需操作主机网络栈                  |
 | 容器内运行 Docker（Docker-in-Docker） | `docker run --privileged -v /var/run/docker.sock:/var/run/docker.sock docker:dind` | 需创建嵌套容器，操作宿主机 Docker 守护进程 |
-| 访问宿主机 USB 设备（如串口、摄像头） | `docker run --privileged -v /dev/ttyUSB0:/dev/ttyUSB0 python` | 需读写 USB 串口设备 |
-| 容器内挂载宿主机文件系统 | `docker run --privileged -v /:/host ubuntu mount /host/sda1 /mnt` | 需挂载主机磁盘分区 |
+| 访问宿主机 USB 设备（如串口、摄像头）          | `docker run --privileged -v /dev/ttyUSB0:/dev/ttyUSB0 python`                      | 需读写 USB 串口设备              |
+| 容器内挂载宿主机文件系统                   | `docker run --privileged -v /:/host ubuntu mount /host/sda1 /mnt`                  | 需挂载主机磁盘分区                 |
 
 #### 4.1.5.4 风险提示（重点！）
 `--privileged` 是**高风险选项**，生产环境需极度谨慎：
