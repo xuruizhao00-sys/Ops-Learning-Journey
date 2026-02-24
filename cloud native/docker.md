@@ -2371,3 +2371,4 @@ docker ps -l
 # 显示指定状态的容器
 docker ps -f  'status=exited'
 ```
+### 4.2.2 查看容器内的进程
