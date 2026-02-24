@@ -2956,3 +2956,97 @@ docker inspect -f '{{.Config.Labels}}' my-image
 > ✅ 提示：`docker inspect` 是排查容器配置、网络、挂载等问题的 **核心命令**，建议熟练掌握 `-f` 模板用法。
 
 #### 4.2.4.5 Docker Inspect Go 模板速查表
+
+> ✅ 用法：`docker inspect -f '{{模板}}' <容器名或ID>`
+
+| 目标信息 | Go 模板 | 示例命令 |
+|--------|--------|--------|
+| **容器名称** | `{{.Name}}` | `docker inspect -f '{{.Name}}' op` → `/op` |
+| **容器短 ID** | `{{.Id}}`（配合 `--no-trunc=false` 无效，需截取） | `docker inspect -f '{{.Id}}' op \| cut -c1-12` |
+| **运行状态** | `{{.State.Status}}` | `running` / `exited` |
+| **是否正在运行** | `{{.State.Running}}` | `true` / `false` |
+| **主进程 PID（宿主机）** | `{{.State.Pid}}` | `8629` |
+| **退出码** | `{{.State.ExitCode}}` | `0`（运行中也为 0） |
+| **启动命令（完整）** | `{{.Config.Cmd}}` | `[tail -f /etc/hosts]` |
+| **镜像标签（用户指定）** | `{{.Config.Image}}` | `openeuler/openeuler:22.03-lts-sp4` |
+| **镜像 SHA256 ID** | `{{.Image}}` | `sha256:b8bd2a...` |
+
+---
+
+##### 🌐 网络相关
+
+| 目标 | Go 模板 | 说明 |
+|------|--------|------|
+| 默认 bridge 网络 IP | `{{.NetworkSettings.Networks.bridge.IPAddress}}` | 最常用 |
+| 所有网络 IP（通用） | `{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}` | 适用于自定义网络 |
+| 网关地址 | `{{.NetworkSettings.Networks.bridge.Gateway}}` | 如 `172.17.0.1` |
+| MAC 地址 | `{{.NetworkSettings.Networks.bridge.MacAddress}}` | 容器虚拟网卡 MAC |
+| 映射的端口 | `{{.NetworkSettings.Ports}}` | 输出类似 `map[80/tcp:[{0.0.0.0 8080}]]` |
+
+> 💡 如果容器连接了自定义网络（如 `my-net`），把 `bridge` 替换为网络名：
+> ```bash
+> docker inspect -f '{{.Networkishments.Networks.my-net.IPAddress}}' my-container
+> ```
+
+---
+
+##### 📁 存储与日志
+
+| 目标 | Go 模板 |
+|------|--------|
+| 日志文件路径 | `{{.LogPath}}` |
+| hosts 文件路径（宿主机） | `{{.HostsPath}}` |
+| resolv.conf 路径 | `{{.ResolvConfPath}}` |
+
+---
+
+##### ⚙️ 资源与配置
+
+| 目标 | Go 模板 |
+|------|--------|
+| 内存限制（字节） | `{{.HostConfig.Memory}}`（0 表示无限制） |
+| CPU 份额 | `{{.HostConfig.CpuShares}}` |
+| 重启策略 | `{{.HostConfig.RestartPolicy.Name}}` |
+| 是否自动删除 | `{{.HostConfig.AutoRemove}}` |
+
+---
+
+##### 🎨 高级技巧：格式化输出（表格）
+
+```bash
+# 自定义表格：名称、状态、IP、镜像
+docker inspect --format 'NAME: {{.Name}} | STATUS: {{.State.Status}} | IP: {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} | IMAGE: {{.Config.Image}}' op
+```
+
+或使用多行 + 表头（适合多个容器）：
+
+```bash
+docker inspect --format 'table {{.Names}}\t{{.State.Status}}\t{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}\t{{.Config.Image}}' $(docker ps -q)
+```
+
+> ⚠️ 注意：`{{.Names}}` 是 `docker inspect` 对数组的特殊处理（实际是 `.Name` 去掉前导 `/`）
+
+更准确的写法（兼容单容器）：
+```bash
+docker inspect --format='table {{.Name | trimPrefix "/"}}\t{{.State.Status}}\t{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}\t{{.Config.Image}}' op
+```
+
+---
+
+##### 🔍 实用函数（Go 模板内置）
+
+| 函数 | 作用 | 示例 |
+|------|------|------|
+| `trimPrefix "/"` | 去掉容器名前的 `/` | `{{.Name | trimPrefix "/"}}` → `op` |
+| `join .Config.Cmd " "` | 将命令数组转为字符串 | `tail -f /etc/hosts` |
+| `printf "%.2f" ...` | 格式化数字（需配合数值字段） | — |
+
+示例：显示完整启动命令
+```bash
+docker inspect -f 'Command: {{join .Config.Cmd " "}}' op
+╭─[root@lnxguru] /home/xuruizhao
+╰─➤ docker inspect -f 'Command: {{join .Config.Cmd " "}}' op
+Command: tail -f /etc/hosts
+
+```
+### 4.2.5 查看容器日志
