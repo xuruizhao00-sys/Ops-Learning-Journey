@@ -2480,3 +2480,72 @@ docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300  -e "discovery.type
 ### 4.2.4 查看容器的详细信息
 https://docs.docker.com/engine/reference/commandline/inspect/
 docker inspect 可以查看 docker 各种对象的详细信息,包括:镜像,容器,网络等
+#### 4.2.4.1 `docker inspect [OPTIONS] NAME|ID [NAME|ID...]`
+
+**作用**：返回 Docker 对象（容器、镜像、网络、卷等）的 **底层详细信息**，以 JSON 格式输出。常用于调试、自动化脚本或获取特定字段。
+
+```bash
+docker inspect [OPTIONS] <对象名称或ID>...
+```
+
+支持的对象包括：
+- 容器（Container）
+- 镜像（Image）
+- 网络（Network）
+- 卷（Volume）
+
+---
+
+#### 4.2.4.2 选项说明
+
+| 选项 | 全称 | 说明 |
+|------|------|------|
+| `-f` | `--format string` | 使用 **Go 模板** 提取并格式化输出特定字段（避免解析完整 JSON） |
+| `-s` | `--size` | **仅对容器有效**：在输出中包含容器的磁盘使用大小（可写层 + 日志等） |
+
+> ⚠️ 注意：`-s` 选项在 inspect 镜像、网络等非容器对象时无效。
+
+#### 4.2.4.3 常用示例
+
+##### 4.2.4.3.1 查看容器的 IP 地址
+```bash
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' my-container
+```
+
+##### 4.2.4.3.2 获取容器的镜像 ID 和状态
+```bash
+docker inspect -f 'Image: {{.Image}} Status: {{.State.Status}}' my-container
+```
+
+##### 4.2.4.3.3 查看容器的磁盘使用大小（需加 `-s`）
+```bash
+docker inspect -s my-container
+# 输出中会包含 "SizeRw"（可写层大小）和 "SizeRootFs"（总文件系统大小）
+```
+
+##### 4.2.4.3.4 同时 inspect 多个对象
+```bash
+docker inspect nginx redis mongo
+```
+
+##### 4.2.4.3.5 获取镜像的标签（Labels）
+```bash
+docker inspect -f '{{.Config.Labels}}' my-image
+```
+
+---
+
+#### 4.2.4.4 小技巧
+
+- 使用 `jq` 工具处理完整 JSON 输出（若未使用 `-f`）：
+  ```bash
+  docker inspect my-container | jq '.[0].NetworkSettings.IPAddress'
+  ```
+- Go 模板支持条件、循环等逻辑，例如：
+  ```bash
+  docker inspect -f '{{if .State.Running}}Running{{else}}Stopped{{end}}' my-container
+  ```
+
+---
+
+> ✅ 提示：`docker inspect` 是排查容器配置、网络、挂载等问题的 **核心命令**，建议熟练掌握 `-f` 模板用法。
