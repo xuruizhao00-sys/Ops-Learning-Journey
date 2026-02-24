@@ -3143,6 +3143,35 @@ docker rm -v my-container
 # 批量删除容器（结合 docker ps -q）
 docker rm $(docker ps -aq)
 
+# 删除指定状态的容器
 ```
 ### 4.3.2 `docker container prune`
 **作用**：**批量清理** 所有 **已停止的容器**（一次性删除，无需逐个指定）。
+```python
+docker container prune [OPTIONS]
+```
+
+|选项|全称|说明|
+|---|---|---|
+|`--filter`|—|按条件过滤要删除的容器  <br>• 示例：`--filter "until=24h"`（删除 24 小时前停止的容器）|
+|`-f`|`--force`|**跳过确认提示**，直接删除|
+```python
+# 删除所有已停止的容器（交互式确认）
+docker container prune
+
+# 跳过确认，直接删除
+docker container prune -f
+
+# 删除 1 小时前停止的容器
+docker container prune --filter "until=1h" -f
+```
+
+📌 提示：`prune` 系列命令还有：
+- `docker image prune` → 清理无用镜像
+- `docker volume prune` → 清理无用卷
+- `docker network prune` → 清理无用网络
+- `docker system prune` → 一键清理所有未使用资源（容器、镜像、卷、网络）
+### ⚠️ 注意事项
+- **运行中的容器无法被 `rm` 删除**，除非使用 `-f`。
+- 使用 `-v` 时，**只有匿名卷会被删**，命名卷（如 `my-data:/app/data`）会保留。
+- `prune` **不会删除正在运行的容器**，只处理 **已停止（exited/created）** 的容器。
