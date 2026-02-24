@@ -2484,8 +2484,207 @@ docker inspect 可以查看 docker 各种对象的详细信息,包括:镜像,容
 
 **作用**：返回 Docker 对象（容器、镜像、网络、卷等）的 **底层详细信息**，以 JSON 格式输出。常用于调试、自动化脚本或获取特定字段。
 
-```bash
+```json
 docker inspect [OPTIONS] <对象名称或ID>...
+
+╭─[root@lnxguru] /home/xuruizhao
+╰─➤ docker inspect 9e11
+[
+    {
+        "Id": "9e11f0418e9613dd9c5aff7f91ea66e3c88ba781023048d70ec464bc8af13dff",
+        "Created": "2026-02-24T08:58:19.470426316Z",
+        "Path": "tail",
+        "Args": [
+            "-f",
+            "/etc/hosts"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 8629,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-02-24T08:58:19.761855512Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:b8bd2a5778dc6dc3af97fa983abcbeb675a27ebc50f351db5dfa081034f160ce",
+        "ResolvConfPath": "/var/lib/docker/containers/9e11f0418e9613dd9c5aff7f91ea66e3c88ba781023048d70ec464bc8af13dff/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/9e11f0418e9613dd9c5aff7f91ea66e3c88ba781023048d70ec464bc8af13dff/hostname",
+        "HostsPath": "/var/lib/docker/containers/9e11f0418e9613dd9c5aff7f91ea66e3c88ba781023048d70ec464bc8af13dff/hosts",
+        "LogPath": "/var/lib/docker/containers/9e11f0418e9613dd9c5aff7f91ea66e3c88ba781023048d70ec464bc8af13dff/9e11f0418e9613dd9c5aff7f91ea66e3c88ba781023048d70ec464bc8af13dff-json.log",
+        "Name": "/op",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "bridge",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                31,
+                105
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [],
+        "Config": {
+            "Hostname": "9e11f0418e96",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "tail",
+                "-f",
+                "/etc/hosts"
+            ],
+            "Image": "openeuler/openeuler:22.03-lts-sp4",
+            "Volumes": null,
+            "WorkingDir": "/",
+            "Entrypoint": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "SandboxID": "da5d3a6f0685501d6743f98ef233436b6624dfe3630e742c373d32ddfffcbc0e",
+            "SandboxKey": "/var/run/docker/netns/da5d3a6f0685",
+            "Ports": {},
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "1b54ea9bcc694369a4daf634ffcc251c69c7bdb25a241e072c6ee84d38b787b7",
+                    "EndpointID": "5c1165a92aa88f7227461383f6b2a4e26d14c104df18eedce7f88c4e1bd7b036",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "MacAddress": "c2:4b:3a:0c:16:a0",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:1f64a58588c9a24ab931c66e209ba78c2f1d5b5ef3e5f6f023f1dc26430514ea",
+            "size": 671,
+            "platform": {
+                "architecture": "amd64",
+                "os": "linux"
+            }
+        }
+    }
+]
+
 ```
 
 支持的对象包括：
@@ -2509,12 +2708,17 @@ docker inspect [OPTIONS] <对象名称或ID>...
 
 ##### 4.2.4.3.1 查看容器的 IP 地址
 ```bash
-docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' my-container
+╭─[root@lnxguru] /home/xuruizhao
+╰─➤ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 9e11
+172.17.0.2
+
 ```
 
 ##### 4.2.4.3.2 获取容器的镜像 ID 和状态
 ```bash
-docker inspect -f 'Image: {{.Image}} Status: {{.State.Status}}' my-container
+╭─[root@lnxguru] /home/xuruizhao
+╰─➤ docker inspect -f 'Image: {{.Image}} Status: {{.State.Status}}' 9e11
+Image: sha256:b8bd2a5778dc6dc3af97fa983abcbeb675a27ebc50f351db5dfa081034f160ce Status: running
 ```
 
 ##### 4.2.4.3.3 查看容器的磁盘使用大小（需加 `-s`）
