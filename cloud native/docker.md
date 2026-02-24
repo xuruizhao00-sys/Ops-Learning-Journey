@@ -2483,7 +2483,7 @@ docker inspect 可以查看 docker 各种对象的详细信息,包括:镜像,容
 #### 4.2.4.1 `docker inspect [OPTIONS] NAME|ID [NAME|ID...]`
 
 **作用**：返回 Docker 对象（容器、镜像、网络、卷等）的 **底层详细信息**，以 JSON 格式输出。常用于调试、自动化脚本或获取特定字段。
-
+##### 4.2.4.1.1 docker inspect 输出内容
 ```json
 docker inspect [OPTIONS] <对象名称或ID>...
 
@@ -2687,13 +2687,214 @@ docker inspect [OPTIONS] <对象名称或ID>...
 
 ```
 
+
+
 支持的对象包括：
 - 容器（Container）
 - 镜像（Image）
 - 网络（Network）
 - 卷（Volume）
 
+##### 4.2.4.1.2 docker inspect 输出解析
+`docker inspect` 返回一个 JSON 数组（即使只查一个对象），每个元素代表一个对象（这里是容器）。我们聚焦于这个容器对象的各个部分：
+
+###### 4.2.4.1.2.1 基础信息（Top-level Fields）
+
+```json
+"Id": "9e11f0418e9613dd9c5aff7f91ea66e3c88ba781023048d70ec464bc8af13dff",
+```
+- 容器的完整 ID（64位 SHA256 哈希）
+
+```json
+"Created": "2026-02-24T08:58:19.470426316Z",
+```
+- 容器创建时间（UTC）
+
+```json
+"Path": "tail",
+"Args": ["-f", "/etc/hosts"]
+```
+- 容器启动时执行的命令：`tail -f /etc/hosts`
+- `Path` 是可执行文件，`Args` 是参数
+
+```json
+"Name": "/op"
+```
+- 容器名称（带 `/` 是 Docker 内部命名习惯）
+
 ---
+
+###### 4.2.4.1.2.2 🟢 运行状态（`State`）
+
+```json
+"State": {
+  "Status": "running",        // 当前状态：running, exited, paused 等
+  "Running": true,            // 是否正在运行
+  "Paused": false,            // 是否被暂停
+  "Restarting": false,        // 是否正在重启
+  "OOMKilled": false,         // 是否因内存溢出被杀
+  "Dead": false,              // 是否处于“僵尸”状态（罕见）
+  "Pid": 8629,                // 容器主进程在宿主机上的 PID
+  "ExitCode": 0,              // 退出码（运行中为 0）
+  "StartedAt": "...",         // 启动时间
+  "FinishedAt": "0001..."     // 结束时间（未结束则为零值）
+}
+```
+
+> ✅ **关键点**：`Pid` 可用于在宿主机上调试（如 `kill -9 8629`）
+
+---
+
+###### 4.2.4.1.2.3 🖼️ 镜像信息
+
+```json
+"Image": "sha256:b8bd2a5778dc6dc3af97fa983abcbeb675a27ebc50f351db5dfa081034f160ce"
+```
+- 容器所基于的镜像 ID（完整 sha256）
+
+```json
+"Config": {
+  "Image": "openeuler/openeuler:22.03-lts-sp4"
+}
+```
+- 用户指定的镜像名称（构建/运行时用的标签）
+
+---
+
+###### 4.2.4.1.2.4 📁 文件系统与挂载路径
+
+```json
+"ResolvConfPath": ".../resolv.conf",
+"HostnamePath": ".../hostname",
+"HostsPath": ".../hosts",
+```
+- 容器使用的 DNS、主机名、hosts 文件在宿主机上的路径  
+- Docker 通过 bind mount 将这些文件注入容器
+
+```json
+"LogPath": "...-json.log"
+```
+- 容器日志文件位置（默认 json-file 驱动）
+
+```json
+"Mounts": []
+```
+- 容器挂载的卷或绑定挂载（本例为空）
+
+---
+
+###### 4.2.4.1.2.5 ⚙️ 主机配置（`HostConfig`）
+
+这部分是你运行容器时通过 `docker run` 指定的选项：
+
+```json
+"NetworkMode": "bridge"
+```
+- 网络模式：`bridge`（默认）、`host`、`none`、自定义网络等
+
+```json
+"PortBindings": {}
+```
+- 端口映射（本例未暴露端口）
+
+```json
+"RestartPolicy": { "Name": "no" }
+```
+- 重启策略：`no` / `on-failure` / `always` / `unless-stopped`
+
+```json
+"ShmSize": 67108864
+```
+- `/dev/shm` 大小（64MB，默认值）
+
+```json
+"Privileged": false
+```
+- 是否特权模式（高权限，慎用）
+
+```json
+"MaskedPaths" / "ReadonlyPaths"
+```
+- 安全加固：屏蔽或只读某些敏感路径（防止容器篡改）
+
+---
+
+###### 4.2.4.1.2.6 🔒 安全相关
+
+```json
+"AppArmorProfile": "docker-default"
+```
+- 使用的 AppArmor 安全策略（Linux 特有）
+
+```json
+"Driver": "overlayfs"
+```
+- 存储驱动（OverlayFS 是现代主流）
+
+```json
+"Platform": "linux"
+```
+- 容器运行平台
+
+---
+
+###### 4.2.4.1.2.7 🌐 网络设置（`NetworkSettings`）
+
+```json
+"Networks": {
+  "bridge": {
+    "IPAddress": "172.17.0.2",
+    "Gateway": "172.17.0.1",
+    "MacAddress": "c2:4b:3a:0c:16:a0",
+    "IPPrefixLen": 16
+  }
+}
+```
+- 容器在 `bridge` 网络中的 IP、网关、MAC 地址
+- `172.17.0.0/16` 是 Docker 默认网段
+
+> 💡 可通过此 IP 在宿主机访问容器服务（如果监听了 0.0.0.0）
+
+---
+
+###### 4.2.4.1.2.8 🛠️ 配置细节（`Config`）
+
+```json
+"Cmd": ["tail", "-f", "/etc/hosts"]
+```
+- 最终执行的命令（合并了 `ENTRYPOINT` + `CMD`）
+
+```json
+"Env": ["PATH=..."]
+```
+- 环境变量列表
+
+```json
+"WorkingDir": "/"
+```
+- 工作目录
+
+```json
+"Labels": {}
+```
+- 用户自定义标签（可用于分类、调度等）
+
+---
+
+###### 4.2.4.1.2.9 🗃️ 存储与镜像元数据（`Storage` & `ImageManifestDescriptor`）
+
+```json
+"Storage": { "RootFS": { "Snapshot": { "Name": "overlayfs" } } }
+```
+- 底层文件系统类型（OverlayFS 快照）
+
+```json
+"ImageManifestDescriptor": {
+  "digest": "sha256:1f64a...",
+  "platform": { "architecture": "amd64", "os": "linux" }
+}
+```
+- 镜像的 OCI 清单摘要和平台信息（用于多架构支持）
 
 #### 4.2.4.2 选项说明
 
@@ -2753,3 +2954,5 @@ docker inspect -f '{{.Config.Labels}}' my-image
 ---
 
 > ✅ 提示：`docker inspect` 是排查容器配置、网络、挂载等问题的 **核心命令**，建议熟练掌握 `-f` 模板用法。
+
+#### 4.2.4.5 Docker Inspect Go 模板速查表
