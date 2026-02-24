@@ -2400,7 +2400,7 @@ docker top my-nginx aux
 
 ---
 
-### 🆚 与 `docker stats` 的区别
+#### 4.2.2.3 🆚 与 `docker stats` 的区别
 
 | 命令 | 用途 |
 |------|------|
@@ -2409,15 +2409,11 @@ docker top my-nginx aux
 
 ---
 
-### ⚠️ 注意事项
+#### 4.2.2.4 注意事项
 
 - 容器必须处于 **运行中（running）** 状态，否则会报错。
 - 输出中的 **PID 是宿主机上的真实 PID**（因为容器共享内核），可通过此 PID 在宿主机进一步排查（如 `kill`、`strace` 等）。
 - 若容器内没有 `ps` 所需的 `/proc` 信息（极简镜像如 `scratch`），可能无法正常工作。
-
----
-
-你可以将以上内容直接保存到 Obsidian 中，作为 Docker 调试命令的一部分。需要我帮你整合成一张“Docker 容器监控命令速查表”吗？
 
 ### 4.2.3 查看容器资源使用情况
 #### 4.2.3.1 `docker stats` — 实时查看容器资源使用情况
@@ -2480,3 +2476,7 @@ CONTAINER ID NAME   CPU %   MEM USAGE / LIMIT MEM % NET I/O BLOCK I/O     PI
 # 限制内存使用大小
 docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300  -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms64m -Xmx128m" elasticsearch:7.6.2
 ```
+
+### 4.2.4 查看容器的详细信息
+https://docs.docker.com/engine/reference/commandline/inspect/
+docker inspect 可以查看 docker 各种对象的详细信息,包括:镜像,容器,网络等
