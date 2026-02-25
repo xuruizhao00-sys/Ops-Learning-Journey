@@ -3177,3 +3177,5 @@ docker container prune --filter "until=1h" -f
 - **运行中的容器无法被 `rm` 删除**，除非使用 `-f`。
 - 使用 `-v` 时，**只有匿名卷会被删**，命名卷（如 `my-data:/app/data`）会保留。
 - `prune` **不会删除正在运行的容器**，只处理 **已停止（exited/created）** 的容器。
+
+## 4.4 容器的启动和停止
