@@ -3179,6 +3179,18 @@ docker container prune --filter "until=1h" -f
 - `prune` **不会删除正在运行的容器**，只处理 **已停止（exited/created）** 的容器。
 
 ## 4.4 容器的启动和停止
+```python
+# 批量操作容器
+# 核心就是获取容器的 id 号，通过 docker ps -q 
+docker start $(docker ps -a -q)  
+docker stop $(docker ps -a -q)
+
+# 准备测试容器
+╭─[root@lnxguru] ~
+╰─➤ docker run -d --name ub ubuntu:24.04 tail -f /etc/hosts
+30bee1138c7615e3d8cfde79ca66e9f393f5d09899f71dee0fa1deabfd496057
+
+```
 ### 4.4.1 启动容器 (`start`)
 用于启动一个或多个**已停止**的容器。
 ```bash
@@ -3186,6 +3198,15 @@ docker start <容器ID或名称>
 # 示例
 docker start a1b2c3d4
 docker start my-nginx
+
+╭─[root@lnxguru] ~
+╰─➤ docker start ub 
+ub
+╭─[root@lnxguru] ~
+╰─➤ docker ps -l 
+CONTAINER ID   IMAGE          COMMAND                CREATED              STATUS         PORTS     NAMES
+30bee1138c76   ubuntu:24.04   "tail -f /etc/hosts"   About a minute ago   Up 2 seconds             ub
+
 ```
 *   **注意**：不会创建新容器，仅唤醒已存在的停止状态容器。加上 `-i` 参数可以保持 STDIN 打开（通常用于交互式启动），加上 `-a` 可以附加输出。
 
@@ -3195,6 +3216,15 @@ docker start my-nginx
 docker stop <容器ID或名称>
 # 示例
 docker stop a1b2c3d4
+
+╭─[root@lnxguru] ~
+╰─➤ docker stop ub 
+ub
+╭─[root@lnxguru] ~
+╰─➤ docker ps -l 
+CONTAINER ID   IMAGE          COMMAND                CREATED          STATUS                       PORTS     NAMES
+30bee1138c76   ubuntu:24.04   "tail -f /etc/hosts"   56 seconds ago   Exited (137) 9 seconds ago             ub
+
 ```
 *   **机制**：Docker 会向容器主进程发送 `SIGTERM` 信号，等待容器自行退出。如果默认超时时间（通常10秒）后仍未停止，会强制发送 `SIGKILL` 信号。
 *   **自定义超时**：`docker stop -t 30 <容器ID>` (设置等待时间为30秒)。
@@ -3261,3 +3291,5 @@ Running        --(restart)--> Running (重置进程)
 Running        --(pause)-->  Paused
 Paused         --(unpause)--> Running
 ```
+
+## 4.5 进入容器
