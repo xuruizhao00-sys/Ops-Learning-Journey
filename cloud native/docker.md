@@ -3293,4 +3293,72 @@ Paused         --(unpause)--> Running
 ```
 
 ## 4.5 给正在运行的容器发信号
+### 4.5.1 基本语法
+```bash
+docker kill [OPTIONS] CONTAINER [CONTAINER...]
+```
 
+### 4.5.2 核心选项详解
+
+| 选项 | 简写 | 说明 | 默认值 |
+| :--- | :--- | :--- | :--- |
+| **--signal** | **-s** | 指定要发送给容器主进程的信号名称或编号。 | `KILL` (即 SIGKILL, 信号 9) |
+
+### 4.5.3 常用场景与示例
+
+#### A. 强制立即停止 (默认行为)
+不等待容器清理资源，直接杀死进程。适用于容器无响应或 `docker stop` 超时的情况。
+```bash
+# 发送 SIGKILL (信号 9)，立即终止
+docker kill <容器ID>
+# 等价于
+docker kill -s KILL <容器ID>
+docker kill -s 9 <容器ID>
+```
+
+#### B. 发送自定义信号 (优雅关闭的另一种方式)
+你可以利用 `-s` 参数发送其他信号，让应用程序执行特定的清理逻辑或重新加载配置，而不必完全停止容器（取决于应用如何处理该信号）。
+
+*   **发送 SIGTERM (信号 15)**：
+    通常用于请求程序优雅退出（类似于 `docker stop` 的第一步，但 `kill` 不会在超时后自动升级为 SIGKILL，除非你手动再发一次）。
+    ```bash
+    docker kill -s TERM <容器ID>
+    # 或
+    docker kill -s 15 <容器ID>
+    ```
+
+*   **发送 SIGHUP (信号 1)**：
+    常用于让守护进程重新加载配置文件，而无需重启进程。
+    ```bash
+    docker kill -s HUP <容器ID>
+    ```
+
+*   **发送 SIGQUIT (信号 3)**：
+    某些应用（如 Nginx, Java）收到此信号会进行更详细的堆栈转储或优雅退出。
+    ```bash
+    docker kill -s QUIT <容器ID>
+    ```
+
+#### C. 批量强制停止
+```bash
+# 强制停止多个容器
+docker kill container1 container2 container3
+
+# 强制停止所有正在运行的容器 (慎用)
+docker kill $(docker ps -q)
+```
+
+### 4.5.4 `docker kill` vs `docker stop` 对比
+
+| 特性 | docker stop | docker kill |
+| :--- | :--- | :--- |
+| **默认信号** | `SIGTERM` (15) | `SIGKILL` (9) |
+| **行为机制** | 先发 SIGTERM，等待超时（默认10s）后若未停则发 SIGKILL | 直接发送指定信号（默认 SIGKILL），**无等待时间** |
+| **数据安全性** | 较高，给应用时间保存数据和关闭连接 | 较低，进程立即终止，可能导致数据丢失或文件损坏 |
+| **适用场景** | 正常运维、部署更新、日常关闭 | 容器死锁、无响应、紧急止损、测试异常处理 |
+| **可定制性** | 仅能调整等待时间 (`-t`) | 可任意指定信号类型 (`-s`) |
+
+### 4.5.5 注意事项
+1.  **数据风险**：由于 `docker kill` (默认) 是暴力终止，如果容器内数据库正在写入数据，可能会导致数据文件损坏。生产环境请优先尝试 `docker stop`。
+2.  **信号兼容性**：发送的信号必须是容器内主进程（PID 1）能够识别和处理的。如果主进程忽略了 `SIGTERM`，`docker kill -s TERM` 可能不会停止容器。
+3.  **退出码**：被 `SIGKILL` 杀死的容器，其退出代码（Exit Code）通常为 **137** (128 + 9)。
