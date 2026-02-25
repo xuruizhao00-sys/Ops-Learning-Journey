@@ -3179,3 +3179,85 @@ docker container prune --filter "until=1h" -f
 - `prune` **不会删除正在运行的容器**，只处理 **已停止（exited/created）** 的容器。
 
 ## 4.4 容器的启动和停止
+### 4.4.1 启动容器 (`start`)
+用于启动一个或多个**已停止**的容器。
+```bash
+docker start <容器ID或名称>
+# 示例
+docker start a1b2c3d4
+docker start my-nginx
+```
+*   **注意**：不会创建新容器，仅唤醒已存在的停止状态容器。加上 `-i` 参数可以保持 STDIN 打开（通常用于交互式启动），加上 `-a` 可以附加输出。
+
+### 4.4.2 停止容器 (`stop`)
+用于**优雅地停止**一个或多个运行中的容器。
+```bash
+docker stop <容器ID或名称>
+# 示例
+docker stop a1b2c3d4
+```
+*   **机制**：Docker 会向容器主进程发送 `SIGTERM` 信号，等待容器自行退出。如果默认超时时间（通常10秒）后仍未停止，会强制发送 `SIGKILL` 信号。
+*   **自定义超时**：`docker stop -t 30 <容器ID>` (设置等待时间为30秒)。
+
+### 4.4.3 重启容器 (`restart`)
+用于重启一个或多个容器（相当于先 stop 再 start）。
+```bash
+docker restart <容器ID或名称>
+# 示例
+docker restart a1b2c3d4
+```
+*   **场景**：常用于应用配置更新后需要重载，或者容器出现假死状态时。同样支持 `-t` 参数设置停止时的等待时间。
+
+### 4.4.4 暂停容器 (`pause`)
+用于**挂起**一个或多个运行中容器内的所有进程。
+```bash
+docker pause <容器ID或名称>
+# 示例
+docker pause a1b2c3d4
+```
+*   **机制**：利用 Linux cgroup 的 freezer 功能，冻结容器内所有进程。
+*   **状态**：容器仍在运行，占用内存，但 CPU 时间片被剥夺，进程完全停止执行。网络请求会挂起，不会断开。
+
+### 4.4.5 恢复容器 (`unpause`)
+用于**恢复**一个被暂停的容器。
+```bash
+docker unpause <容器ID或名称>
+# 示例
+docker unpause a1b2c3d4
+```
+*   **效果**：解冻容器内所有进程，容器从暂停的那一刻继续执行。
+
+---
+
+### 💡 补充技巧
+
+#### 批量操作
+你可以一次性对多个容器执行操作，也可以使用通配符（需配合 shell）或过滤命令：
+```bash
+# 批量停止多个指定容器
+docker stop container1 container2 container3
+
+# 停止所有正在运行的容器 (慎用)
+docker stop $(docker ps -q)
+```
+
+#### 查看状态
+在执行这些操作前后，可以使用以下命令确认容器状态：
+```bash
+# 查看所有容器（包括已停止的）
+docker ps -a
+
+# 只查看运行中的容器
+docker ps
+```
+*   `pause` 后的容器在 `docker ps` 中的状态栏会显示为 `Paused`。
+*   `stop` 后的容器在 `docker ps` 中不会显示（除非加 `-a`），其状态为 `Exited`。
+
+#### 状态流转图
+```text
+Created/Exited --(start)--> Running
+Running        --(stop)-->   Exited
+Running        --(restart)--> Running (重置进程)
+Running        --(pause)-->  Paused
+Paused         --(unpause)--> Running
+```
