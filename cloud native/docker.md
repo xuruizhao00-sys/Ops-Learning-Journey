@@ -1145,7 +1145,7 @@ For more examples and ideas, visit:
 
 ##### 7. 查看Docker相关进程树
 通过`pstree -p`确认Docker核心进程（dockerd、containerd）正常运行，且隶属于systemd（PID 1）：
-```bash
+```python
 [root@centos8 ~]# pstree -p
 systemd(1)─┬─NetworkManager(660)─┬─{NetworkManager}(669)
            │                     └─{NetworkManager}(671)
@@ -1204,7 +1204,7 @@ systemd(1)─┬─NetworkManager(660)─┬─{NetworkManager}(669)
 ### 2.1.2 ubuntu 包安装 Docker
 官方文档: https://docs.docker.com/install/linux/docker-ce/ubuntu/
 #### 方式一：安装最新版 Docker-CE
-```bash
+```python
 # Step 1: 更新系统包并安装必要依赖
 sudo apt-get update
 sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
@@ -1223,7 +1223,7 @@ sudo apt-get -y install docker-ce
 ---
 
 #### 方式二：安装指定版本 Docker-CE
-```bash
+```python
 # Step 1: 先执行方式一的 Step 1-3（安装依赖、添加证书和源）
 
 # Step 2: 查看可安装的 Docker-CE 版本列表
@@ -1248,7 +1248,7 @@ sudo apt-get -y install docker-ce=5:24.0.6-1~ubuntu.22.04~jammy docker-ce-cli=5:
 4. **换行符修正**：原命令中部分换行导致的断行（如 `softwareproperties-common`）已修正为正确的 `software-properties-common`，避免执行报错。
 ## 2.2 Docker 相关信息和优化配置
 ### 2.2.1 查看 docker 版本
-```bash
+```python
 ╭─[root@lnxguru] ~
 ╰─➤ docker version
 Client:
@@ -1365,7 +1365,7 @@ docker info
 
 ### 2.2.3 查看 docker0 网卡
 在 docker 安装启动之后，默认会生成一个名称为 docker0 的网卡并且默认IP地址为172.17.0.1的网卡
-```bash
+```python
 ╭─[root@lnxguru] ~
 ╰─➤ ifconfig docker0
 docker0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
@@ -1474,7 +1474,7 @@ docker info | grep -E "Registry Mirrors|Docker Root Dir"
 ### 2.2.5 docker 实现代理功能
 #### 一、问题现象：拉取 k8s 镜像失败
 执行 `docker pull` 拉取 ingress-nginx 镜像时，因网络问题无法连接镜像仓库，报错如下：
-```bash
+```python
 [root@ubuntu2204 ~]# docker pull registry.k8s.io/ingress-nginx/controller:v1.7.1
 Error response from daemon: Head "https://us-west2-docker.pkg.dev/v2/k8s-artifacts-prod/images/ingress-nginx/controller/manifests/v1.7.1": dial tcp 142.251.170.82:443: connect: connection refused
 ```
@@ -2012,7 +2012,7 @@ docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
 仓库主机 FQDN 或 IP[:端口]/项目名(或用户名)/image名字:版本
 ```
 tag 默认为 lastest
-```bash
+```python
 [root@ubuntu1804 ~]#docker images
 
 REPOSITORY         TAG                 IMAGE ID           CREATED            SIZE
