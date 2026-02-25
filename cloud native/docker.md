@@ -3292,4 +3292,5 @@ Running        --(pause)-->  Paused
 Paused         --(unpause)--> Running
 ```
 
-## 4.5 进入容器
+## 4.5 给正在运行的容器发信号
+
