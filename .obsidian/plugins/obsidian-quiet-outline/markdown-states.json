@@ -189,15 +189,15 @@
     ]
   },
   "redis/redis.md": {
-    "scroll": 2895.2133458646617,
+    "scroll": 2446.940789473684,
     "cursor": {
       "from": {
-        "line": 2907,
-        "ch": 59
+        "line": 2461,
+        "ch": 39
       },
       "to": {
-        "line": 2907,
-        "ch": 31
+        "line": 2461,
+        "ch": 39
       }
     },
     "expandedKeys": [
@@ -563,7 +563,7 @@
     "expandedKeys": []
   },
   "cloud native/docker.md": {
-    "scroll": 3368.7708333333335,
+    "scroll": 3466.005672149745,
     "cursor": {
       "from": {
         "line": 3474,
