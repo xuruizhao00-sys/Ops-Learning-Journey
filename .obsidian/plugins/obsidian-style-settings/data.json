@@ -45,5 +45,6 @@
   "Editor@@h1-divider-on": true,
   "Plugin@@colorful-checkbox": true,
   "Editor@@table-width-select": "table-width-obsidian-default",
-  "Editor@@codeblock-style-select": "codeblock-style-dracula"
+  "Editor@@codeblock-style-select": "codeblock-style-dracula",
+  "Editor@@file-line-width": "1200px"
 }

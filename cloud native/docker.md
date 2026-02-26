@@ -901,7 +901,7 @@ Linux Cgroups 的全称是 Linux Control Groups,是 Linux 内核的一个功能.
 如果不对一个容器做任何资源限制，则宿主机会允许其占用无限大的内存空间，有时候会因为代码 bug 程序会一直申请内存，直到把宿主机内存占完，为了避免此类的问题出现，宿主机有必要对容器进行资源分配限制，比如 CPU、内存等
 Cgroups 最主要的作用，就是限制一个进程组能够使用的资源上限，包CPU、内存、磁盘、网络带宽等等。此外，还能够对进程进行优先级设置，资源的计量以及资源的控制(比如:将进程挂起和恢复等操作)。
 Cgroups 在内核层默认已经开启，从 CentOS 和 Ubuntu 不同版本对比，显然内核较新的支持的功能更多。
-```bash
+```python
 ╭─[root@lnxguru] ~
 ╰─➤ grep CGROUP /boot/config-6.14.0-37-generic 
 CONFIG_CGROUPS=y
