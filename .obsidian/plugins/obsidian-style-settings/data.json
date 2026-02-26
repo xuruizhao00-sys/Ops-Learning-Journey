@@ -28,5 +28,22 @@
   "Blue-Topaz-Codebox-Highlight@@code-theme-selection": "code-theme-sublime",
   "blue-topaz-theme@@text-indentation-two-em": false,
   "blue-topaz-theme@@justify-align": true,
-  "blue-topaz-theme@@file-line-width": 60
+  "blue-topaz-theme@@file-line-width": 60,
+  "Components@@tab-autohide": true,
+  "Components@@Ribbon-autohide": true,
+  "Components@@CTA-BTN-enable": true,
+  "Components@@folder-font-bold": true,
+  "Components@@colorful-folder": true,
+  "Components@@outline-enhanced": false,
+  "Appearance-light@@card-layout-open-light": false,
+  "Editor@@line-hover-indicator": true,
+  "Editor@@focus-indicator-list-level": true,
+  "Editor@@focus-indicator-codeblock-line-number": true,
+  "Editor@@editor-grid-background-pattren": false,
+  "Editor@@collapse-icon-restore": false,
+  "Editor@@heading-indicator-off": false,
+  "Editor@@h1-divider-on": true,
+  "Plugin@@colorful-checkbox": true,
+  "Editor@@table-width-select": "table-width-obsidian-default",
+  "Editor@@codeblock-style-select": "codeblock-style-dracula"
 }

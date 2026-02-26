@@ -1054,7 +1054,7 @@ https://mirrors.aliyun.com/docker-ce/linux/static/stable/x86_64/
 
 ##### 2. 解压二进制包
 解压后生成`docker`目录，包含Docker核心组件（如dockerd、docker、runc、containerd等）：
-```bash
+```python
 [root@centos8 ~]# tar xvf docker-19.03.5.tgz 
 docker/
 docker/docker-init
@@ -1114,7 +1114,7 @@ Server: Docker Engine - Community
 
 ##### 6. 运行测试容器验证功能
 通过`hello-world`镜像验证Docker完整运行流程（拉取镜像→创建容器→运行→输出结果）：
-```bash
+```python
 [root@centos8 ~]# docker run hello-world
 Unable to find image 'hello-world:latest' locally
 latest: Pulling from library/hello-world
